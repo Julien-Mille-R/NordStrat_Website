@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= seo?.title || 'Nord Stratégie | Association de jeux de figurines' %></title>
+  <meta name="description" content="<%= seo?.description || '' %>">
+  <meta name="robots" content="<%= seo?.robots || 'index, follow' %>">
+  <% if (seo?.canonicalUrl) { %><link rel="canonical" href="<%= seo.canonicalUrl %>"><% } %>
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
+  <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#2d2520">
+
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="Nord Stratégie">
+  <meta property="og:type" content="<%= seo?.type || 'website' %>">
+  <meta property="og:title" content="<%= seo?.title || 'Nord Stratégie' %>">
+  <meta property="og:description" content="<%= seo?.description || '' %>">
+  <% if (seo?.canonicalUrl) { %><meta property="og:url" content="<%= seo.canonicalUrl %>"><% } %>
+  <% if (seo?.imageUrl) { %><meta property="og:image" content="<%= seo.imageUrl %>"><% } %>
+  <% if (seo?.type === 'article' && seo?.publishedTime) { %><meta property="article:published_time" content="<%= seo.publishedTime %>"><% } %>
+  <% if (seo?.type === 'article' && seo?.modifiedTime) { %><meta property="article:modified_time" content="<%= seo.modifiedTime %>"><% } %>
+
+  <meta name="twitter:card" content="<%= seo?.imageUrl ? 'summary_large_image' : 'summary' %>">
+  <meta name="twitter:title" content="<%= seo?.title || 'Nord Stratégie' %>">
+  <meta name="twitter:description" content="<%= seo?.description || '' %>">
+  <% if (seo?.imageUrl) { %><meta name="twitter:image" content="<%= seo.imageUrl %>"><% } %>
+
+  <% (seo?.structuredData || []).forEach((jsonLd) => { %>
+    <script type="application/ld+json" nonce="<%= cspNonce %>"><%- jsonLd %></script>
+  <% }) %>
+  <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="min-h-screen flex flex-col bg-fantasy-darkest">
+  <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+  <% const navigationPath = typeof currentPath === 'string' ? currentPath : ''; %>
+  <% const linkClass = (active = false) => `px-2 2xl:px-4 py-2 rounded-lg font-medieval border transition-colors ${active ? 'bg-fantasy-brown border-fantasy-gold text-fantasy-gold' : 'border-transparent text-fantasy-gold-light hover:border-fantasy-gold/40 hover:text-fantasy-gold'}`; %>
+
+  <header id="siteHeader" class="fixed top-0 left-0 right-0 z-40 bg-fantasy-dark border-b-2 border-fantasy-gold shadow-fantasy">
+    <div class="absolute inset-0 opacity-5 bg-wood pointer-events-none"></div>
+
+    <nav class="container mx-auto px-4 sm:px-6 py-3 relative z-10" aria-label="Navigation principale">
+      <div class="flex items-center justify-between gap-6">
+        <a href="/" class="flex items-center gap-3 shrink-0 group" aria-label="NordStrat, association de jeux, accueil">
+          <span class="text-3xl text-fantasy-orange group-hover:scale-110 transition-transform" aria-hidden="true">⚔️</span>
+          <span>
+            <span class="block text-2xl sm:text-3xl font-fantasy font-bold text-fantasy-gold group-hover:text-fantasy-orange transition-colors">NordStrat</span>
+            <span class="block text-xs text-fantasy-gold-light -mt-1">Association de jeux</span>
+          </span>
+        </a>
+
+        <div class="hidden xl:flex items-center gap-0 2xl:gap-1">
+          <a href="/" class="<%= linkClass(navigationPath === '/') %>">Accueil</a>
+          <a href="/news" class="<%= linkClass(navigationPath.startsWith('/news')) %>">Actualités</a>
+          <% if (currentUser && typeof publicEventNavigationVisible !== 'undefined' && publicEventNavigationVisible) { %>
+            <a href="/events/assaut-de-bruay" class="<%= linkClass(navigationPath.startsWith('/events/assaut-de-bruay')) %>">Assaut de Bruay</a>
+          <% } %>
+          <a href="/about" class="<%= linkClass(navigationPath === '/about') %>">À propos</a>
+          <% if (currentUser) { %>
+            <span class="px-4 py-2 rounded-lg font-medieval border border-fantasy-gold/15 text-fantasy-gold-light/40 cursor-not-allowed" aria-disabled="true" title="La galerie sera bientôt disponible">Galerie</span>
+            <a href="/booking" class="<%= linkClass(navigationPath.startsWith('/booking')) %>">Réserver une table</a>
+          <% } %>
+          <a href="/contact" class="<%= linkClass(navigationPath.startsWith('/contact')) %>">Contact</a>
+
+          <div class="w-px h-8 bg-fantasy-gold/25 mx-2"></div>
+
+          <div class="relative" data-nav-dropdown>
+            <button type="button" data-dropdown-toggle aria-expanded="false" aria-controls="accountMenu" aria-label="<%= currentUser ? `Ouvrir le menu du compte de ${currentUser.nickname || currentUser.firstname}` : 'Ouvrir les options de connexion et d’inscription' %>" class="px-3 2xl:px-4 py-2 rounded-lg border border-fantasy-gold/35 text-fantasy-gold font-bold hover:bg-fantasy-brown transition-colors inline-flex items-center gap-2">
+              <span aria-hidden="true">♟️</span>
+              <%= currentUser ? (currentUser.nickname || currentUser.firstname) : 'Connexion / Inscription' %>
+              <svg data-dropdown-chevron class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"></path></svg>
+            </button>
+            <div id="accountMenu" data-dropdown-panel class="hidden absolute right-0 top-full mt-2 w-60 p-2 bg-fantasy-dark border border-fantasy-gold/30 rounded-xl shadow-fantasy">
+              <% if (currentUser) { %>
+                <a href="/account" class="block px-4 py-3 rounded-lg text-fantasy-gold-light hover:bg-fantasy-brown hover:text-fantasy-gold">Mon compte</a>
+                <a href="/members/<%= currentUser.id %>" class="block px-4 py-3 rounded-lg text-fantasy-gold-light hover:bg-fantasy-brown hover:text-fantasy-gold">Mon profil public</a>
+                <% if (currentUser.role.name === 'Admin') { %>
+                  <a href="/admindashboard" class="block px-4 py-3 rounded-lg text-fantasy-orange hover:bg-fantasy-brown">Administration</a>
+                <% } %>
+                <div class="my-2 border-t border-fantasy-gold/15"></div>
+                <form method="POST" action="/auth/logout">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button class="w-full px-4 py-3 text-left rounded-lg text-fantasy-gold-light hover:bg-fantasy-red/20 hover:text-white">Déconnexion</button>
+                </form>
+              <% } else { %>
+                <button id="btnConnexion" type="button" class="w-full px-4 py-3 text-left rounded-lg text-fantasy-gold-light hover:bg-fantasy-brown hover:text-fantasy-gold">Connexion</button>
+                <button id="btnInscription" type="button" class="w-full px-4 py-3 text-left rounded-lg text-fantasy-orange hover:bg-fantasy-brown">Créer un compte</button>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <div class="xl:hidden flex items-center gap-2 shrink-0">
+          <a href="/" aria-label="Retour à l’accueil" title="Accueil" <%= navigationPath === '/' ? 'aria-current="page"' : '' %> class="w-11 h-11 flex items-center justify-center rounded-lg border transition-colors <%= navigationPath === '/' ? 'bg-fantasy-brown border-fantasy-gold text-fantasy-gold' : 'border-fantasy-gold/50 text-fantasy-gold hover:bg-fantasy-brown' %>">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 11 9-8 9 8M5 10v10h14V10M9 20v-6h6v6"></path></svg>
+          </a>
+          <button id="mobileMenuToggle" type="button" aria-expanded="false" aria-controls="mobileNavigation" aria-label="Ouvrir le menu" class="w-11 h-11 flex items-center justify-center text-fantasy-gold border border-fantasy-gold/50 rounded-lg hover:bg-fantasy-brown transition-colors">
+            <svg data-menu-open-icon class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <svg data-menu-close-icon class="hidden w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="mobileNavigation" class="hidden xl:hidden mt-3 max-h-[calc(100vh-6rem)] overflow-y-auto p-3 bg-fantasy-darker border border-fantasy-gold/30 rounded-xl shadow-fantasy">
+        <div class="space-y-1">
+          <a href="/news" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath.startsWith('/news') ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">Actualités</a>
+          <% if (currentUser && typeof publicEventNavigationVisible !== 'undefined' && publicEventNavigationVisible) { %>
+            <a href="/events/assaut-de-bruay" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath.startsWith('/events/assaut-de-bruay') ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">Assaut de Bruay</a>
+          <% } %>
+          <a href="/about" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath === '/about' ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">À propos</a>
+          <% if (currentUser) { %>
+            <span class="block px-4 py-3 rounded-lg font-bold text-fantasy-gold-light/40" aria-disabled="true">Galerie <span class="text-xs font-normal">(bientôt disponible)</span></span>
+            <a href="/booking" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath.startsWith('/booking') ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">Réserver une table</a>
+          <% } %>
+          <a href="/contact" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath.startsWith('/contact') ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">Contact</a>
+        </div>
+
+        <div class="mt-3 pt-3 border-t border-fantasy-gold/20">
+          <p class="px-4 pb-2 text-xs uppercase tracking-wider text-fantasy-gold-light/50"><%= currentUser ? 'Mon espace' : 'Connexion / Inscription' %></p>
+          <% if (currentUser) { %>
+            <a href="/account" class="block px-4 py-3 rounded-lg text-fantasy-gold-light hover:bg-fantasy-brown">Mon compte</a>
+            <a href="/members/<%= currentUser.id %>" class="block px-4 py-3 rounded-lg text-fantasy-gold-light hover:bg-fantasy-brown">Mon profil public</a>
+            <% if (currentUser.role.name === 'Admin') { %>
+              <a href="/admindashboard" class="block px-4 py-3 rounded-lg text-fantasy-orange hover:bg-fantasy-brown">Administration</a>
+            <% } %>
+            <form method="POST" action="/auth/logout" class="mt-1">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="w-full px-4 py-3 text-left rounded-lg text-fantasy-gold-light hover:bg-fantasy-red/20 hover:text-white">Déconnexion</button>
+            </form>
+          <% } else { %>
+            <button id="btnConnexionMobile" type="button" class="w-full px-4 py-3 text-left rounded-lg text-fantasy-gold-light hover:bg-fantasy-brown">Connexion</button>
+            <button id="btnInscriptionMobile" type="button" class="w-full px-4 py-3 text-left rounded-lg text-fantasy-orange hover:bg-fantasy-brown">Créer un compte</button>
+          <% } %>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <%- include('./flash-message') %>
+  <main id="main-content" tabindex="-1" class="flex-grow">

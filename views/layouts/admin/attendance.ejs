@@ -1,0 +1,49 @@
+<%- include('../../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-4xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'events' }) %>
+    <h1 class="text-4xl font-fantasy text-fantasy-gold mb-3">Présences</h1>
+    <p class="text-fantasy-gold-light"><%= event.title %></p>
+    <p class="mt-2 mb-8 text-sm text-fantasy-gold-light/65">Tous les joueurs inscrits sont comptabilisés par défaut. Décochez uniquement les joueurs ayant annulé leur présence.</p>
+    <form method="POST" action="/admindashboard/events/<%= event.id %>/attendance" class="space-y-3">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <% event.reservations.forEach((reservation) => { %>
+        <% const membershipStatus = reservation.player.memberships?.[0]?.status || null; %>
+        <% const hasMembershipPriority = ['paid', 'exempted'].includes(membershipStatus); %>
+        <% const playerLabel = reservation.player.nickname || `${reservation.player.firstname} ${reservation.player.lastname}`; %>
+        <div class="flex flex-col md:flex-row md:items-center gap-4 p-4 bg-fantasy-dark border border-fantasy-gold/30 rounded-lg text-fantasy-gold-light">
+          <label class="flex items-center gap-4 flex-grow cursor-pointer">
+            <input type="checkbox" name="attendedPlayerIds" value="<%= reservation.playerId %>" <%= !attendanceByPlayer.has(reservation.playerId) || attendanceByPlayer.get(reservation.playerId) ? 'checked' : '' %>>
+            <span>
+              <span class="block font-bold text-fantasy-gold"><%= playerLabel %></span>
+              <span class="block text-sm">Table <%= reservation.gameTable.tableNumber %> — <%= reservation.gameTable.game.name %></span>
+            </span>
+          </label>
+          <span class="self-start md:self-auto px-3 py-1 rounded-full text-xs font-bold <%= hasMembershipPriority ? 'bg-fantasy-emerald-dark/20 text-fantasy-emerald' : 'bg-fantasy-orange/15 text-fantasy-orange' %>">
+            <%= hasMembershipPriority ? 'Cotisation à jour' : 'Non prioritaire' %>
+          </span>
+          <% if (!hasMembershipPriority) { %>
+            <button
+              type="submit"
+              formaction="/admindashboard/events/<%= event.id %>/reservations/<%= reservation.playerId %>/cancel"
+              formmethod="POST"
+              data-cancel-registration
+              data-player-label="<%= playerLabel %>"
+              data-player-email="<%= reservation.player.email %>"
+              class="self-start md:self-auto px-3 py-2 border border-fantasy-red text-fantasy-gold-light rounded-lg hover:bg-fantasy-red"
+            >
+              Annuler l’inscription
+            </button>
+          <% } %>
+        </div>
+      <% }) %>
+      <div class="flex flex-wrap gap-3 pt-4">
+        <button type="button" id="checkAll" class="px-4 py-2 border border-fantasy-gold text-fantasy-gold rounded">Compter tout le monde</button>
+        <button type="button" id="uncheckAll" class="px-4 py-2 border border-fantasy-gold text-fantasy-gold rounded">Tout décocher</button>
+        <button class="px-4 py-2 bg-fantasy-gold text-fantasy-darkest font-bold rounded">Enregistrer les exceptions</button>
+      </div>
+    </form>
+  </div>
+</section>
+<script src="/js/attendance.js" defer></script>
+<%- include('../../partials/footer') %>

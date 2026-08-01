@@ -1,0 +1,120 @@
+<%- include('../../partials/header') %>
+<section class="pt-28 pb-12 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-7xl">
+    <header class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6">
+      <div>
+        <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">Espace administrateur</p>
+        <h1 class="text-4xl md:text-5xl font-fantasy text-fantasy-gold mt-1">Tableau de bord</h1>
+        <p class="text-fantasy-gold-light mt-2">Bonjour <%= currentUser.nickname || currentUser.firstname %> !</p>
+      </div>
+      <!-- <div class="inline-flex items-center gap-2 self-start lg:self-auto px-4 py-2 bg-fantasy-dark border border-fantasy-gold/25 rounded-full text-sm text-fantasy-gold-light">
+        <span class="w-2 h-2 rounded-full bg-fantasy-emerald"></span>
+        8 rubriques disponibles
+      </div> -->
+    </header>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-5">
+      <a href="/admindashboard/events" class="group min-h-44 p-5 bg-fantasy-dark border-2 border-fantasy-gold/25 rounded-2xl hover:border-fantasy-orange hover:-translate-y-1 transition flex flex-col">
+        <div class="flex items-start justify-between gap-4">
+          <span class="w-11 h-11 rounded-xl bg-fantasy-brown flex items-center justify-center text-2xl" aria-hidden="true">📅</span>
+          <% if (dashboardStats.nextEvent) { %><span class="px-3 py-1 text-xs border border-fantasy-emerald/50 text-fantasy-emerald rounded-full">Planifiée</span><% } %>
+        </div>
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Soirées</h2>
+        <% if (dashboardStats.nextEvent) { %>
+          <p class="text-fantasy-gold-light mt-1">Prochaine : <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(dashboardStats.nextEvent.date) %></p>
+        <% } else { %>
+          <p class="text-fantasy-orange mt-1">Aucune soirée ouverte actuellement.</p>
+        <% } %>
+        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Gérer les soirées →</span>
+      </a>
+
+      <a href="/admindashboard/members" class="group min-h-44 p-5 bg-fantasy-dark border-2 border-fantasy-gold/25 rounded-2xl hover:border-fantasy-orange hover:-translate-y-1 transition flex flex-col">
+        <div class="flex items-start justify-between gap-4">
+          <span class="w-11 h-11 rounded-xl bg-fantasy-brown flex items-center justify-center text-2xl" aria-hidden="true">👥</span>
+          <span class="text-3xl font-bold text-fantasy-gold"><%= dashboardStats.activeMemberCount %></span>
+        </div>
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Membres</h2>
+        <p class="text-fantasy-gold-light mt-1"><%= dashboardStats.activeMemberCount %> compte<%= dashboardStats.activeMemberCount > 1 ? 's' : '' %> actif<%= dashboardStats.activeMemberCount > 1 ? 's' : '' %>.</p>
+        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Consulter les membres →</span>
+      </a>
+
+      <a href="/admindashboard/memberships" class="group min-h-44 p-5 bg-fantasy-dark border-2 <%= dashboardStats.membershipMissingCount ? 'border-fantasy-red/40 hover:border-fantasy-red' : 'border-fantasy-emerald/30 hover:border-fantasy-emerald' %> rounded-2xl hover:-translate-y-1 transition flex flex-col">
+        <div class="flex items-start justify-between gap-4">
+          <span class="w-11 h-11 rounded-xl bg-fantasy-brown flex items-center justify-center text-2xl" aria-hidden="true">💳</span>
+          <span class="text-3xl font-bold <%= dashboardStats.membershipMissingCount ? 'text-fantasy-red' : 'text-fantasy-emerald' %>"><%= dashboardStats.membershipMissingCount %></span>
+        </div>
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Cotisations</h2>
+        <p class="text-fantasy-gold-light mt-1"><%= dashboardStats.membershipMissingCount %> à régulariser — saison <%= dashboardStats.membershipSeason %>.</p>
+        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Ouvrir le suivi →</span>
+      </a>
+
+      <a href="/admindashboard/inbox" class="group min-h-44 p-5 bg-fantasy-dark border-2 <%= dashboardStats.unreadMessageCount ? 'border-fantasy-orange/60' : 'border-fantasy-gold/25' %> rounded-2xl hover:border-fantasy-orange hover:-translate-y-1 transition flex flex-col">
+        <div class="flex items-start justify-between gap-4">
+          <span class="w-11 h-11 rounded-xl bg-fantasy-brown flex items-center justify-center text-2xl" aria-hidden="true">✉️</span>
+          <% if (dashboardStats.unreadMessageCount) { %>
+            <span class="min-w-10 h-10 px-3 rounded-full bg-fantasy-orange text-fantasy-darkest font-bold flex items-center justify-center"><%= dashboardStats.unreadMessageCount %></span>
+          <% } else { %>
+            <span class="text-sm text-fantasy-emerald">À jour</span>
+          <% } %>
+        </div>
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Messagerie</h2>
+        <p class="text-fantasy-gold-light mt-1"><%= dashboardStats.unreadMessageCount %> message<%= dashboardStats.unreadMessageCount > 1 ? 's' : '' %> non lu<%= dashboardStats.unreadMessageCount > 1 ? 's' : '' %>.</p>
+        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Ouvrir la boîte de réception →</span>
+      </a>
+
+      <a href="/admindashboard/games" class="group min-h-44 p-5 bg-fantasy-dark border-2 border-fantasy-gold/25 rounded-2xl hover:border-fantasy-orange hover:-translate-y-1 transition flex flex-col">
+        <div class="flex items-start justify-between gap-4">
+          <span class="w-11 h-11 rounded-xl bg-fantasy-brown flex items-center justify-center text-2xl" aria-hidden="true">🎲</span>
+          <span class="text-3xl font-bold text-fantasy-gold"><%= dashboardStats.availableGameCount %></span>
+        </div>
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Catalogue des jeux</h2>
+        <p class="text-fantasy-gold-light mt-1"><%= dashboardStats.availableGameCount %> jeu<%= dashboardStats.availableGameCount > 1 ? 'x' : '' %> disponible<%= dashboardStats.availableGameCount > 1 ? 's' : '' %>.</p>
+        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Gérer le catalogue →</span>
+      </a>
+
+      <a href="/admindashboard/archives" class="group min-h-44 p-5 bg-fantasy-dark border-2 border-fantasy-gold/25 rounded-2xl hover:border-fantasy-orange hover:-translate-y-1 transition flex flex-col">
+        <div class="flex items-start justify-between gap-4">
+          <span class="w-11 h-11 rounded-xl bg-fantasy-brown flex items-center justify-center text-2xl" aria-hidden="true">📦</span>
+          <span class="text-3xl font-bold text-fantasy-gold"><%= dashboardStats.archiveCount %></span>
+        </div>
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Archives</h2>
+        <p class="text-fantasy-gold-light mt-1"><%= dashboardStats.archiveCount %> soirée<%= dashboardStats.archiveCount > 1 ? 's' : '' %> archivée<%= dashboardStats.archiveCount > 1 ? 's' : '' %>.</p>
+        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Consulter les archives →</span>
+      </a>
+
+      <a href="/admindashboard/news" class="group min-h-44 p-5 bg-fantasy-dark border-2 border-fantasy-gold/25 rounded-2xl hover:border-fantasy-orange hover:-translate-y-1 transition flex flex-col">
+        <div class="flex items-start justify-between gap-4">
+          <span class="w-11 h-11 rounded-xl bg-fantasy-brown flex items-center justify-center text-2xl" aria-hidden="true">📰</span>
+          <span class="text-3xl font-bold text-fantasy-gold"><%= dashboardStats.newsPostCount %></span>
+        </div>
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Actualités</h2>
+        <p class="text-fantasy-gold-light mt-1"><%= dashboardStats.newsPostCount %> article<%= dashboardStats.newsPostCount > 1 ? 's' : '' %> publié<%= dashboardStats.newsPostCount > 1 ? 's' : '' %>.</p>
+        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Gérer les actualités →</span>
+      </a>
+
+      <a href="/admindashboard/assaut-de-bruay" class="group min-h-44 p-5 bg-fantasy-dark border-2 border-fantasy-gold/25 rounded-2xl hover:border-fantasy-orange hover:-translate-y-1 transition flex flex-col">
+        <div class="flex items-start justify-between gap-4">
+          <span class="w-11 h-11 rounded-xl bg-fantasy-brown flex items-center justify-center text-2xl" aria-hidden="true">🏛️</span>
+          <% if (dashboardStats.newPublicEventApplicationCount) { %>
+            <span class="min-w-10 h-10 px-3 rounded-full bg-fantasy-orange text-fantasy-darkest font-bold flex items-center justify-center"><%= dashboardStats.newPublicEventApplicationCount %></span>
+          <% } %>
+        </div>
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Assaut de Bruay</h2>
+        <p class="text-fantasy-gold-light mt-1"><%= dashboardStats.newPublicEventApplicationCount %> nouvelle<%= dashboardStats.newPublicEventApplicationCount > 1 ? 's' : '' %> inscription<%= dashboardStats.newPublicEventApplicationCount > 1 ? 's' : '' %> à examiner.</p>
+        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Gérer l’Assaut de Bruay →</span>
+      </a>
+
+      <a href="/admindashboard/audit-log" class="group min-h-44 p-5 bg-fantasy-dark border-2 border-fantasy-gold/25 rounded-2xl hover:border-fantasy-orange hover:-translate-y-1 transition flex flex-col">
+        <div class="flex items-start justify-between gap-4">
+          <span class="w-11 h-11 rounded-xl bg-fantasy-brown flex items-center justify-center text-2xl" aria-hidden="true">📋</span>
+          <span class="text-3xl font-bold text-fantasy-gold"><%= dashboardStats.auditLogCount %></span>
+        </div>
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Journal d’activité</h2>
+        <p class="text-fantasy-gold-light mt-1">Consulter l’historique permanent des actions administratives.</p>
+        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Consulter le journal →</span>
+      </a>
+    </div>
+
+  </div>
+</section>
+<%- include('../../partials/footer') %>

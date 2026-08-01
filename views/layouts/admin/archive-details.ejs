@@ -1,0 +1,23 @@
+<%- include('../../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-5xl text-fantasy-gold-light">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'archives' }) %>
+    <h1 class="text-4xl font-fantasy text-fantasy-gold mb-3"><%= archive.snapshot.event.title %></h1>
+    <p class="mb-8"><%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(new Date(archive.snapshot.event.date)) %></p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="p-4 bg-fantasy-dark rounded">Inscrits : <strong><%= archive.snapshot.statistics.registeredPlayers %></strong></div>
+      <div class="p-4 bg-fantasy-dark rounded">Présents : <strong><%= archive.snapshot.statistics.attendanceRecorded ? archive.snapshot.statistics.attendedPlayers : 'non renseigné' %></strong></div>
+      <div class="p-4 bg-fantasy-dark rounded">Tables : <strong><%= archive.snapshot.statistics.tablesUsed %></strong></div>
+      <div class="p-4 bg-fantasy-dark rounded">Jeux : <strong><%= archive.snapshot.statistics.gamesUsed %></strong></div>
+    </div>
+    <div class="space-y-4">
+      <% archive.snapshot.tables.forEach((table) => { %>
+        <article class="p-5 bg-fantasy-dark border border-fantasy-gold/30 rounded-lg">
+          <h2 class="text-xl text-fantasy-gold">Table <%= table.number %> — <%= table.game.name %></h2>
+          <ul class="mt-3"><% table.participants.forEach((player) => { %><li>• <%= player.nickname %><%= player.attended === null ? '' : ` — ${player.attended ? 'présent' : 'absent'}` %></li><% }) %></ul>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

@@ -1,0 +1,132 @@
+<%- include('../partials/header') %>
+
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 sm:px-6 max-w-6xl">
+    <header class="max-w-4xl">
+      <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">À propos de Nord Stratégie</p>
+      <h1 class="mt-3 text-4xl md:text-6xl font-fantasy text-fantasy-gold">Des figurines, des décors et surtout des joueurs</h1>
+      <p class="mt-6 text-lg md:text-xl leading-relaxed text-fantasy-gold-light">
+        Nord Stratégie est née en 2007 d’une envie toute simple : permettre aux passionnés de jeux de figurines de Bruay-sur-l’Escaut et des alentours de se rencontrer et de jouer ensemble. Depuis, nous accueillons toutes les personnes qui souhaitent partager une partie, découvrir un nouvel univers ou simplement discuter du hobby. Nous préparons les tables et les décors. De votre côté, venez avec vos figurines, votre curiosité et l’envie de passer une bonne soirée.
+      </p>
+    </header>
+
+    <section class="mt-14 grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-7 items-stretch">
+      <article class="p-6 sm:p-8 bg-fantasy-dark border-2 border-fantasy-gold/35 rounded-2xl shadow-fantasy">
+        <p class="text-sm uppercase tracking-wider text-fantasy-orange">Notre histoire</p>
+        <h2 class="mt-2 text-3xl font-fantasy text-fantasy-gold">Une aventure commencée en 2007</h2>
+        <p class="mt-5 leading-relaxed text-fantasy-gold-light">
+          L’association a été créée par des passionnés avec l’envie de rassembler les amateurs de jeux de figurines du secteur. Depuis, elle offre un cadre pour organiser des parties, découvrir de nouveaux univers et partager autour du jeu et du modélisme.
+        </p>
+        <p class="mt-4 leading-relaxed text-fantasy-gold-light">
+          Nous mettons à disposition des tables, des décors et du matériel lorsque cela est nécessaire. Vous pouvez donc venir avec une armée et une bonne dose de fair-play ; inutile de transporter une forteresse médiévale dans le coffre.
+        </p>
+      </article>
+
+      <article class="p-6 sm:p-8 bg-fantasy-darker border border-fantasy-orange/40 rounded-2xl">
+        <p class="text-sm uppercase tracking-wider text-fantasy-orange">Notre mission</p>
+        <h2 class="mt-2 text-3xl font-fantasy text-fantasy-gold">Faire découvrir et partager le jeu de figurines</h2>
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 bg-fantasy-dark border border-fantasy-gold/20 rounded-xl">
+            <span class="text-3xl" aria-hidden="true">🧭</span>
+            <h3 class="mt-3 font-bold text-fantasy-gold">Découvrir</h3>
+            <p class="mt-2 text-sm leading-relaxed text-fantasy-gold-light">Accueillir les curieux et présenter les jeux de figurines à toutes et tous.</p>
+          </div>
+          <div class="p-4 bg-fantasy-dark border border-fantasy-gold/20 rounded-xl">
+            <span class="text-3xl" aria-hidden="true">🤝</span>
+            <h3 class="mt-3 font-bold text-fantasy-gold">Se retrouver</h3>
+            <p class="mt-2 text-sm leading-relaxed text-fantasy-gold-light">Trouver des partenaires de jeu et partager sa passion dans un lieu adapté.</p>
+          </div>
+          <div class="p-4 bg-fantasy-dark border border-fantasy-gold/20 rounded-xl">
+            <span class="text-3xl" aria-hidden="true">🏰</span>
+            <h3 class="mt-3 font-bold text-fantasy-gold">Jouer dans de bonnes conditions</h3>
+            <p class="mt-2 text-sm leading-relaxed text-fantasy-gold-light">Profiter de tables, de décors et du matériel disponible selon les besoins.</p>
+          </div>
+          <div class="p-4 bg-fantasy-dark border border-fantasy-gold/20 rounded-xl">
+            <span class="text-3xl" aria-hidden="true">🎨</span>
+            <h3 class="mt-3 font-bold text-fantasy-gold">Transmettre</h3>
+            <p class="mt-2 text-sm leading-relaxed text-fantasy-gold-light">Échanger des conseils de jeu, de peinture, de décors et de modélisme.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="mt-16" aria-labelledby="about-values-title">
+      <div class="max-w-3xl">
+        <p class="text-sm uppercase tracking-wider text-fantasy-orange">L’esprit de l’association</p>
+        <h2 id="about-values-title" class="mt-2 text-3xl md:text-4xl font-fantasy text-fantasy-gold">Nos règles les plus importantes ne tiennent pas dans un livre de 300 pages</h2>
+      </div>
+      <div class="mt-7 grid grid-cols-2 md:grid-cols-5 gap-3">
+        <% [
+          ['😊', 'Convivialité'],
+          ['🎲', 'Fair-play'],
+          ['🫱🏻‍🫲🏼', 'Entraide'],
+          ['💬', 'Partage'],
+          ['✨', 'Bonne humeur']
+        ].forEach(([icon, value]) => { %>
+          <div class="p-4 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl text-center">
+            <span class="text-3xl" aria-hidden="true"><%= icon %></span>
+            <p class="mt-2 font-bold text-fantasy-gold"><%= value %></p>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+
+    <section class="mt-16 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-7 items-start">
+      <article class="p-6 sm:p-8 bg-fantasy-darker border-2 border-fantasy-gold/35 rounded-2xl">
+        <p class="text-sm uppercase tracking-wider text-fantasy-orange">Votre première visite</p>
+        <h2 class="mt-2 text-3xl font-fantasy text-fantasy-gold">Débutants et curieux bienvenus</h2>
+        <p class="mt-5 leading-relaxed text-fantasy-gold-light">
+          Vous pouvez venir à l’improviste pour rencontrer les membres et découvrir les parties en cours, ou préparer votre venue en vous inscrivant à une table depuis le site. Les débutants sont les bienvenus : connaître toutes les règles par cœur n’est pas un prérequis — et, entre nous, même les vétérans ouvrent encore le livre.
+        </p>
+        <div class="mt-6 p-5 bg-fantasy-dark border-l-4 border-fantasy-emerald rounded-r-xl">
+          <h3 class="font-bold text-fantasy-gold">Trois visites pour découvrir librement</h3>
+          <p class="mt-2 leading-relaxed text-fantasy-gold-light">Aucune adhésion n’est demandée pour vos trois premières visites. Prenez le temps de découvrir l’association avant de décider de nous rejoindre.</p>
+        </div>
+        <p class="mt-5 text-sm leading-relaxed text-fantasy-gold-light/75">
+          Les mineurs sont accueillis à condition d’être accompagnés par leur responsable légal.
+        </p>
+        <div class="mt-7 flex flex-col sm:flex-row gap-3">
+          <a href="/booking" class="px-5 py-3 text-center bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange transition-colors">Voir les tables</a>
+          <a href="/contact" class="px-5 py-3 text-center border border-fantasy-gold/50 text-fantasy-gold font-bold rounded-lg hover:bg-fantasy-brown transition-colors">Nous poser une question</a>
+        </div>
+      </article>
+
+      <aside class="p-6 sm:p-8 bg-fantasy-dark border border-fantasy-orange/40 rounded-2xl">
+        <p class="text-sm uppercase tracking-wider text-fantasy-orange">Le bureau</p>
+        <h2 class="mt-2 text-3xl font-fantasy text-fantasy-gold">L’équipe derrière les jets de dés</h2>
+        <dl class="mt-6 divide-y divide-fantasy-gold/15">
+          <% [
+            ['Président', 'BeN'],
+            ['Vice-président', 'Unicorn_Yann'],
+            ['Trésorier', 'Karlus'],
+            ['Trésorier adjoint', 'Eklatax'],
+            ['Secrétaire', 'Morrdred'],
+            ['Secrétaire adjoint', 'Ton_io']
+          ].forEach(([role, name]) => { %>
+            <div class="py-3 flex items-center justify-between gap-4">
+              <dt class="text-fantasy-gold-light"><%= role %></dt>
+              <dd class="font-bold text-fantasy-gold"><%= name %></dd>
+            </div>
+          <% }) %>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="mt-16 p-6 sm:p-9 bg-fantasy-dark border-2 border-fantasy-gold/30 rounded-2xl shadow-fantasy">
+      <p class="text-sm uppercase tracking-wider text-fantasy-orange">Des projets toute l’année</p>
+      <h2 class="mt-2 text-3xl md:text-4xl font-fantasy text-fantasy-gold">Bien plus que nos rendez-vous du vendredi</h2>
+      <p class="mt-5 max-w-4xl leading-relaxed text-fantasy-gold-light">
+        Tout au long de l’année, les membres font vivre l’association en proposant des tournois, des campagnes narratives ainsi que des ateliers de peinture et de modélisme. Nord Stratégie participe également aux événements organisés par les associations partenaires, toujours avec l’envie de jouer, de partager et de faire découvrir le hobby.
+      </p>
+      <p class="mt-4 max-w-4xl leading-relaxed text-fantasy-gold-light">
+        Le grand rendez-vous annuel reste <span class="font-bold text-fantasy-gold">« À l’assaut de Bruay »</span>, notre salon du jeu organisé dans la salle polyvalente de la ville. Cet événement ouvert à tous permet aux joueurs, aux familles et aux simples curieux de découvrir différents univers, de rencontrer des passionnés et de profiter d’une journée entièrement consacrée au jeu.
+      </p>
+      <p class="mt-4 max-w-4xl leading-relaxed text-fantasy-gold-light">
+        Les dates et les prochains projets sont annoncés au fil de l’année dans nos actualités.
+      </p>
+      <a href="/news" class="inline-flex mt-6 text-fantasy-orange font-bold hover:text-fantasy-gold transition-colors">Consulter les actualités →</a>
+    </section>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

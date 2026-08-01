@@ -1,0 +1,111 @@
+<%- include('../../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-7xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'audit-log' }) %>
+
+    <header class="mb-8">
+      <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">Administration</p>
+      <h1 class="text-4xl md:text-5xl font-fantasy text-fantasy-gold mt-1">Journal d’activité</h1>
+      <p class="text-fantasy-gold-light mt-2">
+        Historique permanent des actions administratives. Aucune entrée ne peut être modifiée ou supprimée.
+      </p>
+    </header>
+
+    <form method="GET" action="/admindashboard/audit-log" class="mb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 p-4 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+      <label class="text-sm text-fantasy-gold-light">
+        Rubrique
+        <select name="category" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+          <option value="">Toutes les rubriques</option>
+          <% Object.entries(categoryLabels).forEach(([value, label]) => { %>
+            <option value="<%= value %>" <%= filters.category === value ? 'selected' : '' %>><%= label %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label class="text-sm text-fantasy-gold-light">
+        Action effectuée par
+        <input type="search" name="admin" value="<%= filters.admin %>" maxlength="100" placeholder="Pseudo de l’administrateur" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <label class="text-sm text-fantasy-gold-light">
+        Membre concerné
+        <input type="search" name="targetMember" value="<%= filters.targetMember %>" maxlength="255" placeholder="Pseudo du membre" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <label class="text-sm text-fantasy-gold-light">
+        Nature de l’action
+        <select name="actionType" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+          <option value="">Toutes les actions</option>
+          <% Object.entries(actionFilterLabels).forEach(([value, label]) => { %>
+            <option value="<%= value %>" <%= filters.actionType === value ? 'selected' : '' %>><%= label %></option>
+          <% }) %>
+        </select>
+      </label>
+      <div class="md:col-span-2 xl:col-span-4 flex flex-wrap justify-end gap-2">
+        <button class="px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Filtrer</button>
+        <% if (filters.category || filters.admin || filters.targetMember || filters.actionType) { %>
+          <a href="/admindashboard/audit-log" class="px-4 py-3 border border-fantasy-gold/40 text-fantasy-gold rounded-lg">Effacer</a>
+        <% } %>
+      </div>
+    </form>
+
+    <p class="mb-4 text-sm text-fantasy-gold-light/70">
+      <%= pagination.totalItems %> action<%= pagination.totalItems > 1 ? 's' : '' %> enregistrée<%= pagination.totalItems > 1 ? 's' : '' %>
+    </p>
+
+    <% if (!auditLogs.length) { %>
+      <div class="p-8 text-center bg-fantasy-dark border border-fantasy-gold/25 rounded-xl text-fantasy-gold-light">
+        Aucune action ne correspond aux filtres sélectionnés.
+      </div>
+    <% } else { %>
+      <div class="space-y-2">
+        <% auditLogs.forEach((log) => { %>
+          <article class="px-3 py-3 sm:px-4 bg-fantasy-dark border border-fantasy-gold/25 rounded-lg">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-3">
+              <div class="flex flex-wrap items-center gap-2 min-w-0">
+                <span class="px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-wide bg-fantasy-brown text-fantasy-gold rounded-full"><%= categoryLabels[log.category] %></span>
+                <h2 class="text-base sm:text-lg font-bold text-fantasy-gold"><%= log.actionLabel %></h2>
+              </div>
+              <time datetime="<%= log.createdAt.toISOString() %>" class="shrink-0 text-xs text-fantasy-gold-light/60">
+                <%= new Intl.DateTimeFormat('fr-FR', {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                  timeZone: 'Europe/Paris'
+                }).format(log.createdAt) %>
+              </time>
+            </div>
+
+            <dl class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+              <div class="flex gap-1.5 min-w-0">
+                <dt class="text-fantasy-gold-light/55">Par :</dt>
+                <dd class="font-bold text-fantasy-gold-light break-words"><%= log.adminNickname %></dd>
+              </div>
+              <div class="flex gap-1.5 min-w-0">
+                <dt class="text-fantasy-gold-light/55"><%= log.targetTypeLabel %> :</dt>
+                <dd class="font-bold text-fantasy-orange break-words"><%= log.targetLabel %></dd>
+              </div>
+            </dl>
+
+            <p class="mt-2 pt-2 border-t border-fantasy-gold/15 text-sm text-fantasy-gold-light/85 leading-snug whitespace-pre-line break-words"><%= log.description %></p>
+          </article>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <% if (pagination.totalPages > 1) { %>
+      <% const filterQuery = new URLSearchParams({
+        ...(filters.category ? { category: filters.category } : {}),
+        ...(filters.admin ? { admin: filters.admin } : {}),
+        ...(filters.targetMember ? { targetMember: filters.targetMember } : {}),
+        ...(filters.actionType ? { actionType: filters.actionType } : {})
+      }).toString(); %>
+      <nav aria-label="Pagination du journal" class="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <% if (pagination.page > 1) { %>
+          <a href="/admindashboard/audit-log?page=<%= pagination.page - 1 %><%= filterQuery ? `&${filterQuery}` : '' %>" class="px-4 py-2 border border-fantasy-gold/40 text-fantasy-gold rounded-lg">← Précédent</a>
+        <% } %>
+        <span class="text-fantasy-gold-light">Page <%= pagination.page %> sur <%= pagination.totalPages %></span>
+        <% if (pagination.page < pagination.totalPages) { %>
+          <a href="/admindashboard/audit-log?page=<%= pagination.page + 1 %><%= filterQuery ? `&${filterQuery}` : '' %>" class="px-4 py-2 border border-fantasy-gold/40 text-fantasy-gold rounded-lg">Suivant →</a>
+        <% } %>
+      </nav>
+    <% } %>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

@@ -1,0 +1,71 @@
+<div id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle" aria-hidden="true" class="hidden fixed inset-0 bg-fantasy-darkest/90 backdrop-blur-sm z-50 overflow-y-auto flex items-start md:items-center justify-center p-4">
+  <div data-auth-dialog-content tabindex="-1" class="my-4 md:my-8 bg-fantasy-dark border-3 border-fantasy-gold rounded-xl shadow-fantasy max-w-md md:max-w-3xl w-full relative">
+    <button id="closeModal" type="button" aria-label="Fermer" class="absolute top-3 right-4 text-fantasy-gold hover:text-fantasy-orange text-2xl font-bold">✕</button>
+
+    <div class="text-center pt-6 md:pt-4 px-6 pb-3">
+      <div class="text-3xl mb-1" aria-hidden="true">⚔️</div>
+      <h2 id="authModalTitle" class="text-2xl md:text-3xl font-fantasy font-bold text-fantasy-gold">Bienvenue !</h2>
+      <p class="text-fantasy-gold-light text-sm mt-1">Rejoignez Nord Stratégie</p>
+    </div>
+
+    <div class="flex border-b-2 border-fantasy-gold/30 px-6" role="tablist" aria-label="Accès au compte">
+      <button id="tabConnexion" type="button" role="tab" aria-selected="true" aria-controls="contentConnexion" tabindex="0" class="flex-1 py-2.5 font-fantasy font-bold text-lg border-b-3 border-fantasy-gold text-fantasy-gold bg-fantasy-brown/50 transition-all">Connexion</button>
+      <button id="tabInscription" type="button" role="tab" aria-selected="false" aria-controls="contentInscription" tabindex="-1" class="flex-1 py-2.5 font-fantasy font-bold text-lg border-b-3 border-transparent text-fantasy-gold-light bg-fantasy-darkest/30 hover:text-fantasy-gold transition-all">Inscription</button>
+    </div>
+
+    <div id="contentConnexion" role="tabpanel" aria-labelledby="tabConnexion" class="p-5 md:p-4 md:min-h-[22rem]">
+      <form id="formConnexion" method="POST" action="/auth/login" class="w-full max-w-md mx-auto md:pt-10 space-y-4">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label class="block text-fantasy-gold font-semibold">
+          Adresse e-mail
+          <input type="email" id="loginEmail" name="email" required autocomplete="email" class="mt-2 w-full min-h-11 px-4 py-3 rounded-lg bg-fantasy-brown border-2 border-fantasy-gold/30 text-fantasy-gold-light focus:border-fantasy-gold focus:outline-none" placeholder="votre@email.com">
+        </label>
+        <label class="block text-fantasy-gold font-semibold">
+          Mot de passe
+          <input type="password" id="loginPassword" name="password" required autocomplete="current-password" class="mt-2 w-full min-h-11 px-4 py-3 rounded-lg bg-fantasy-brown border-2 border-fantasy-gold/30 text-fantasy-gold-light focus:border-fantasy-gold focus:outline-none" placeholder="••••••••">
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer text-sm text-fantasy-gold-light">
+          <input type="checkbox" name="rememberMe" class="w-4 h-4 rounded border-fantasy-gold">
+          Se souvenir de moi
+        </label>
+        <button type="submit" data-loading-text="Connexion en cours…" class="w-full px-4 py-3 rounded-lg bg-fantasy-gold text-fantasy-darkest font-bold hover:bg-fantasy-orange transition-colors">Se connecter</button>
+      </form>
+    </div>
+
+    <div id="contentInscription" role="tabpanel" aria-labelledby="tabInscription" hidden class="p-5 md:p-4 md:min-h-[22rem]">
+      <form id="formInscription" method="POST" action="/account/register" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-3">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label class="block text-fantasy-gold font-semibold text-sm">
+          Prénom
+          <input type="text" id="registerPrenom" name="firstname" required autocomplete="given-name" class="mt-1 md:mt-1 w-full min-h-11 md:min-h-10 px-3 py-2 md:py-1.5 rounded-lg bg-fantasy-brown border-2 border-fantasy-gold/30 text-fantasy-gold-light focus:border-fantasy-gold focus:outline-none">
+        </label>
+        <label class="block text-fantasy-gold font-semibold text-sm">
+          Nom
+          <input type="text" id="registerNom" name="lastname" required autocomplete="family-name" class="mt-1 w-full min-h-11 md:min-h-10 px-3 py-2 md:py-1.5 rounded-lg bg-fantasy-brown border-2 border-fantasy-gold/30 text-fantasy-gold-light focus:border-fantasy-gold focus:outline-none">
+        </label>
+        <label class="block text-fantasy-gold font-semibold text-sm">
+          Pseudonyme <span class="font-normal text-fantasy-gold-light/60">(facultatif)</span>
+          <input type="text" id="registerNickname" name="nickname" maxlength="50" autocomplete="nickname" class="mt-1 w-full min-h-11 md:min-h-10 px-3 py-2 md:py-1.5 rounded-lg bg-fantasy-brown border-2 border-fantasy-gold/30 text-fantasy-gold-light focus:border-fantasy-gold focus:outline-none">
+        </label>
+        <label class="block text-fantasy-gold font-semibold text-sm">
+          Adresse e-mail
+          <input type="email" id="registerEmail" name="email" required autocomplete="email" class="mt-1 w-full min-h-11 md:min-h-10 px-3 py-2 md:py-1.5 rounded-lg bg-fantasy-brown border-2 border-fantasy-gold/30 text-fantasy-gold-light focus:border-fantasy-gold focus:outline-none">
+        </label>
+        <label class="block text-fantasy-gold font-semibold text-sm">
+          Mot de passe
+          <input type="password" id="registerPassword" name="password" required minlength="10" maxlength="128" autocomplete="new-password" aria-describedby="registerPasswordHelp" class="mt-1 w-full min-h-11 md:min-h-10 px-3 py-2 md:py-1.5 rounded-lg bg-fantasy-brown border-2 border-fantasy-gold/30 text-fantasy-gold-light focus:border-fantasy-gold focus:outline-none">
+          <span id="registerPasswordHelp" class="mt-1 block text-xs text-fantasy-gold-light/75">10 caractères minimum.</span>
+        </label>
+        <label class="block text-fantasy-gold font-semibold text-sm">
+          Confirmer le mot de passe
+          <input type="password" id="registerPasswordConfirm" name="passwordConfirmation" required minlength="10" maxlength="128" autocomplete="new-password" class="mt-1 w-full min-h-11 md:min-h-10 px-3 py-2 md:py-1.5 rounded-lg bg-fantasy-brown border-2 border-fantasy-gold/30 text-fantasy-gold-light focus:border-fantasy-gold focus:outline-none">
+        </label>
+        <label class="md:col-span-2 flex items-start gap-3 p-3 bg-fantasy-brown/50 rounded-lg border-l-3 border-fantasy-orange cursor-pointer">
+          <input type="checkbox" id="acceptCGU" name="acceptTerms" required class="mt-1 w-4 h-4 rounded border-fantasy-gold">
+          <span class="text-fantasy-gold-light text-xs leading-relaxed">J’accepte les <a href="/cgu" class="text-fantasy-orange hover:text-fantasy-gold underline">conditions générales d’utilisation</a> et la politique de confidentialité de l’association.</span>
+        </label>
+        <button type="submit" data-loading-text="Création du compte…" class="md:col-span-2 md:justify-self-center w-full md:max-w-xs px-4 py-2.5 rounded-lg bg-fantasy-gold text-fantasy-darkest font-bold hover:bg-fantasy-orange transition-colors">S’inscrire</button>
+      </form>
+    </div>
+  </div>
+</div>

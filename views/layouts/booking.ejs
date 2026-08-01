@@ -1,0 +1,277 @@
+<%- include('../partials/header') %>
+
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 sm:px-6">
+    <div class="text-center mb-10">
+      <h1 class="text-4xl md:text-5xl font-fantasy font-bold text-fantasy-gold mb-4">Réservation des tables</h1>
+      <% if (event) { %>
+        <% const bookingDateFormatter = new Intl.DateTimeFormat('fr-FR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          timeZone: 'Europe/Paris'
+        }); %>
+        <p class="text-fantasy-gold-light text-lg">
+          Soirée du <%= bookingDateFormatter.format(event.date) %> - Ouverture à 20h30
+        </p>
+        <% if (event.status === 'cancelled') { %>
+          <div class="max-w-3xl mx-auto mt-5 p-5 border-2 border-fantasy-red bg-fantasy-red/10 rounded-xl text-left" role="alert">
+            <p class="text-xl font-bold text-fantasy-red">Soirée annulée</p>
+            <p class="mt-2 text-fantasy-gold-light"><span class="font-bold">Motif :</span> <%= event.cancellationReason %></p>
+            <p class="mt-2 text-sm text-fantasy-gold-light/70">Les tables et inscriptions de cette soirée ont été supprimées. En cas de réouverture, les réservations repartiront de zéro.</p>
+          </div>
+        <% } else { %>
+          <p class="text-fantasy-gold-light/70 text-sm mt-2">
+            Inscriptions jusqu’au <%= bookingDateFormatter.format(event.registrationDeadline) %> - 20h30
+          </p>
+        <% } %>
+      <% } else { %>
+        <p class="text-fantasy-gold-light">Aucune soirée n’est actuellement ouverte aux réservations.</p>
+      <% } %>
+    </div>
+
+    <% const messages = {
+      'table-created': 'Votre table a été créée.',
+      'table-joined': 'Vous avez rejoint la table.',
+      'table-left': 'Vous vous êtes désinscrit de la table.',
+      'attendance-cancelled': 'Votre absence a été enregistrée. Votre place à la table reste réservée.',
+      'attendance-confirmed': 'Votre présence sera de nouveau comptabilisée.',
+      'capacity-updated': 'La capacité de la table a été mise à jour.',
+      'table-updated': 'Les paramètres de la table ont été mis à jour.',
+      'table-closed': 'La table a été fermée.',
+      'table-reopened': 'La table est de nouveau ouverte aux réservations.',
+      'table-cancelled': 'La table a été annulée.'
+    }; %>
+    <% const errors = {
+      'login-required': 'Vous devez être connecté pour effectuer cette action.',
+      'event_not_reservable': 'Les réservations ne sont plus ouvertes.',
+      'player_already_registered': 'Vous êtes déjà inscrit à une table pour cette soirée.',
+      'invalid_game_capacity': 'La capacité choisie n’est pas compatible avec ce jeu.',
+      'no_table_available': 'Aucune table n’est disponible.',
+      'table_unavailable': 'Cette table n’est pas disponible.',
+      'table_full': 'Cette table est complète.',
+      'table_not_found': 'Cette table est introuvable.',
+      'table_already_closed': 'Les inscriptions à cette table sont déjà fermées.',
+      'table_already_open': 'Cette table est déjà ouverte aux réservations.',
+      'reservation_not_found': 'Votre réservation est introuvable.',
+      'event_not_available': 'Cette soirée ne permet plus de modifier votre présence.',
+      'not_table_host': 'Seul l’organisateur peut modifier cette table.'
+    }; %>
+
+    <% if (message && messages[message]) { %>
+      <div class="max-w-3xl mx-auto mb-6 p-4 border border-fantasy-emerald text-fantasy-emerald rounded-lg" role="status" aria-live="polite"><%= messages[message] %></div>
+    <% } %>
+    <% if (error && errors[error]) { %>
+      <div class="max-w-3xl mx-auto mb-6 p-4 border border-fantasy-red text-fantasy-gold-light rounded-lg" role="alert"><%= errors[error] %></div>
+    <% } %>
+
+    <% if (currentUser && !hasMembershipPriority && event && event.status !== 'cancelled') { %>
+      <aside class="max-w-3xl mx-auto mb-8 p-5 bg-fantasy-orange/10 border border-fantasy-orange/60 rounded-xl" role="note">
+        <h2 class="text-lg font-bold text-fantasy-orange">Réservation non prioritaire</h2>
+        <p class="mt-2 leading-relaxed text-fantasy-gold-light">
+          Votre cotisation n’est pas enregistrée comme étant à jour. Vous pouvez réserver normalement, mais en cas de forte affluence, les membres à jour de cotisation restent prioritaires. Un administrateur pourra exceptionnellement libérer votre place et vous contactera directement si cela arrive.
+        </p>
+      </aside>
+    <% } %>
+
+    <div id="bookingWorkspace" class="booking-workspace <%= currentUser ? 'booking-workspace--with-discussions' : 'booking-workspace--single' %>">
+      <div class="space-y-4 min-w-0">
+      <% tableSlots.forEach((slot) => { %>
+        <% const gameTable = slot.gameTable; %>
+        <% const reservations = gameTable?.reservations || []; %>
+        <% const isFull = gameTable && reservations.length >= gameTable.maxPlayers; %>
+        <% const isMyTable = currentReservation && currentReservation.gameTableId === gameTable?.id; %>
+        <% const isHost = currentUser && gameTable && currentUser.id === gameTable.hostPlayerId; %>
+        <% const isAdmin = currentUser?.role?.name === 'Admin'; %>
+        <% const discussion = gameTable ? discussionByTableId.get(gameTable.id) : null; %>
+
+        <article id="table-<%= gameTable?.id || `slot-${slot.number}` %>" class="bg-fantasy-dark border-2 border-fantasy-gold/40 rounded-xl p-4 sm:p-5 shadow-fantasy flex flex-col">
+          <div class="flex justify-between items-start gap-3 mb-4">
+            <h2 class="text-2xl font-fantasy font-bold text-fantasy-gold">Table <%= slot.number %></h2>
+            <% if (slot.isClosed) { %>
+              <span class="text-xs px-2 py-1 rounded bg-fantasy-brown text-fantasy-gold-light">Fermée</span>
+            <% } else if (!slot.enabled) { %>
+              <span class="text-xs px-2 py-1 rounded bg-fantasy-brown text-fantasy-gold-light">Indisponible</span>
+            <% } else if (!gameTable) { %>
+              <span class="text-xs px-2 py-1 rounded bg-fantasy-emerald-dark text-white">Libre</span>
+            <% } else if (isFull) { %>
+              <span class="text-xs px-2 py-1 rounded bg-fantasy-red text-white">Complète</span>
+            <% } else { %>
+              <span class="text-xs px-2 py-1 rounded bg-fantasy-emerald-dark text-white">Ouverte</span>
+            <% } %>
+          </div>
+
+          <% if (gameTable) { %>
+            <div class="flex items-center gap-4 text-fantasy-gold-light mb-4">
+              <div class="w-28 h-20 sm:w-32 sm:h-24 shrink-0 p-2 bg-white/90 border border-fantasy-gold/25 rounded-lg flex items-center justify-center">
+                <% if (gameTable.game.displayImageUrl) { %>
+                  <img src="<%= gameTable.game.displayImageUrl %>" alt="" loading="lazy" class="w-full h-full object-contain">
+                <% } else { %>
+                  <span aria-hidden="true" class="text-3xl text-fantasy-brown">🎲</span>
+                  <span class="sr-only">Aucun logo renseigné</span>
+                <% } %>
+              </div>
+              <div class="min-w-0 space-y-2">
+                <p class="font-bold text-lg break-words"><%= gameTable.game.name %></p>
+                <p><%= reservations.length %> / <%= gameTable.maxPlayers %> joueurs</p>
+                <p class="text-sm">Organisateur :
+                  <% if (gameTable.host.isProfilePublic) { %><a href="/members/<%= gameTable.host.id %>" class="text-fantasy-orange"><%= gameTable.host.nickname || gameTable.host.firstname %></a><% } else { %><%= gameTable.host.nickname || gameTable.host.firstname %><% } %>
+                </p>
+              </div>
+            </div>
+
+            <ul class="space-y-1 text-sm text-fantasy-gold-light/80 mb-5 flex-grow">
+              <% reservations.forEach((reservation) => { %>
+                <li>•
+                  <% if (reservation.player.isProfilePublic) { %><a href="/members/<%= reservation.player.id %>" class="text-fantasy-orange"><%= reservation.player.nickname || reservation.player.firstname %></a><% } else { %><%= reservation.player.nickname || reservation.player.firstname %><% } %><%= reservation.playerId === gameTable.hostPlayerId ? ' (organisateur)' : '' %>
+                </li>
+              <% }) %>
+            </ul>
+
+            <% if (currentUser) { %>
+              <form method="POST" action="/tables/<%= gameTable.id %>/discussion/open" class="mb-3">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button id="tableDiscussionTrigger-<%= gameTable.id %>" aria-controls="tableDiscussion-<%= gameTable.id %>" aria-expanded="<%= openDiscussionId === gameTable.id ? 'true' : 'false' %>" class="w-full min-h-11 px-4 py-2 flex items-center justify-center gap-2 border border-fantasy-gold/40 text-fantasy-gold rounded-lg hover:bg-fantasy-brown transition-colors">
+                  <span>Discussion</span>
+                  <span class="text-sm text-fantasy-gold-light/65">· <%= discussion.totalCount %></span>
+                  <% if (discussion.unreadCount) { %>
+                    <span class="px-2 py-0.5 text-xs font-bold bg-fantasy-orange text-fantasy-darkest rounded-full"><%= discussion.unreadCount %> nouveau<%= discussion.unreadCount > 1 ? 'x' : '' %></span>
+                  <% } %>
+                </button>
+              </form>
+            <% } %>
+
+            <% if (isAdmin) { %>
+              <div class="mb-3 p-3 border border-fantasy-orange/50 bg-fantasy-orange/10 rounded-lg">
+                <p class="text-xs uppercase tracking-wider font-bold text-fantasy-orange">Modération</p>
+                <% if (!slot.isClosed) { %>
+                  <form method="POST" action="/events/<%= event.id %>/tables/<%= slot.number %>/close" class="mt-2" data-confirm="Fermer les inscriptions à la table <%= gameTable.tableNumber %> pour <%= gameTable.game.name %> ? Les joueurs déjà inscrits conserveront leur place.">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button class="w-full min-h-11 px-3 py-2 border border-fantasy-orange text-fantasy-gold-light font-bold rounded-lg hover:bg-fantasy-orange hover:text-fantasy-darkest transition-colors" aria-label="Fermer les inscriptions à la table <%= gameTable.tableNumber %>">Fermer les inscriptions</button>
+                  </form>
+                <% } else { %>
+                  <form method="POST" action="/events/<%= event.id %>/tables/<%= slot.number %>/reopen" class="mt-2" data-confirm="Rouvrir les inscriptions à la table <%= gameTable.tableNumber %> pour <%= gameTable.game.name %> ?">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button class="w-full min-h-11 px-3 py-2 border border-fantasy-emerald text-fantasy-emerald font-bold rounded-lg hover:bg-fantasy-emerald hover:text-fantasy-darkest transition-colors" aria-label="Rouvrir les inscriptions à la table <%= gameTable.tableNumber %>">Rouvrir les inscriptions</button>
+                  </form>
+                <% } %>
+              </div>
+            <% } %>
+
+            <% if (!currentUser) { %>
+              <button type="button" data-open-auth="login" class="w-full px-4 py-2 border border-fantasy-gold text-fantasy-gold rounded-lg">Se connecter pour participer</button>
+            <% } else if (isMyTable) { %>
+              <form method="POST" action="/tables/<%= gameTable.id %>/leave">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="w-full px-4 py-2 border border-fantasy-red text-fantasy-gold-light rounded-lg hover:bg-fantasy-red">Se désinscrire</button>
+              </form>
+              <% if (isHost) { %>
+                <details class="mt-3 text-fantasy-gold-light">
+                  <summary class="cursor-pointer text-sm">Gérer la table</summary>
+                  <form method="POST" action="/tables/<%= gameTable.id %>/update" class="mt-3 space-y-3">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <label class="block text-sm" for="tableGame-<%= gameTable.id %>">Jeu</label>
+                    <select id="tableGame-<%= gameTable.id %>" name="gameId" required class="w-full min-h-11 bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light">
+                      <% if (!games.some((game) => game.id === gameTable.gameId)) { %><option value="<%= gameTable.gameId %>" selected><%= gameTable.game.name %> (indisponible dans le catalogue)</option><% } %>
+                      <% games.forEach((game) => { %><option value="<%= game.id %>" <%= game.id === gameTable.gameId ? 'selected' : '' %>><%= game.name %></option><% }) %>
+                    </select>
+                    <label class="block text-sm" for="tableCapacity-<%= gameTable.id %>">Nombre maximal de joueurs</label>
+                    <input id="tableCapacity-<%= gameTable.id %>" type="number" name="maxPlayers" min="<%= reservations.length %>" max="10" required value="<%= gameTable.maxPlayers %>" class="w-full min-h-11 bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light">
+                    <button class="w-full min-h-11 px-3 py-2 border border-fantasy-gold rounded hover:bg-fantasy-brown">Enregistrer les modifications</button>
+                  </form>
+                  <% if (gameTable.status === 'open' && !isAdmin) { %>
+                    <form method="POST" action="/tables/<%= gameTable.id %>/close" class="mt-2" data-confirm="Fermer les inscriptions à la table <%= gameTable.tableNumber %> ? Les joueurs déjà inscrits conserveront leur place.">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button class="text-sm text-fantasy-gold">Fermer les inscriptions</button>
+                    </form>
+                  <% } %>
+                  <form method="POST" action="/tables/<%= gameTable.id %>/cancel" class="mt-2">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button class="text-sm text-fantasy-red">Annuler la table</button>
+                  </form>
+                </details>
+              <% } %>
+            <% } else if (!currentReservation && gameTable.status === 'open' && !isFull) { %>
+              <form method="POST" action="/tables/<%= gameTable.id %>/join">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="w-full px-4 py-2 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange">Rejoindre</button>
+              </form>
+            <% } else if (currentReservation) { %>
+              <p class="text-sm text-fantasy-gold-light/60 text-center">Vous êtes déjà inscrit à une autre table.</p>
+            <% } %>
+          <% } else if (slot.enabled && event) { %>
+            <div class="flex-grow flex items-center gap-4 text-fantasy-gold-light/60 mb-4">
+              <div id="gamePreview-<%= slot.number %>" data-game-preview class="w-28 h-20 sm:w-32 sm:h-24 shrink-0 p-2 border border-dashed border-fantasy-gold/25 rounded-lg flex items-center justify-center">
+                <img data-game-preview-image src="" alt="" class="hidden w-full h-full object-contain">
+                <span data-game-preview-placeholder aria-hidden="true" class="text-3xl">🎲</span>
+              </div>
+              <p>Aucun jeu réservé</p>
+            </div>
+            <% if (!currentUser) { %>
+              <button type="button" data-open-auth="login" class="w-full px-4 py-2 border border-fantasy-gold text-fantasy-gold rounded-lg">Se connecter pour réserver</button>
+            <% } else if (!currentReservation) { %>
+              <form method="POST" action="/tables/create" class="space-y-3">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="eventId" value="<%= event.id %>">
+                <input type="hidden" name="tableNumber" value="<%= slot.number %>">
+                <label class="block text-sm text-fantasy-gold-light">Jeu
+                  <select name="gameId" required data-game-select aria-controls="gamePreview-<%= slot.number %>" class="mt-1 w-full bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light">
+                    <option value="">Choisir un jeu</option>
+                    <% games.forEach((game) => { %><option value="<%= game.id %>" data-image-url="<%= game.displayImageUrl || '' %>"><%= game.name %></option><% }) %>
+                  </select>
+                </label>
+                <label class="block text-sm text-fantasy-gold-light">Nombre maximal de joueurs
+                  <input type="number" name="maxPlayers" min="1" max="10" required class="mt-1 w-full bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light">
+                </label>
+                <button class="w-full px-4 py-2 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange">Réserver</button>
+              </form>
+            <% } else { %>
+              <p class="text-sm text-fantasy-gold-light/60 text-center">Vous êtes déjà inscrit à une table.</p>
+            <% } %>
+            <% if (isAdmin) { %>
+              <div class="mt-4 p-3 border border-fantasy-orange/50 bg-fantasy-orange/10 rounded-lg">
+                <p class="text-xs uppercase tracking-wider font-bold text-fantasy-orange">Modération</p>
+                <form method="POST" action="/events/<%= event.id %>/tables/<%= slot.number %>/close" class="mt-2" data-confirm="Fermer la table <%= slot.number %> ? Aucun membre ne pourra la réserver.">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button class="w-full min-h-11 px-3 py-2 border border-fantasy-orange text-fantasy-gold-light font-bold rounded-lg hover:bg-fantasy-orange hover:text-fantasy-darkest transition-colors" aria-label="Fermer la table libre <%= slot.number %>">Fermer cette table</button>
+                </form>
+              </div>
+            <% } %>
+          <% } else { %>
+            <div class="flex-grow flex items-center justify-center text-fantasy-gold-light/40"><%= slot.isClosed ? 'Table fermée par l’administration' : 'Non disponible pour cette soirée' %></div>
+            <% if (isAdmin && slot.isClosed && event) { %>
+              <div class="mt-4 p-3 border border-fantasy-orange/50 bg-fantasy-orange/10 rounded-lg">
+                <p class="text-xs uppercase tracking-wider font-bold text-fantasy-orange">Modération</p>
+                <form method="POST" action="/events/<%= event.id %>/tables/<%= slot.number %>/reopen" class="mt-2" data-confirm="Rendre la table <%= slot.number %> de nouveau disponible à la réservation ?">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button class="w-full min-h-11 px-3 py-2 border border-fantasy-emerald text-fantasy-emerald font-bold rounded-lg hover:bg-fantasy-emerald hover:text-fantasy-darkest transition-colors" aria-label="Rouvrir la table libre <%= slot.number %>">Rouvrir cette table</button>
+                </form>
+              </div>
+            <% } %>
+          <% } %>
+        </article>
+
+      <% }) %>
+      </div>
+
+      <% if (currentUser) { %>
+        <aside id="bookingDiscussionRegion" class="booking-discussion-region" aria-label="Discussions des tables">
+          <div class="booking-discussion-placeholder" data-discussion-placeholder>
+            <div aria-hidden="true" class="booking-discussion-placeholder-icon">💬</div>
+            <h2 class="text-2xl font-fantasy font-bold text-fantasy-gold">Discussions des tables</h2>
+            <p class="mt-3 max-w-sm leading-relaxed text-fantasy-gold-light/70">Sélectionnez la discussion d’une table pour consulter les messages et échanger avec les joueurs avant de vous inscrire.</p>
+          </div>
+          <% tableSlots.filter((slot) => slot.gameTable).forEach((slot) => { %>
+            <% const gameTable = slot.gameTable; %>
+            <% const discussion = discussionByTableId.get(gameTable.id); %>
+            <%- include('../partials/table-discussion-panel', { gameTable, discussion }) %>
+          <% }) %>
+        </aside>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<script src="/js/booking-discussions.js" defer></script>
+<script src="/js/booking-game-preview.js" defer></script>
+<%- include('../partials/footer') %>

@@ -1,0 +1,80 @@
+<%- include('../../partials/header') %>
+<section class="pt-28 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'assaut-de-bruay' }) %>
+    <header class="mb-8">
+      <p class="text-sm uppercase tracking-wider text-fantasy-orange">Organisation annuelle</p>
+      <h1 class="mt-2 text-3xl sm:text-4xl font-fantasy text-fantasy-gold">Assaut de Bruay</h1>
+      <p class="mt-2 text-fantasy-gold-light">Configurez la présentation, la période d’inscription et la visibilité de l’événement.</p>
+    </header>
+
+    <section class="mb-8 grid grid-cols-1 min-[360px]:grid-cols-2 lg:grid-cols-5 gap-3">
+      <% [
+        ['Total', summary.total],
+        ['Nouvelles', summary.new],
+        ['Partenaires', summary.partner],
+        ['Vendeurs', summary.vendor],
+        ['Bénévoles', summary.volunteer]
+      ].forEach(([label, value]) => { %>
+        <div class="p-4 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+          <p class="text-sm text-fantasy-gold-light/70"><%= label %></p>
+          <p class="mt-1 text-3xl font-bold text-fantasy-gold"><%= value %></p>
+        </div>
+      <% }) %>
+    </section>
+
+    <div class="mb-8 flex flex-wrap gap-3">
+      <a href="/admindashboard/assaut-de-bruay/applications" class="px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Gérer les inscriptions</a>
+      <% if (publicEvent?.isVisible) { %>
+        <a href="/events/assaut-de-bruay" class="px-5 py-3 border border-fantasy-gold/40 text-fantasy-gold rounded-lg">Voir la page membre</a>
+      <% } %>
+    </div>
+
+    <form method="POST" action="/admindashboard/assaut-de-bruay/save" enctype="multipart/form-data" class="p-4 sm:p-6 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-5 text-fantasy-gold-light">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label class="md:col-span-2">Titre
+        <input name="title" required maxlength="150" value="<%= publicEvent?.title || 'Assaut de Bruay' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <label>Premier jour
+        <input type="date" name="eventDate" required value="<%= publicEvent?.eventDate || '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <label>Dernier jour
+        <input type="date" name="eventEndDate" required value="<%= publicEvent?.eventEndDate || publicEvent?.eventDate || '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <label>Ouverture des inscriptions
+        <input type="date" name="registrationOpenAt" required value="<%= publicEvent?.registrationOpenAt || '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <label>Fermeture des inscriptions
+        <input type="date" name="registrationCloseAt" required value="<%= publicEvent?.registrationCloseAt || '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <label class="md:col-span-2">Présentation
+        <textarea name="description" required minlength="20" maxlength="5000" rows="6" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"><%= publicEvent?.description || 'Le grand rendez-vous annuel tout public de Nord Stratégie.' %></textarea>
+      </label>
+      <div class="md:col-span-2 p-4 bg-fantasy-darkest/45 border border-fantasy-gold/20 rounded-xl">
+        <label class="block">Image panoramique
+          <span class="block mt-1 text-sm text-fantasy-gold-light/60">JPEG, PNG ou WebP, 5 Mo maximum. Une image horizontale est recommandée.</span>
+          <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="mt-3 block w-full min-w-0 text-sm">
+        </label>
+        <% if (publicEvent?.imageUrl) { %>
+          <img src="<%= publicEvent.imageUrl %>" alt="" class="mt-4 w-full max-h-64 object-cover rounded-lg border border-fantasy-gold/25">
+          <label class="mt-3 flex items-center gap-3">
+            <input type="checkbox" name="removeImage">
+            <span>Supprimer l’image actuelle</span>
+          </label>
+        <% } %>
+      </div>
+      <label class="flex items-start gap-3 p-4 bg-fantasy-brown/40 rounded-lg">
+        <input type="checkbox" name="isVisible" <%= publicEvent?.isVisible ? 'checked' : '' %> class="mt-1">
+        <span><strong class="text-fantasy-gold">Afficher la page aux membres</strong><br><span class="text-sm">Le lien apparaît uniquement pour les comptes connectés.</span></span>
+      </label>
+      <label class="flex items-start gap-3 p-4 bg-fantasy-brown/40 rounded-lg">
+        <input type="checkbox" name="applicationsEnabled" <%= publicEvent?.applicationsEnabled ? 'checked' : '' %> class="mt-1">
+        <span><strong class="text-fantasy-gold">Autoriser les inscriptions</strong><br><span class="text-sm">Les dates configurées restent également appliquées.</span></span>
+      </label>
+      <div class="md:col-span-2 flex justify-end">
+        <button class="w-full sm:w-auto px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Enregistrer la configuration</button>
+      </div>
+    </form>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

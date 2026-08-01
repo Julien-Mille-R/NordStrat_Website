@@ -1,0 +1,64 @@
+<%- include('../partials/header') %>
+<% const taskOptions = [
+  ['setup', 'Installation'],
+  ['welcome', 'Accueil du public'],
+  ['refreshments', 'Buvette ou restauration'],
+  ['logistics', 'Aide logistique'],
+  ['game_hosting', 'Animation d’un espace de jeu'],
+  ['exhibitor_support', 'Accompagnement des exposants'],
+  ['communication', 'Photographie ou communication'],
+  ['cleanup', 'Rangement et nettoyage'],
+  ['where_needed', 'Là où il y aura besoin']
+]; %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-3xl">
+    <a href="/account/assaut-de-bruay" class="text-fantasy-orange font-bold">← Mes inscriptions</a>
+    <header class="mt-5 mb-8">
+      <p class="text-sm uppercase tracking-wider text-fantasy-orange">Assaut de Bruay</p>
+      <h1 class="mt-2 text-3xl sm:text-4xl font-fantasy text-fantasy-gold">Modifier ma candidature bénévole</h1>
+      <p class="mt-3 text-fantasy-gold-light">Toute modification replace la candidature dans les nouvelles demandes afin que l’équipe puisse l’examiner à nouveau.</p>
+    </header>
+
+    <form method="POST" action="/account/assaut-de-bruay/applications/<%= application.id %>/edit" data-presence-required class="p-5 sm:p-6 space-y-5 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl text-fantasy-gold-light">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label class="block">Nom de la personne à contacter
+        <input name="contactName" required minlength="2" maxlength="120" autocomplete="name" value="<%= application.contactName %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <label class="block">Téléphone <span class="text-fantasy-gold-light/50">(facultatif)</span>
+        <input type="tel" name="phone" maxlength="30" autocomplete="tel" value="<%= application.phone || '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <fieldset>
+        <legend class="text-fantasy-gold">Jours de présence <span aria-hidden="true" class="text-fantasy-red">*</span></legend>
+        <div class="mt-2 flex flex-wrap gap-4">
+          <label class="flex items-center gap-2"><input type="checkbox" name="presentSaturday" <%= application.presentSaturday ? 'checked' : '' %>> Samedi</label>
+          <label class="flex items-center gap-2"><input type="checkbox" name="presentSunday" <%= application.presentSunday ? 'checked' : '' %>> Dimanche</label>
+        </div>
+      </fieldset>
+      <label class="block">Nombre total de personnes présentes
+        <input type="number" name="participantCount" required min="1" max="100" value="<%= application.participantCount %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <fieldset>
+        <legend class="text-fantasy-gold">Missions souhaitées</legend>
+        <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <% taskOptions.forEach(([value, label]) => { %>
+            <label class="flex items-start gap-2"><input type="checkbox" name="volunteerTasks" value="<%= value %>" <%= application.volunteerTasks.includes(value) ? 'checked' : '' %> class="mt-1"> <%= label %></label>
+          <% }) %>
+        </div>
+      </fieldset>
+      <label class="block">Disponibilités ou horaires
+        <input name="availability" maxlength="1000" value="<%= application.availability || '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <label class="block">Présentez vos envies, compétences ou contraintes
+        <textarea name="description" required minlength="20" maxlength="5000" rows="5" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"><%= application.description %></textarea>
+      </label>
+      <label class="block">Autres besoins ou remarques <span class="text-fantasy-gold-light/50">(facultatif)</span>
+        <textarea name="needs" maxlength="3000" rows="3" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"><%= application.needs || '' %></textarea>
+      </label>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button class="px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Enregistrer les modifications</button>
+        <a href="/account/assaut-de-bruay" class="px-5 py-3 text-center border border-fantasy-gold/40 text-fantasy-gold font-bold rounded-lg">Annuler</a>
+      </div>
+    </form>
+  </div>
+</section>
+<%- include('../partials/footer') %>

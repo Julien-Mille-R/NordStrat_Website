@@ -1,0 +1,67 @@
+<%- include('../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <div class="grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] gap-8 lg:gap-12 items-start">
+      <aside class="lg:sticky lg:top-28">
+        <p class="text-sm uppercase tracking-wider text-fantasy-orange">Nous contacter</p>
+        <h1 class="text-4xl md:text-5xl font-fantasy text-fantasy-gold mt-2">Une question pour l’association ?</h1>
+        <p class="text-fantasy-gold-light mt-5 leading-relaxed">Utilisez ce formulaire pour nous parler d’une inscription, d’une soirée, d’un jeu ou de toute autre demande. L’équipe pourra vous répondre avec les coordonnées indiquées.</p>
+
+        <div class="mt-7 grid gap-3">
+          <div class="flex gap-4 p-4 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+            <span class="text-2xl" aria-hidden="true">🎲</span>
+            <div>
+              <h2 class="font-bold text-fantasy-gold">Votre première visite</h2>
+              <p class="mt-1 text-sm leading-relaxed text-fantasy-gold-light">Posez vos questions sur l’accueil, le fonctionnement des soirées ou les jeux pratiqués.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 p-4 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+            <span class="text-2xl" aria-hidden="true">⚔️</span>
+            <div>
+              <h2 class="font-bold text-fantasy-gold">Une demande particulière</h2>
+              <p class="mt-1 text-sm leading-relaxed text-fantasy-gold-light">Précisez votre besoin dans le message afin qu’il soit transmis à la bonne personne.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 p-4 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+            <span class="text-2xl" aria-hidden="true">📍</span>
+            <div>
+              <h2 class="font-bold text-fantasy-gold">Nous retrouver</h2>
+              <p class="mt-1 text-sm leading-relaxed text-fantasy-gold-light">Salle Musmeaux, rue Émile Zola<br>59860 Bruay-sur-l’Escaut</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <article class="p-5 sm:p-7 bg-fantasy-dark border-2 border-fantasy-gold/40 rounded-2xl shadow-fantasy">
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mb-5">Envoyer un message</h2>
+        <form method="POST" action="/contact" class="space-y-5 text-fantasy-gold-light">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="absolute -left-[10000px]" aria-hidden="true">
+            <label>Site internet<input name="website" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <label class="block">Nom ou pseudonyme
+            <input name="authorName" required minlength="2" maxlength="100" autocomplete="name" value="<%= currentUser ? (currentUser.nickname || `${currentUser.firstname} ${currentUser.lastname}`) : '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label class="block">Adresse e-mail
+              <input type="email" name="email" required maxlength="255" autocomplete="email" value="<%= currentUser?.email || '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+            </label>
+            <label class="block">Téléphone <span class="text-fantasy-gold-light/75">(facultatif)</span>
+              <input type="tel" name="phone" minlength="6" maxlength="30" autocomplete="tel" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+            </label>
+          </div>
+          <label class="block">Objet
+            <input name="subject" required minlength="3" maxlength="150" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+          </label>
+          <label class="block">Message
+            <textarea id="contactMessage" name="message" required minlength="20" maxlength="5000" rows="8" aria-describedby="contactMessageHelp" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg" placeholder="Décrivez votre demande…"></textarea>
+            <span id="contactMessageHelp" class="block mt-1 text-xs text-fantasy-gold-light/75">Entre 20 et 5 000 caractères.</span>
+          </label>
+          <p class="text-xs text-fantasy-gold-light/75">Ces informations sont utilisées uniquement pour traiter votre demande et vous recontacter.</p>
+          <button data-loading-text="Envoi du message…" class="w-full sm:w-auto px-6 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Envoyer le message</button>
+        </form>
+      </article>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

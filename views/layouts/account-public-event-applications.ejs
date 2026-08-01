@@ -1,0 +1,61 @@
+<%- include('../partials/header') %>
+<% const typeLabels = { partner: 'Partenaire', vendor: 'Vendeur', volunteer: 'Bénévole' }; %>
+<% const statusLabels = { new: 'Reçue', reviewing: 'En cours d’étude', accepted: 'Acceptée', waitlisted: 'Liste d’attente', rejected: 'Refusée', withdrawn: 'Candidature retirée' }; %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <a href="/account" class="text-fantasy-orange font-bold">← Mon compte</a>
+    <header class="mt-5 mb-8">
+      <p class="text-sm uppercase tracking-wider text-fantasy-orange">Assaut de Bruay</p>
+      <h1 class="mt-2 text-4xl font-fantasy text-fantasy-gold">Mes inscriptions</h1>
+      <p class="mt-2 text-fantasy-gold-light">Retrouvez ici l’état des demandes envoyées avec votre compte.</p>
+    </header>
+
+    <% if (!applications.length) { %>
+      <div class="p-7 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+        <p class="text-fantasy-gold-light">Vous n’avez encore envoyé aucune demande.</p>
+        <a href="/events/assaut-de-bruay" class="inline-flex mt-4 px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Voir l’Assaut de Bruay</a>
+      </div>
+    <% } else { %>
+      <div class="space-y-4">
+        <% applications.forEach((application) => { %>
+          <article class="p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div>
+                <p class="text-sm uppercase tracking-wider text-fantasy-orange"><%= typeLabels[application.applicationType] %></p>
+                <h2 class="mt-1 text-2xl font-fantasy text-fantasy-gold"><%= application.organizationName || application.publicEvent.title %></h2>
+                <p class="mt-2 text-fantasy-gold-light">Présence : <%= [application.presentSaturday ? 'samedi' : '', application.presentSunday ? 'dimanche' : ''].filter(Boolean).join(' et ') %> · <%= application.participantCount %> personne<%= application.participantCount > 1 ? 's' : '' %></p>
+              </div>
+              <span class="self-start px-3 py-1 bg-fantasy-brown text-fantasy-gold rounded-full"><%= statusLabels[application.status] %></span>
+            </div>
+            <p class="mt-4 text-sm text-fantasy-gold-light/60">Demande envoyée le <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(application.createdAt) %>.</p>
+            <% if (application.applicationType === 'volunteer' && ['new', 'reviewing'].includes(application.status)) { %>
+              <a href="/account/assaut-de-bruay/applications/<%= application.id %>/edit" class="inline-flex mt-4 px-4 py-2 border border-fantasy-gold text-fantasy-gold font-bold rounded-lg">Modifier ma candidature</a>
+            <% } %>
+            <% if (application.applicationType === 'volunteer' && ['new', 'reviewing', 'accepted', 'waitlisted'].includes(application.status)) { %>
+              <details class="mt-4 p-4 border border-fantasy-red/40 rounded-lg">
+                <summary class="cursor-pointer font-bold text-fantasy-red">Annuler ma candidature</summary>
+                <% if (application.status === 'accepted') { %>
+                  <p class="mt-3 text-sm text-fantasy-gold-light">Votre participation a déjà été validée. L’équipe organisatrice sera informée afin de pouvoir réorganiser les missions.</p>
+                <% } %>
+                <form method="POST" action="/account/assaut-de-bruay/applications/<%= application.id %>/withdraw" class="mt-3 space-y-3" data-confirm="Confirmer votre désistement ? Cette candidature ne pourra plus être réactivée depuis votre compte.">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <label class="block text-sm text-fantasy-gold-light">Motif <span class="text-fantasy-gold-light/50">(facultatif)</span>
+                    <textarea name="withdrawalReason" maxlength="1000" rows="3" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg" placeholder="Une précision utile pour l’organisation…"></textarea>
+                  </label>
+                  <button class="px-4 py-2 bg-fantasy-red text-white font-bold rounded-lg">Confirmer mon désistement</button>
+                </form>
+              </details>
+            <% } %>
+            <% if (application.status === 'withdrawn') { %>
+              <p class="mt-4 text-sm text-fantasy-gold-light">
+                Désistement enregistré le <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(application.withdrawnAt) %>.
+              </p>
+              <% if (application.withdrawalReason) { %><p class="mt-2 text-sm whitespace-pre-line text-fantasy-gold-light/70"><strong>Motif :</strong> <%= application.withdrawalReason %></p><% } %>
+            <% } %>
+          </article>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+<%- include('../partials/footer') %>

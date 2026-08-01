@@ -1,0 +1,20 @@
+<%- include('../../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'archives' }) %>
+    <h1 class="text-4xl font-fantasy text-fantasy-gold mb-8">Archives des réservations</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <% archives.forEach((archive) => { %>
+        <article class="p-5 bg-fantasy-dark border border-fantasy-gold/30 rounded-lg text-fantasy-gold-light">
+          <h2 class="text-xl text-fantasy-gold"><%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full', timeZone: 'Europe/Paris' }).format(archive.eventDate) %></h2>
+          <p class="mt-2"><%= archive.snapshot.statistics.registeredPlayers %> inscrits — <%= archive.snapshot.statistics.attendanceRecorded ? `${archive.snapshot.statistics.attendedPlayers} présents` : 'présences non renseignées' %></p>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 mt-4">
+            <a class="text-fantasy-orange" href="/admindashboard/archives/<%= archive.id %>">Consulter</a>
+            <a class="text-fantasy-orange" href="/admindashboard/archives/<%= archive.id %>/download">Télécharger le JSON</a>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

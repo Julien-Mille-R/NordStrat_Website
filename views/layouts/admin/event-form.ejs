@@ -1,0 +1,18 @@
+<%- include('../../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-2xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'events' }) %>
+    <h1 class="text-4xl font-fantasy text-fantasy-gold mb-8"><%= event ? 'Modifier la soirée' : 'Créer une soirée' %></h1>
+    <form method="POST" action="<%= event ? `/admindashboard/events/${event.id}/update` : '/admindashboard/events/create' %>" class="space-y-5 text-fantasy-gold-light">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label class="block">Titre<input name="title" required value="<%= event?.title || '' %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
+      <label class="block">Date<input type="datetime-local" name="date" required value="<%= event ? new Date(event.date.getTime() - event.date.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '' %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
+      <label class="block">Fin des inscriptions<input type="datetime-local" name="registrationDeadline" required value="<%= event ? new Date(event.registrationDeadline.getTime() - event.registrationDeadline.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '' %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
+      <label class="block">Nombre de tables<input type="number" name="maxTable" min="1" max="8" value="<%= event?.maxTable || 8 %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
+      <% if (event) { %><label class="block">Statut<select name="status" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"><% ['upcoming', 'ongoing', 'completed'].forEach((status) => { %><option value="<%= status %>" <%= event.status === status ? 'selected' : '' %>><%= status %></option><% }) %></select></label><% } %>
+      <label class="flex gap-2"><input type="checkbox" name="reservable" <%= !event || event.reservable ? 'checked' : '' %>> Réservations ouvertes</label>
+      <button class="px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded">Enregistrer</button>
+    </form>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

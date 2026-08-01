@@ -1,0 +1,396 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 6 /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 4281 >>
+stream
+0.97 0.94 0.89 rg 0 0 595 842 re f
+0.72 0.53 0.32 rg 0 690 595 152 re f
+BT /F2 12 Tf 1 1 1 rg 1 0 0 1 54 788 Tm (NORD STRATÉGIE) Tj ET
+BT /F2 28 Tf 1 1 1 rg 1 0 0 1 54 744 Tm (État des lieux du projet) Tj ET
+BT /F1 14 Tf 1 1 1 rg 1 0 0 1 54 713 Tm (SEO · Sécurité · CI/CD · Fonctionnalités) Tj ET
+BT /F2 17 Tf 0.45 0.25 0.10 rg 1 0 0 1 54 655 Tm (Rapport synthétique) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 627 Tm (Analyse du projet associatif au 27 juillet 2026, fondée sur le code, les modèles, les) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 612.8 Tm (routes et la configuration présents dans le dépôt.) Tj ET
+0.82 0.69 0.52 RG 54 585.5999999999999 m 541 585.5999999999999 l S
+0.82 0.69 0.52 RG 54 558.5999999999999 m 90 558.5999999999999 l S
+BT /F2 17 Tf 0.38 0.22 0.10 rg 1 0 0 1 54 550.5999999999999 Tm (Synthèse) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 519.5999999999999 Tm (Le projet dispose désormais d’un socle fonctionnel cohérent pour une association locale :) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 505.3999999999999 Tm (présentation publique, actualités, comptes, profils, réservations de tables, cotisations,) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 491.19999999999993 Tm (administration, journal d’activité et gestion de l’Assaut de Bruay. L’architecture Express,) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 476.99999999999994 Tm (EJS, Sequelize et PostgreSQL reste simple à maintenir et correspond bien au choix MVC du) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 462.79999999999995 Tm (projet.) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 441.59999999999997 Tm (Les priorités ne sont plus de multiplier les pages, mais de préparer une mise en production) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 427.4 Tm (fiable. Les efforts les plus rentables concernent le SEO technique, le durcissement HTTP,) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 413.2 Tm (les tests automatisés et la fiabilisation des parcours déjà créés.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 392 Tm (Priorités recommandées) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 366 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 366 Tm (Priorité 1 : durcir la sécurité de production et retirer les documents internes du dossier) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 352.5 Tm (public.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 335 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 335 Tm (Priorité 2 : créer une chaîne de tests et de déploiement reproductible.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 317.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 317.5 Tm (Priorité 3 : rendre chaque page publique identifiable par les moteurs de recherche.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 300 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 300 Tm (Priorité 4 : compléter les notifications, la récupération de compte et le suivi de l’Assaut) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 286.5 Tm (de Bruay.) Tj ET
+0.82 0.69 0.52 RG 54 270 m 90 270 l S
+BT /F2 17 Tf 0.38 0.22 0.10 rg 1 0 0 1 54 262 Tm (SEO) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 231 Tm (État actuel) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 205 Tm (Le site utilise des vues EJS rendues par le serveur. Le contenu principal est donc présent) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 190.8 Tm (directement dans le HTML et ne dépend pas d’un framework JavaScript côté client. C’est une) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 176.60000000000002 Tm (bonne base pour l’indexation, la rapidité d’affichage et l’accessibilité.) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 155.40000000000003 Tm (Les actualités disposent de pages individuelles et la page d’accueil affiche les) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 141.20000000000005 Tm (publications récentes. Le site possède également des pages À propos, Contact et Mentions) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 127.00000000000004 Tm (légales qui renforcent sa légitimité locale.) Tj ET
+BT /F1 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 54 30 Tm (Nord Stratégie  ·  Rapport projet  ·  27 juillet 2026) Tj ET
+BT /F2 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 529 30 Tm (1) Tj ET
+
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 7168 >>
+stream
+0.72 0.53 0.32 RG 54 802 m 541 802 l S
+BT /F2 8 Tf 0.42 0.29 0.18 rg 1 0 0 1 54 811 Tm (NORD STRATÉGIE  ·  ÉTAT DES LIEUX DU PROJET) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 775 Tm (En revanche, toutes les pages utilisent actuellement le même titre « NordStrat -) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 760.8 Tm (Association de jeux ». Aucun système de titre ou de description propre à chaque page n’est) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 746.5999999999999 Tm (visible. Aucun fichier robots.txt, sitemap XML, URL canonique, métadonnée Open Graph ou) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 732.3999999999999 Tm (donnée structurée Schema.org n’a été identifié.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 711.1999999999998 Tm (Risques) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 685.1999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 685.1999999999998 Tm (Les moteurs de recherche distinguent mal les actualités, l’association et les événements.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 667.6999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 667.6999999999998 Tm (Les résultats Google risquent d’utiliser des extraits générés automatiquement et peu) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 654.1999999999998 Tm (attractifs.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 636.6999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 636.6999999999998 Tm (Les partages Facebook ou Discord ne disposent pas d’une image et d’un résumé maîtrisés.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 619.1999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 619.1999999999998 Tm (Les nouvelles actualités sont moins faciles à découvrir sans sitemap.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 601.6999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 601.6999999999998 Tm (Le nom local, Bruay-sur-l’Escaut, n’est pas exploité systématiquement dans les titres et) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 588.1999999999998 Tm (descriptions.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 570.6999999999998 Tm (Améliorations proposées) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 544.6999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 544.6999999999998 Tm (Permettre à chaque contrôleur de transmettre un titre, une description et éventuellement une) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 531.1999999999998 Tm (image sociale à la vue header.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 513.6999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 513.6999999999998 Tm (Ajouter une URL canonique et les métadonnées Open Graph sur les pages publiques.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 496.1999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 496.1999999999998 Tm (Créer robots.txt et un sitemap dynamique contenant les pages publiques et les actualités.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 478.6999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 478.6999999999998 Tm (Ajouter des données Schema.org de type Organization, NewsArticle et Event.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 461.1999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 461.1999999999998 Tm (Utiliser des titres locaux explicites, par exemple « Nord Stratégie, jeux de figurines à) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 447.6999999999998 Tm (Bruay-sur-l’Escaut ».) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 430.1999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 430.1999999999998 Tm (Définir une image sociale par défaut et utiliser l’image de l’article pour les actualités.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 412.6999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 412.6999999999998 Tm (Vérifier la hiérarchie des titres H1, H2 et les textes alternatifs des images.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 395.1999999999998 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 395.1999999999998 Tm (Ajouter Google Search Console ou un équivalent respectueux de la vie privée après la mise en) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 381.6999999999998 Tm (ligne.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 364.1999999999998 Tm (Niveau de priorité) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 338.1999999999998 Tm (Élevé avant l’ouverture publique. Le coût est modéré et le bénéfice est durable, notamment) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 323.99999999999983 Tm (pour les actualités et l’Assaut de Bruay.) Tj ET
+0.82 0.69 0.52 RG 54 303.79999999999984 m 90 303.79999999999984 l S
+BT /F2 17 Tf 0.38 0.22 0.10 rg 1 0 0 1 54 295.79999999999984 Tm (Sécurité) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 264.79999999999984 Tm (Points déjà solides) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 238.79999999999984 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 238.79999999999984 Tm (Mots de passe hachés avec bcrypt et longueur contrôlée.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 221.29999999999984 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 221.29999999999984 Tm (Sessions stockées dans PostgreSQL avec cookies HttpOnly et SameSite.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 203.79999999999984 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 203.79999999999984 Tm (Régénération de la session après authentification.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 186.29999999999984 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 186.29999999999984 Tm (Protection CSRF sur les formulaires.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 168.79999999999984 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 168.79999999999984 Tm (Vérification serveur des rôles et protection globale des routes administratives.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 151.29999999999984 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 151.29999999999984 Tm (Limitation des tentatives de connexion, d’inscription et de contact.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 133.79999999999984 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 133.79999999999984 Tm (Requêtes Sequelize et SQL paramétrées.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 116.29999999999984 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 116.29999999999984 Tm (Contrôle du type, du contenu et de la taille des images.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 98.79999999999984 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 98.79999999999984 Tm (Anonymisation des comptes et protection du dernier administrateur.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 81.29999999999984 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 81.29999999999984 Tm (Journal administratif immuable sans collecte d’adresse IP.) Tj ET
+BT /F1 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 54 30 Tm (Nord Stratégie  ·  Rapport projet  ·  27 juillet 2026) Tj ET
+BT /F2 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 529 30 Tm (2) Tj ET
+
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 6333 >>
+stream
+0.72 0.53 0.32 RG 54 802 m 541 802 l S
+BT /F2 8 Tf 0.42 0.29 0.18 rg 1 0 0 1 54 811 Tm (NORD STRATÉGIE  ·  ÉTAT DES LIEUX DU PROJET) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 775 Tm (Points à améliorer) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 749 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 749 Tm (Helmet n’est pas installé et les principaux en-têtes HTTP de sécurité ne sont pas) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 735.5 Tm (configurés.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 718 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 718 Tm (Express peut encore révéler sa technologie avec X-Powered-By.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 700.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 700.5 Tm (La configuration trust proxy n’est pas définie pour un futur reverse proxy.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 683 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 683 Tm (La vérification de l’adresse e-mail et la réinitialisation du mot de passe sont absentes.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 665.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 665.5 Tm (Les administrateurs ne disposent pas encore d’une authentification renforcée.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 648 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 648 Tm (Les autres sessions ne sont pas invalidées systématiquement après un changement de mot de) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 634.5 Tm (passe ou d’e-mail.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 617 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 617 Tm (Les limiteurs utilisent vraisemblablement la mémoire du processus et seront remis à zéro au) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 603.5 Tm (redémarrage.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 586 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 586 Tm (Des documents de travail et fichiers Zone.Identifier sont présents dans public et peuvent) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 572.5 Tm (être exposés.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 555 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 555 Tm (Le fichier .env doit disposer de permissions strictes sur le serveur.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 537.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 537.5 Tm (Aucun audit automatique des dépendances n’est intégré au projet.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 520 Tm (Améliorations proposées) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 494 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 494 Tm (Installer Helmet, désactiver X-Powered-By et préparer une politique CSP.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 476.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 476.5 Tm (Configurer HTTPS, HSTS et trust proxy selon l’hébergement retenu.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 459 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 459 Tm (Sortir immédiatement les PDF internes et fichiers de travail du dossier public.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 441.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 441.5 Tm (Ajouter confirmation d’e-mail, mot de passe oublié et jetons à usage unique.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 424 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 424 Tm (Invalider les anciennes sessions après toute modification sensible du compte.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 406.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 406.5 Tm (Prévoir une authentification à deux facteurs pour les administrateurs.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 389 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 389 Tm (Stocker les limites de requêtes dans PostgreSQL ou Redis en production.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 371.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 371.5 Tm (Utiliser un compte PostgreSQL applicatif limité, distinct du propriétaire des migrations.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 354 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 354 Tm (Réencoder les images téléversées pour retirer les métadonnées et limiter leurs dimensions.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 336.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 336.5 Tm (Ajouter des tests d’autorisation, de CSRF, d’upload et de contrôle d’accès.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 319 Tm (Niveau de priorité) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 293 Tm (Très élevé avant la mise en production. Le socle applicatif est sain, mais la configuration) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 278.8 Tm (HTTP et l’exploitation du serveur doivent encore être durcies.) Tj ET
+0.82 0.69 0.52 RG 54 258.6 m 90 258.6 l S
+BT /F2 17 Tf 0.38 0.22 0.10 rg 1 0 0 1 54 250.60000000000002 Tm (CI/CD) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 219.60000000000002 Tm (État actuel) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 193.60000000000002 Tm (Le projet possède uniquement les commandes de développement, de compilation CSS en mode) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 179.40000000000003 Tm (surveillance et de démarrage du serveur. Aucun script de test, lint, contrôle de format,) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 165.20000000000005 Tm (migration ou build de production n’est déclaré.) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 144.00000000000006 Tm (Aucun workflow GitHub Actions, fichier Docker, pipeline de déploiement ou environnement de) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 129.80000000000007 Tm (préproduction n’a été identifié. Les migrations SQL sont appliquées manuellement.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 108.60000000000007 Tm (Risques) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 82.60000000000007 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 82.60000000000007 Tm (Une erreur de syntaxe ou une régression peut être poussée sans contrôle.) Tj ET
+BT /F1 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 54 30 Tm (Nord Stratégie  ·  Rapport projet  ·  27 juillet 2026) Tj ET
+BT /F2 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 529 30 Tm (3) Tj ET
+
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 5967 >>
+stream
+0.72 0.53 0.32 RG 54 802 m 541 802 l S
+BT /F2 8 Tf 0.42 0.29 0.18 rg 1 0 0 1 54 811 Tm (NORD STRATÉGIE  ·  ÉTAT DES LIEUX DU PROJET) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 775 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 775 Tm (Le CSS peut ne pas correspondre aux vues déployées.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 757.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 757.5 Tm (Une migration oubliée peut provoquer une erreur interne en production.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 740 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 740 Tm (Le déploiement dépend de manipulations manuelles difficiles à reproduire.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 722.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 722.5 Tm (Aucun retour automatique n’indique si une dépendance possède une vulnérabilité connue.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 705 Tm (Pipeline minimal recommandé) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 679 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 679 Tm (Étape 1 : installation reproductible avec npm ci.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 661.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 661.5 Tm (Étape 2 : compilation CSS sans mode watch.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 644 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 644 Tm (Étape 3 : contrôle de syntaxe JavaScript et compilation de toutes les vues EJS.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 626.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 626.5 Tm (Étape 4 : lint avec ESLint.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 609 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 609 Tm (Étape 5 : tests unitaires et tests d’intégration avec une base PostgreSQL temporaire.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 591.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 591.5 Tm (Étape 6 : audit des dépendances et contrôle des secrets.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 574 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 574 Tm (Étape 7 : application contrôlée des migrations.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 556.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 556.5 Tm (Étape 8 : déploiement en préproduction, test de santé, puis production.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 539 Tm (Améliorations proposées) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 513 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 513 Tm (Ajouter les scripts npm build, lint, test, test:integration et migrate.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 495.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 495.5 Tm (Introduire un véritable outil de migrations avec table de suivi.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 478 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 478 Tm (Créer un workflow GitHub Actions déclenché sur chaque pull request.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 460.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 460.5 Tm (Protéger la branche principale et exiger la réussite des contrôles.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 443 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 443 Tm (Créer un environnement de préproduction utilisant une base séparée.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 425.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 425.5 Tm (Sauvegarder PostgreSQL avant les migrations de production.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 408 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 408 Tm (Ajouter une route de santé ne révélant aucune donnée sensible.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 390.5 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 390.5 Tm (Déployer une version identifiable et prévoir un retour arrière.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 373 Tm (Niveau de priorité) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 347 Tm (Élevé dès que plusieurs personnes contribuent ou que le site est hébergé. Un pipeline) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 332.8 Tm (minimal peut être créé avant même de choisir l’hébergeur.) Tj ET
+0.82 0.69 0.52 RG 54 312.6 m 90 312.6 l S
+BT /F2 17 Tf 0.38 0.22 0.10 rg 1 0 0 1 54 304.6 Tm (Fonctionnalités pertinentes à développer) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 273.6 Tm (1. Fiabilisation des comptes) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 247.60000000000002 Tm (Ajouter la vérification de l’adresse e-mail, le mot de passe oublié et la fermeture des) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 233.40000000000003 Tm (autres sessions. Ces fonctions sont plus importantes qu’une nouvelle fonctionnalité) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 219.20000000000005 Tm (sociale, car tous les parcours réservations et Assaut de Bruay reposent sur les comptes.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 198.00000000000006 Tm (2. Notifications utiles) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 172.00000000000006 Tm (Prévoir des e-mails pour les événements réellement importants : inscription à une table,) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 157.80000000000007 Tm (annulation administrative, changement de statut d’une candidature, fermeture exceptionnelle) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 143.60000000000008 Tm (de la salle et réponse à un message. Les préférences doivent permettre de limiter les) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 129.4000000000001 Tm (envois.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 108.20000000000009 Tm (3. Finalisation de l’Assaut de Bruay) Tj ET
+BT /F1 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 54 30 Tm (Nord Stratégie  ·  Rapport projet  ·  27 juillet 2026) Tj ET
+BT /F2 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 529 30 Tm (4) Tj ET
+
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 6087 >>
+stream
+0.72 0.53 0.32 RG 54 802 m 541 802 l S
+BT /F2 8 Tf 0.42 0.29 0.18 rg 1 0 0 1 54 811 Tm (NORD STRATÉGIE  ·  ÉTAT DES LIEUX DU PROJET) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 775 Tm (Permettre au demandeur de corriger ou retirer sa candidature avant la clôture. Ajouter une) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 760.8 Tm (demande de précision par l’administrateur, un résumé des besoins matériels et un export) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 746.5999999999999 Tm (opérationnel des dossiers acceptés. Un export CSV devient pertinent ici, car il sert) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 732.3999999999999 Tm (directement à l’organisation du week-end.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 711.1999999999998 Tm (4. Statistiques associatives) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 685.1999999999998 Tm (Exploiter les archives existantes pour afficher l’évolution du nombre de participants, les) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 670.9999999999998 Tm (jeux les plus joués, le nombre de tables utilisées et la fréquentation par période. Les) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 656.7999999999997 Tm (statistiques doivent rester agrégées et éviter un suivi individuel inutile.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 635.5999999999997 Tm (5. Galerie globale) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 609.5999999999997 Tm (Créer une galerie associative administrée, liée aux actualités ou événements, plutôt qu’une) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 595.3999999999996 Tm (galerie par membre. Prévoir validation, compression, légendes, crédits et gestion du droit) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 581.1999999999996 Tm (à l’image.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 559.9999999999995 Tm (6. Accessibilité et qualité mobile) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 533.9999999999995 Tm (Effectuer une revue clavier, contrastes, libellés, focus des modales, messages d’erreur et) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 519.7999999999995 Tm (tableaux sur mobile. Ajouter des tests Lighthouse et une vérification des formulaires avec) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 505.5999999999995 Tm (lecteur d’écran.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 484.3999999999995 Tm (7. Outils pratiques pour l’administration) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 458.3999999999995 Tm (Ajouter une recherche homogène, une pagination sur les grandes listes, des résumés) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 444.19999999999953 Tm (matériels pour l’Assaut de Bruay et des notifications visibles sur le tableau de bord.) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 429.99999999999955 Tm (Éviter de créer un rôle supplémentaire tant qu’un besoin réel de séparation des pouvoirs) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 415.79999999999956 Tm (n’est pas identifié.) Tj ET
+0.82 0.69 0.52 RG 54 395.59999999999957 m 90 395.59999999999957 l S
+BT /F2 17 Tf 0.38 0.22 0.10 rg 1 0 0 1 54 387.59999999999957 Tm (Feuille de route conseillée) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 356.59999999999957 Tm (Avant mise en production) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 330.59999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 330.59999999999957 Tm (Retirer les documents internes du dossier public.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 313.09999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 313.09999999999957 Tm (Ajouter Helmet, HTTPS, trust proxy et permissions strictes des secrets.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 295.59999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 295.59999999999957 Tm (Mettre en place les titres SEO, descriptions, sitemap et robots.txt.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 278.09999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 278.09999999999957 Tm (Créer les premiers tests d’authentification, d’autorisation et de réservation.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 260.59999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 260.59999999999957 Tm (Automatiser la compilation CSS et les migrations.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 243.09999999999957 Tm (Première version publique) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 217.09999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 217.09999999999957 Tm (Ajouter confirmation d’e-mail et récupération de mot de passe.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 199.59999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 199.59999999999957 Tm (Mettre en place les notifications critiques.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 182.09999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 182.09999999999957 Tm (Finaliser la modification et le retrait des candidatures Assaut de Bruay.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 164.59999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 164.59999999999957 Tm (Ajouter les contrôles de santé, sauvegardes et supervision des erreurs.) Tj ET
+BT /F2 12.5 Tf 0.65 0.30 0.10 rg 1 0 0 1 54 147.09999999999957 Tm (Après stabilisation) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 121.09999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 121.09999999999957 Tm (Construire le tableau de statistiques.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 103.59999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 103.59999999999957 Tm (Développer la galerie globale.) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 86.09999999999957 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 86.09999999999957 Tm (Améliorer les exports et outils logistiques.) Tj ET
+BT /F1 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 54 30 Tm (Nord Stratégie  ·  Rapport projet  ·  27 juillet 2026) Tj ET
+BT /F2 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 529 30 Tm (5) Tj ET
+
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 1358 >>
+stream
+0.72 0.53 0.32 RG 54 802 m 541 802 l S
+BT /F2 8 Tf 0.42 0.29 0.18 rg 1 0 0 1 54 811 Tm (NORD STRATÉGIE  ·  ÉTAT DES LIEUX DU PROJET) Tj ET
+BT /F2 10 Tf 0.72 0.35 0.12 rg 1 0 0 1 56 775 Tm (•) Tj ET
+BT /F1 9.8 Tf 0.12 0.10 0.08 rg 1 0 0 1 71 775 Tm (Étudier une séparation de rôle uniquement si le fonctionnement du bureau l’exige.) Tj ET
+0.82 0.69 0.52 RG 54 758.5 m 90 758.5 l S
+BT /F2 17 Tf 0.38 0.22 0.10 rg 1 0 0 1 54 750.5 Tm (Conclusion) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 719.5 Tm (Nord Stratégie dispose d’une architecture adaptée à son besoin et d’un périmètre) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 705.3 Tm (fonctionnel déjà riche. Le meilleur investissement consiste maintenant à rendre ce socle) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 691.0999999999999 Tm (observable, testable et sûr en production. Le SEO technique apportera de la visibilité) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 676.8999999999999 Tm (locale, la CI/CD limitera les régressions et les prochaines fonctionnalités devront surtout) Tj ET
+BT /F1 10.2 Tf 0.12 0.10 0.08 rg 1 0 0 1 54 662.6999999999998 Tm (simplifier l’organisation réelle de l’association.) Tj ET
+BT /F1 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 54 30 Tm (Nord Stratégie  ·  Rapport projet  ·  27 juillet 2026) Tj ET
+BT /F2 8 Tf 0.45 0.40 0.34 rg 1 0 0 1 529 30 Tm (6) Tj ET
+
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Title (État des lieux du projet Nord Stratégie) /Author (Nord Stratégie) /Subject (SEO, sécurité, CI/CD et feuille de route fonctionnelle) >>
+endobj
+xref
+0 18
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000155 00000 n 
+0000000252 00000 n 
+0000000354 00000 n 
+0000004687 00000 n 
+0000004823 00000 n 
+0000012043 00000 n 
+0000012179 00000 n 
+0000018564 00000 n 
+0000018701 00000 n 
+0000024721 00000 n 
+0000024859 00000 n 
+0000030999 00000 n 
+0000031137 00000 n 
+0000032548 00000 n 
+0000032686 00000 n 
+trailer
+<< /Size 18 /Root 1 0 R /Info 17 0 R >>
+startxref
+32848
+%%EOF

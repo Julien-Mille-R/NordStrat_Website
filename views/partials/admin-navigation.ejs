@@ -1,0 +1,44 @@
+<%
+  const selectedAdminSection = typeof activeAdminSection === 'string' ? activeAdminSection : '';
+  const adminSections = [
+    ['dashboard', '/admindashboard', 'Vue d’ensemble', '⌂'],
+    ['assaut-de-bruay', '/admindashboard/assaut-de-bruay', 'Assaut de Bruay', '⚑'],
+    ['news', '/admindashboard/news', 'Actualités', '✦'],
+    ['inbox', '/admindashboard/inbox', 'Messagerie', '✉'],
+    ['members', '/admindashboard/members', 'Membres', '♟'],
+    ['memberships', '/admindashboard/memberships', 'Cotisations', '€'],
+    ['events', '/admindashboard/events', 'Soirées', '◷'],
+    ['games', '/admindashboard/games', 'Jeux', '◆'],
+    ['archives', '/admindashboard/archives', 'Archives', '▤'],
+    ['audit-log', '/admindashboard/audit-log', 'Journal', '≡']
+  ];
+  const currentAdminSection = adminSections.find(([key]) => key === selectedAdminSection) || adminSections[0];
+%>
+<nav aria-label="Navigation administrative" class="mb-6">
+  <details class="admin-navigation-menu lg:hidden rounded-xl border border-fantasy-gold/25 bg-fantasy-dark">
+    <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-fantasy-gold marker:content-none">
+      <span class="flex min-w-0 items-center gap-3 font-bold">
+        <span aria-hidden="true" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-fantasy-brown text-fantasy-orange"><%= currentAdminSection[3] %></span>
+        <span class="truncate"><%= currentAdminSection[2] %></span>
+      </span>
+      <span aria-hidden="true" class="admin-navigation-chevron shrink-0 text-xl transition-transform">⌄</span>
+    </summary>
+    <div class="grid grid-cols-2 gap-2 border-t border-fantasy-gold/15 p-3">
+      <% adminSections.forEach(([key, href, label, icon]) => { %>
+        <a href="<%= href %>" <%= selectedAdminSection === key ? 'aria-current="page"' : '' %> class="flex min-h-12 min-w-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition <%= selectedAdminSection === key ? 'bg-fantasy-gold text-fantasy-darkest' : 'bg-fantasy-darkest/40 text-fantasy-gold-light hover:bg-fantasy-brown hover:text-fantasy-gold' %>">
+          <span aria-hidden="true" class="shrink-0 text-base"><%= icon %></span>
+          <span class="leading-tight"><%= label %></span>
+        </a>
+      <% }) %>
+    </div>
+  </details>
+
+  <div class="hidden lg:grid lg:grid-cols-5 xl:grid-cols-10 gap-2 rounded-xl border border-fantasy-gold/20 bg-fantasy-dark p-2">
+    <% adminSections.forEach(([key, href, label, icon]) => { %>
+      <a href="<%= href %>" <%= selectedAdminSection === key ? 'aria-current="page"' : '' %> class="flex min-h-16 min-w-0 flex-col items-center justify-center gap-1 rounded-lg px-2 py-2 text-center text-xs font-bold leading-tight transition <%= selectedAdminSection === key ? 'bg-fantasy-gold text-fantasy-darkest' : 'text-fantasy-gold-light hover:bg-fantasy-brown hover:text-fantasy-gold' %>">
+        <span aria-hidden="true" class="text-lg"><%= icon %></span>
+        <span><%= label %></span>
+      </a>
+    <% }) %>
+  </div>
+</nav>

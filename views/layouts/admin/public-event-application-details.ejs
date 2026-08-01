@@ -1,0 +1,93 @@
+<%- include('../../partials/header') %>
+<% const typeLabels = { partner: 'Partenaire', vendor: 'Vendeur', volunteer: 'Bénévole' }; %>
+<% const statusLabels = { new: 'Nouvelle', reviewing: 'En cours', accepted: 'Acceptée', waitlisted: 'Liste d’attente', rejected: 'Refusée', withdrawn: 'Retirée par le demandeur' }; %>
+<% const taskLabels = { setup: 'Installation', welcome: 'Accueil du public', refreshments: 'Buvette ou restauration', logistics: 'Aide logistique', game_hosting: 'Animation d’un espace de jeu', exhibitor_support: 'Accompagnement des exposants', communication: 'Photographie ou communication', cleanup: 'Rangement et nettoyage', where_needed: 'Là où il y aura besoin' }; %>
+<section class="pt-28 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'assaut-de-bruay' }) %>
+    <a href="/admindashboard/assaut-de-bruay/applications" class="text-fantasy-orange font-bold">← Toutes les inscriptions</a>
+    <header class="mt-5 mb-8">
+      <p class="text-sm uppercase tracking-wider text-fantasy-orange"><%= typeLabels[application.applicationType] %></p>
+      <h1 class="mt-2 text-3xl sm:text-4xl font-fantasy text-fantasy-gold break-words"><%= application.organizationName || application.contactName %></h1>
+      <p class="mt-2 text-fantasy-gold-light">Demande envoyée par <%= application.applicant?.nickname || application.contactName %> le <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(application.createdAt) %>.</p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[1.35fr_0.65fr] gap-6 items-start">
+      <div class="space-y-5">
+        <section class="p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl text-fantasy-gold-light">
+          <h2 class="text-2xl font-fantasy text-fantasy-gold">Contact et présence</h2>
+          <dl class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div><dt class="text-sm text-fantasy-gold-light/60">Contact</dt><dd><%= application.contactName %></dd></div>
+            <div class="min-w-0"><dt class="text-sm text-fantasy-gold-light/60">E-mail</dt><dd><a class="text-fantasy-orange break-all" href="mailto:<%= application.email %>"><%= application.email %></a></dd></div>
+            <div><dt class="text-sm text-fantasy-gold-light/60">Téléphone</dt><dd><%= application.phone || 'Non renseigné' %></dd></div>
+            <div><dt class="text-sm text-fantasy-gold-light/60">Nombre de personnes</dt><dd><%= application.participantCount %></dd></div>
+            <div><dt class="text-sm text-fantasy-gold-light/60">Présence</dt><dd><%= [application.presentSaturday ? 'Samedi' : '', application.presentSunday ? 'Dimanche' : ''].filter(Boolean).join(' et ') %></dd></div>
+          </dl>
+        </section>
+        <% if (application.status === 'withdrawn') { %>
+          <section class="p-5 bg-fantasy-red/10 border border-fantasy-red/50 rounded-xl text-fantasy-gold-light">
+            <h2 class="text-2xl font-fantasy text-fantasy-gold">Désistement du bénévole</h2>
+            <p class="mt-3">Candidature retirée le <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(application.withdrawnAt) %>.</p>
+            <p class="mt-3 whitespace-pre-line"><strong class="text-fantasy-gold">Motif :</strong><br><%= application.withdrawalReason || 'Aucun motif communiqué.' %></p>
+          </section>
+        <% } %>
+
+        <% if (application.applicationType !== 'volunteer') { %>
+          <section class="p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl text-fantasy-gold-light">
+            <h2 class="text-2xl font-fantasy text-fantasy-gold">Installation et matériel</h2>
+            <dl class="mt-4 grid grid-cols-1 min-[380px]:grid-cols-2 sm:grid-cols-3 gap-3">
+              <div><dt class="text-sm text-fantasy-gold-light/60">Tables</dt><dd><%= application.tableCount %></dd></div>
+              <div><dt class="text-sm text-fantasy-gold-light/60">Chaises</dt><dd><%= application.chairCount %></dd></div>
+              <div><dt class="text-sm text-fantasy-gold-light/60">Emplacement souhaité</dt><dd><%= application.spaceLength ? `${application.spaceLength} m × 2,50 m` : 'Non renseigné' %></dd></div>
+              <div><dt class="text-sm text-fantasy-gold-light/60">Branchement électrique</dt><dd><%= application.needsElectricity ? 'Oui' : 'Non' %></dd></div>
+              <div><dt class="text-sm text-fantasy-gold-light/60">Point d’eau</dt><dd><%= application.needsWater ? 'Oui' : 'Non' %></dd></div>
+            </dl>
+            <% if (!application.spaceLength && application.spaceDetails) { %><p class="mt-4 whitespace-pre-line"><strong class="text-fantasy-gold">Ancienne indication d’espace :</strong><br><%= application.spaceDetails %></p><% } %>
+            <% if (application.websiteUrl || application.socialUrl1 || application.socialUrl2) { %>
+              <div class="mt-4">
+                <h3 class="font-bold text-fantasy-gold">Présence en ligne</h3>
+                <ul class="mt-2 space-y-1">
+                  <% if (application.websiteUrl) { %><li><a href="<%= application.websiteUrl %>" target="_blank" rel="noopener noreferrer" class="text-fantasy-orange">Site internet ↗</a></li><% } %>
+                  <% if (application.socialUrl1) { %><li><a href="<%= application.socialUrl1 %>" target="_blank" rel="noopener noreferrer" class="text-fantasy-orange">Réseau social 1 ↗</a></li><% } %>
+                  <% if (application.socialUrl2) { %><li><a href="<%= application.socialUrl2 %>" target="_blank" rel="noopener noreferrer" class="text-fantasy-orange">Réseau social 2 ↗</a></li><% } %>
+                </ul>
+              </div>
+            <% } %>
+          </section>
+        <% } else { %>
+          <section class="p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl text-fantasy-gold-light">
+            <h2 class="text-2xl font-fantasy text-fantasy-gold">Missions souhaitées</h2>
+            <ul class="mt-3 list-disc pl-5 space-y-1"><% application.volunteerTasks.forEach((task) => { %><li><%= taskLabels[task] || task %></li><% }) %></ul>
+            <% if (application.availability) { %><p class="mt-4"><strong class="text-fantasy-gold">Disponibilités :</strong> <%= application.availability %></p><% } %>
+          </section>
+        <% } %>
+
+        <section class="p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl text-fantasy-gold-light">
+          <h2 class="text-2xl font-fantasy text-fantasy-gold">Présentation</h2>
+          <p class="mt-3 whitespace-pre-line"><%= application.description %></p>
+          <% if (application.needs) { %><p class="mt-5 whitespace-pre-line"><strong class="text-fantasy-gold">Autres besoins ou remarques :</strong><br><%= application.needs %></p><% } %>
+        </section>
+      </div>
+
+      <form method="POST" action="/admindashboard/assaut-de-bruay/applications/<%= application.id %>/status" class="p-5 bg-fantasy-dark border border-fantasy-gold/30 rounded-xl space-y-4">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <h2 class="text-2xl font-fantasy text-fantasy-gold">Suivi</h2>
+        <label class="block text-fantasy-gold-light">Statut
+          <select name="status" <%= application.status === 'withdrawn' ? 'disabled' : '' %> class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+            <% Object.entries(statusLabels).filter(([value]) => value !== 'withdrawn' || application.status === 'withdrawn').forEach(([value, label]) => { %><option value="<%= value %>" <%= application.status === value ? 'selected' : '' %>><%= label %></option><% }) %>
+          </select>
+        </label>
+        <label class="block text-fantasy-gold-light">Notes internes
+          <textarea name="adminNotes" maxlength="3000" rows="7" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"><%= application.adminNotes || '' %></textarea>
+        </label>
+        <p class="text-xs text-fantasy-gold-light/50">Ces notes ne sont jamais visibles par le demandeur.</p>
+        <% if (application.status === 'withdrawn') { %>
+          <p class="text-sm text-fantasy-gold-light/70">Le désistement du bénévole est définitif et ne peut pas être annulé depuis le suivi administratif.</p>
+        <% } else { %>
+          <button class="w-full px-4 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Mettre à jour</button>
+        <% } %>
+      </form>
+    </div>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

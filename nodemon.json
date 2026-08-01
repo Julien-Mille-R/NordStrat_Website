@@ -1,0 +1,6 @@
+{
+  "ignore": [
+    "archives/**",
+    "public/uploads/**"
+  ]
+}

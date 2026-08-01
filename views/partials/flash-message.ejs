@@ -1,0 +1,22 @@
+<% if (flash) { %>
+  <% const isError = flash.type === 'error'; %>
+  <div
+    id="flashMessage"
+    role="<%= isError ? 'alert' : 'status' %>"
+    aria-live="<%= isError ? 'assertive' : 'polite' %>"
+    data-auto-dismiss="<%= isError ? 'false' : 'true' %>"
+    class="fixed top-24 left-1/2 z-[70] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 overflow-hidden rounded-xl border bg-fantasy-dark shadow-fantasy opacity-0 -translate-y-3 transition-all duration-300 <%= isError ? 'border-fantasy-red' : 'border-fantasy-emerald' %>"
+  >
+    <div class="flex items-start gap-3 p-4 pr-12">
+      <span class="mt-0.5 text-xl <%= isError ? 'text-fantasy-red' : 'text-fantasy-emerald' %>" aria-hidden="true"><%= isError ? '⚠️' : '✓' %></span>
+      <div>
+        <p class="font-bold <%= isError ? 'text-fantasy-gold' : 'text-fantasy-emerald' %>"><%= isError ? 'Une vérification est nécessaire' : 'Action effectuée' %></p>
+        <p class="mt-1 leading-relaxed text-fantasy-gold-light"><%= flash.message %></p>
+      </div>
+    </div>
+    <button type="button" data-flash-close aria-label="Fermer la notification" class="absolute top-3 right-3 w-8 h-8 rounded-lg text-fantasy-gold-light/65 hover:bg-fantasy-brown hover:text-fantasy-gold transition-colors">✕</button>
+    <div class="h-1 bg-fantasy-brown" aria-hidden="true">
+      <div data-flash-progress class="h-full w-full <%= isError ? 'bg-fantasy-red' : 'bg-fantasy-emerald' %>"></div>
+    </div>
+  </div>
+<% } %>

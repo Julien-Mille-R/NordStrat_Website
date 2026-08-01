@@ -1,0 +1,49 @@
+<%- include('../../partials/header') %>
+
+<section class="pt-28 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'news' }) %>
+
+    <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 mb-8">
+      <div>
+        <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">Communication</p>
+        <h1 class="mt-2 text-4xl md:text-5xl font-fantasy text-fantasy-gold">Actualités</h1>
+        <p class="mt-2 text-fantasy-gold-light"><%= newsPosts.length %> article<%= newsPosts.length > 1 ? 's' : '' %> publié<%= newsPosts.length > 1 ? 's' : '' %>.</p>
+      </div>
+      <a href="/admindashboard/news/create" class="px-5 py-3 text-center bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange transition-colors">Publier une actualité</a>
+    </header>
+
+    <% if (newsPosts.length) { %>
+      <div class="space-y-4">
+        <% newsPosts.forEach((newsPost) => { %>
+          <article class="p-5 bg-fantasy-dark border border-fantasy-gold/30 rounded-xl flex flex-col md:flex-row md:items-center gap-5">
+            <div class="w-full md:w-32 h-28 shrink-0 overflow-hidden rounded-lg bg-fantasy-brown">
+              <% if (newsPost.imageUrl) { %>
+                <img src="<%= newsPost.imageUrl %>" alt="" class="w-full h-full object-cover">
+              <% } else { %>
+                <div class="w-full h-full flex items-center justify-center text-4xl text-fantasy-gold/35" aria-hidden="true">⚔️</div>
+              <% } %>
+            </div>
+            <div class="min-w-0 flex-grow">
+              <time datetime="<%= newsPost.publishedAt.toISOString() %>" class="text-sm text-fantasy-orange"><%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(newsPost.publishedAt) %></time>
+              <h2 class="mt-1 text-2xl font-fantasy text-fantasy-gold break-words"><%= newsPost.title %></h2>
+              <div class="mt-3"><%- include('../../partials/news-author', { author: newsPost.author }) %></div>
+            </div>
+            <div class="flex flex-wrap md:justify-end gap-3 shrink-0">
+              <a href="/news/<%= newsPost.id %>" class="px-4 py-2 border border-fantasy-gold/40 text-fantasy-gold rounded-lg">Voir</a>
+              <a href="/admindashboard/news/<%= newsPost.id %>/edit" class="px-4 py-2 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Modifier</a>
+              <form method="POST" action="/admindashboard/news/<%= newsPost.id %>/delete" data-confirm="Supprimer définitivement cette actualité ? Cette action est irréversible.">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="px-4 py-2 border border-fantasy-red text-fantasy-gold-light rounded-lg hover:bg-fantasy-red">Supprimer</button>
+              </form>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p class="p-8 bg-fantasy-dark border border-fantasy-gold/30 rounded-xl text-center text-fantasy-gold-light">Aucune actualité publiée.</p>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../../partials/footer') %>

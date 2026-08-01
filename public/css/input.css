@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+@theme {
+  --color-fantasy-darkest: #0a0806;
+  --color-fantasy-darker: #1a1511;
+  --color-fantasy-dark: #2d2520;
+  --color-fantasy-brown: #3d2f28;
+  --color-fantasy-brown-light: #4a3930;
+  --color-fantasy-gold: #d4a574;
+  --color-fantasy-gold-light: #e6c89c;
+  --color-fantasy-gold-dark: #b8905f;
+  --color-fantasy-orange: #ff9f43;
+  --color-fantasy-orange-light: #ffb366;
+  --color-fantasy-orange-dark: #e68a2e;
+  --color-fantasy-red: #c9302c;
+  --color-fantasy-red-dark: #a02622;
+  --color-fantasy-emerald: #2ecc71;
+  --color-fantasy-emerald-dark: #27ae60;
+  --color-fantasy-purple: #8e44ad;
+  --color-fantasy-purple-dark: #6c3483;
+  
+  --color-accent-primary: #d4a574;
+  --color-accent-secondary: #ff9f43;
+  --color-accent-danger: #c9302c;
+  --color-accent-success: #2ecc71;
+  --color-accent-info: #3498db;
+}
+
+@source "../../views/**/*.ejs";
+@source "../**/*.js";
+
+.admin-navigation-menu[open] .admin-navigation-chevron {
+  transform: rotate(180deg);
+}
+
+.member-management-dialog,
+.membership-management-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+}
+
+.booking-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.booking-discussion-region {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  min-width: 0;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--color-fantasy-gold) 50%, transparent);
+  background: var(--color-fantasy-dark);
+}
+
+.booking-discussion-region.is-open {
+  display: block;
+}
+
+.booking-discussion-placeholder {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.booking-discussion-placeholder-icon {
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.booking-discussion-region.is-open .booking-discussion-placeholder {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .booking-workspace--with-discussions {
+    grid-template-columns: minmax(28rem, 3fr) minmax(22rem, 2fr);
+  }
+
+  .booking-workspace--single {
+    max-width: 48rem;
+    margin-inline: auto;
+  }
+
+  .booking-discussion-region {
+    display: block;
+    position: sticky;
+    top: 7rem;
+    z-index: 10;
+    height: calc(100vh - 8rem);
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 35%);
+  }
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  border: 2px solid var(--color-fantasy-gold);
+  border-radius: 0.5rem;
+  background: var(--color-fantasy-darkest);
+  color: var(--color-fantasy-gold-light);
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-fantasy-orange);
+  outline-offset: 3px;
+}
+
+#main-content:focus {
+  outline: none;
+}
+
+.text-fantasy-red {
+  color: #ff7b72;
+}
+
+.text-fantasy-gold-light\/40,
+.text-fantasy-gold-light\/50,
+.text-fantasy-gold-light\/55,
+.text-fantasy-gold-light\/60,
+.text-fantasy-gold-light\/65 {
+  color: color-mix(in oklab, var(--color-fantasy-gold-light) 75%, transparent);
+}
+
+.submission-control-locked {
+  cursor: wait;
+  pointer-events: none;
+}
+
+.submission-button-active {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+}
+
+.submission-spinner {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 9999px;
+  animation: submission-spin 0.75s linear infinite;
+}
+
+@keyframes submission-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .submission-spinner {
+    display: none;
+  }
+}

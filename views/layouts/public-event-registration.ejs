@@ -1,0 +1,61 @@
+<%- include('../partials/header') %>
+
+<section class="pt-28 sm:pt-32 pb-16 sm:pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 sm:px-6 max-w-7xl">
+    <a href="/events/assaut-de-bruay" class="text-fantasy-orange font-bold">← Retour à la présentation</a>
+
+    <% if (publicEvent?.isVisible && applicationsOpen) { %>
+      <header class="mt-6 max-w-4xl">
+        <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange"><%= publicEvent.title %></p>
+        <h1 class="mt-2 text-3xl sm:text-5xl font-fantasy text-fantasy-gold">Participer à l’événement</h1>
+        <p class="mt-4 text-lg leading-relaxed text-fantasy-gold-light">
+          Choisissez le formulaire correspondant à votre participation. Vos coordonnées de compte seront utilisées pour permettre à l’équipe de vous recontacter.
+        </p>
+        <p class="mt-3 font-bold text-fantasy-emerald">
+          Inscriptions ouvertes jusqu’au <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(new Date(`${publicEvent.registrationCloseAt}T12:00:00Z`)) %>.
+        </p>
+      </header>
+
+      <% if (ownApplications.length) { %>
+        <aside class="mt-7 p-5 bg-fantasy-brown/50 border border-fantasy-gold/30 rounded-xl">
+          <p class="text-fantasy-gold-light">
+            Vous avez déjà transmis <%= ownApplications.length %> demande<%= ownApplications.length > 1 ? 's' : '' %>.
+            <a href="/account/assaut-de-bruay" class="block sm:inline mt-2 sm:mt-0 sm:ml-1 text-fantasy-orange font-bold">Consulter mon suivi →</a>
+          </p>
+        </aside>
+      <% } %>
+
+      <div class="mt-8 grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+        <%- include('../partials/public-event-application-form', {
+          applicationType: 'partner',
+          eyebrow: 'Associations et structures',
+          heading: 'Devenir partenaire',
+          descriptionLabel: 'Présentez votre activité et ce que vous proposerez au public',
+          buttonLabel: 'Envoyer la demande partenaire'
+        }) %>
+        <%- include('../partials/public-event-application-form', {
+          applicationType: 'vendor',
+          eyebrow: 'Artisans et professionnels',
+          heading: 'Devenir vendeur',
+          descriptionLabel: 'Présentez les produits ou services proposés',
+          buttonLabel: 'Envoyer la demande vendeur'
+        }) %>
+        <%- include('../partials/public-event-application-form', {
+          applicationType: 'volunteer',
+          eyebrow: 'Donner un coup de main',
+          heading: 'Devenir bénévole',
+          descriptionLabel: 'Présentez vos envies, compétences ou contraintes',
+          buttonLabel: 'Proposer mon aide'
+        }) %>
+      </div>
+    <% } else { %>
+      <div class="mt-8 max-w-3xl p-6 sm:p-8 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl">
+        <h1 class="text-3xl sm:text-4xl font-fantasy text-fantasy-gold">Les inscriptions sont fermées</h1>
+        <p class="mt-4 text-lg leading-relaxed text-fantasy-gold-light">Les inscriptions sont généralement ouvertes courant mai ou juin, puis ferment autour du mois d’août pour permettre à l’équipe d’organiser l’événement.</p>
+        <a href="/contact" class="inline-flex mt-6 px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Contacter l’équipe organisatrice</a>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,200 @@
+<%- include('../partials/header') %>
+<section class="pt-28 sm:pt-32 pb-16 sm:pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 sm:px-6 max-w-6xl">
+    <header class="mb-6">
+      <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">Espace personnel</p>
+      <h1 class="mt-1 text-3xl sm:text-4xl font-fantasy text-fantasy-gold">Mon compte</h1>
+    </header>
+
+    <section class="p-5 sm:p-6 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl shadow-fantasy">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-5">
+        <div class="w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-full overflow-hidden border-2 border-fantasy-gold bg-fantasy-brown flex items-center justify-center">
+          <% if (player.avatarUrl) { %>
+            <img src="<%= player.avatarUrl %>" alt="Avatar de <%= player.nickname || 'membre' %>" class="w-full h-full object-cover">
+          <% } else { %>
+            <span class="text-4xl font-fantasy text-fantasy-gold"><%= (player.nickname || player.firstname).slice(0, 1).toUpperCase() %></span>
+          <% } %>
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <h2 class="text-2xl sm:text-3xl font-fantasy text-fantasy-gold break-words"><%= player.nickname || `${player.firstname} ${player.lastname}` %></h2>
+          <p class="mt-1 text-fantasy-gold-light break-words"><%= player.firstname %> <%= player.lastname %></p>
+          <div class="mt-3 flex flex-wrap gap-2 text-sm">
+            <span class="px-3 py-1 rounded-full bg-fantasy-brown text-fantasy-gold-light">Rôle : <%= player.role.name %></span>
+            <span class="px-3 py-1 rounded-full <%= player.isActive ? 'bg-fantasy-emerald/15 text-fantasy-emerald' : 'bg-fantasy-red/15 text-fantasy-red' %>">Compte <%= player.isActive ? 'actif' : 'désactivé' %></span>
+          </div>
+        </div>
+
+        <div class="w-full sm:w-auto flex flex-col gap-2">
+          <a href="/members/<%= player.id %>" class="min-h-11 px-4 py-3 text-center border border-fantasy-gold text-fantasy-gold font-bold rounded-lg hover:bg-fantasy-brown transition-colors">Voir mon profil public</a>
+          <% if (player.role.name === 'Admin') { %><a href="/admindashboard" class="min-h-11 px-4 py-3 text-center bg-fantasy-orange text-fantasy-darkest font-bold rounded-lg">Administration</a><% } %>
+        </div>
+      </div>
+
+      <details class="mt-5 border-t border-fantasy-gold/15 pt-4">
+        <summary class="cursor-pointer font-bold text-fantasy-orange">Modifier mon avatar</summary>
+        <div class="mt-4 space-y-6">
+          <form method="POST" action="/account/avatar/default" class="text-fantasy-gold-light">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <fieldset>
+              <legend class="font-bold text-fantasy-gold">Choisir un avatar proposé</legend>
+              <div class="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                <% defaultAvatars.forEach((avatar) => { %>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="avatarId" value="<%= avatar.id %>" required <%= player.avatarUrl === avatar.url ? 'checked' : '' %> class="peer sr-only">
+                    <span class="flex flex-col items-center gap-2 p-2 border-2 border-transparent rounded-xl bg-fantasy-brown peer-checked:border-fantasy-gold peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-fantasy-orange hover:border-fantasy-gold/50">
+                      <img src="<%= avatar.url %>" alt="" loading="lazy" class="w-16 h-16 rounded-full">
+                      <span class="text-xs text-center break-words"><%= avatar.label %></span>
+                    </span>
+                  </label>
+                <% }) %>
+              </div>
+            </fieldset>
+            <button class="mt-4 w-full sm:w-auto min-h-11 px-4 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Utiliser cet avatar</button>
+          </form>
+
+          <div class="border-t border-fantasy-gold/15 pt-5 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-end">
+          <form method="POST" action="/account/avatar" enctype="multipart/form-data" class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-end text-fantasy-gold-light">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label class="block text-sm">Importer votre propre image — JPEG, PNG ou WebP, 2 Mo maximum
+              <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" required class="mt-2 block w-full min-w-0 text-sm">
+            </label>
+            <button class="w-full sm:w-auto min-h-11 px-4 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Remplacer</button>
+          </form>
+          <% if (player.avatarUrl) { %>
+            <form method="POST" action="/account/avatar/delete">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="w-full md:w-auto min-h-11 px-4 py-3 border border-fantasy-red text-fantasy-gold-light rounded-lg">Supprimer l’avatar</button>
+            </form>
+          <% } %>
+          </div>
+          <p class="text-xs text-fantasy-gold-light/50">Avatars Pixel Art générés localement avec DiceBear.</p>
+        </div>
+      </details>
+    </section>
+
+    <nav class="mt-6 grid grid-cols-2 gap-2 rounded-xl border border-fantasy-gold/20 bg-fantasy-dark p-2 md:flex" role="tablist" aria-label="Rubriques du compte">
+      <% [
+        ['general', 'accountPanelGeneral', 'Informations générales'],
+        ['public-profile', 'accountPanelPublicProfile', 'Profil public'],
+        ['tables', 'accountPanelTables', 'Mon activité'],
+        ['security', 'accountPanelSecurity', 'Sécurité']
+      ].forEach(([key, panelId, label], index) => { %>
+        <button type="button" role="tab" id="accountTab-<%= key %>" aria-controls="<%= panelId %>" aria-selected="<%= index === 0 ? 'true' : 'false' %>" data-account-tab="<%= key %>" class="min-h-12 min-w-0 rounded-lg px-3 py-2 text-sm sm:text-base font-bold leading-tight transition-colors <%= index === 0 ? 'bg-fantasy-gold text-fantasy-darkest' : 'text-fantasy-gold-light hover:bg-fantasy-brown hover:text-fantasy-gold' %>">
+          <%= label %>
+        </button>
+      <% }) %>
+    </nav>
+
+    <section id="accountPanelPublicProfile" role="tabpanel" aria-labelledby="accountTab-public-profile" data-account-panel="public-profile" hidden class="mt-6 p-5 sm:p-6 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-5">
+        <div>
+          <p class="text-sm uppercase tracking-wider text-fantasy-orange">Visible par la communauté</p>
+          <h2 class="mt-1 text-2xl text-fantasy-gold">Mon profil public</h2>
+        </div>
+        <span class="self-start px-3 py-1 rounded-full text-sm <%= player.isProfilePublic ? 'bg-fantasy-emerald/15 text-fantasy-emerald' : 'bg-fantasy-brown text-fantasy-gold-light' %>"><%= player.isProfilePublic ? 'Profil visible' : 'Profil masqué' %></span>
+      </div>
+      <% const favoriteGameIds = new Set(player.favoriteGames.map((game) => game.id)); %>
+      <form method="POST" action="/account/public-profile" class="grid grid-cols-1 lg:grid-cols-2 gap-5 text-fantasy-gold-light">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label class="block">Présentation
+          <textarea id="profileBiography" name="biography" maxlength="500" rows="8" aria-describedby="profileBiographyHelp" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg" placeholder="Présentez votre univers de jeu en quelques lignes…"><%= player.biography || '' %></textarea>
+          <span id="profileBiographyHelp" class="block mt-1 text-xs text-fantasy-gold-light/60">500 caractères maximum.</span>
+        </label>
+        <fieldset>
+          <legend class="mb-2">Mes jeux favoris — 3 maximum</legend>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
+            <% games.forEach((game) => { %>
+              <label class="flex items-center gap-3 p-3 bg-fantasy-brown border border-fantasy-gold/20 rounded-lg">
+                <input type="checkbox" name="gameIds" value="<%= game.id %>" <%= favoriteGameIds.has(game.id) ? 'checked' : '' %>>
+                <span class="break-words"><%= game.name %></span>
+              </label>
+            <% }) %>
+          </div>
+        </fieldset>
+        <label class="lg:col-span-2 flex items-start gap-3 p-4 bg-fantasy-darkest/50 rounded-lg">
+          <input type="checkbox" name="isProfilePublic" <%= player.isProfilePublic ? 'checked' : '' %> class="mt-1">
+          <span>Rendre mon profil visible aux autres membres et visiteurs.</span>
+        </label>
+        <div class="lg:col-span-2">
+          <button class="w-full sm:w-auto px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Enregistrer le profil public</button>
+        </div>
+      </form>
+    </section>
+
+    <div class="mt-6 grid grid-cols-1 gap-6 items-start">
+      <article id="accountPanelGeneral" role="tabpanel" aria-labelledby="accountTab-general" data-account-panel="general" class="p-5 sm:p-6 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl">
+        <h2 class="text-2xl text-fantasy-gold mb-5">Informations personnelles</h2>
+        <form method="POST" action="/account/profile" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-fantasy-gold-light">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <label class="block">Prénom<input name="firstname" required maxlength="100" value="<%= player.firstname %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+          <label class="block">Nom<input name="lastname" required maxlength="100" value="<%= player.lastname %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+          <label class="block">Pseudonyme<input name="nickname" maxlength="50" value="<%= player.nickname || '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+          <label class="block">Adresse e-mail actuelle<input disabled value="<%= player.email %>" class="mt-1 w-full p-3 bg-fantasy-darkest border border-fantasy-gold/20 rounded-lg text-fantasy-gold-light/60 truncate"></label>
+          <div class="md:col-span-2"><button class="w-full sm:w-auto px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Enregistrer mes informations</button></div>
+        </form>
+      </article>
+
+      <article id="accountPanelTables" role="tabpanel" aria-labelledby="accountTab-tables" data-account-panel="tables" hidden class="p-5 sm:p-6 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl text-fantasy-gold-light">
+        <h2 class="text-2xl text-fantasy-gold">Ma prochaine soirée</h2>
+        <% if (player.reservations.length) { const reservation = player.reservations[0]; %>
+          <p class="mt-4 text-xl font-bold text-fantasy-orange">Table <%= reservation.gameTable.tableNumber %></p>
+          <p class="mt-1"><%= reservation.gameTable.game.name %></p>
+          <p class="text-sm mt-2 text-fantasy-gold-light/65"><%= reservation.gameTable.event.title %></p>
+          <a href="/booking" class="inline-block mt-5 text-fantasy-orange font-bold">Voir les tables →</a>
+        <% } else { %>
+          <p class="mt-4">Vous n’avez aucune réservation active.</p>
+          <a href="/booking" class="inline-block mt-5 text-fantasy-orange font-bold">Réserver une table →</a>
+        <% } %>
+      </article>
+    </div>
+
+    <section id="accountPanelSecurity" role="tabpanel" aria-labelledby="accountTab-security" data-account-panel="security" hidden class="mt-8">
+      <header class="mb-4">
+        <p class="text-sm uppercase tracking-wider text-fantasy-orange">Connexion</p>
+        <h2 class="mt-1 text-3xl font-fantasy text-fantasy-gold">Sécurité du compte</h2>
+      </header>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <article class="p-5 sm:p-6 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl">
+          <h3 class="text-2xl text-fantasy-gold mb-5">Changer le mot de passe</h3>
+          <form method="POST" action="/account/password" class="space-y-4 text-fantasy-gold-light">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label class="block">Mot de passe actuel<input type="password" name="currentPassword" required autocomplete="current-password" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+            <label class="block">Nouveau mot de passe<input type="password" name="newPassword" minlength="10" maxlength="128" required autocomplete="new-password" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+            <label class="block">Confirmation<input type="password" name="passwordConfirmation" minlength="10" maxlength="128" required autocomplete="new-password" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+            <button class="w-full sm:w-auto px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Modifier le mot de passe</button>
+          </form>
+        </article>
+
+        <article class="p-5 sm:p-6 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl">
+          <h3 class="text-2xl text-fantasy-gold mb-2">Modifier mon adresse e-mail</h3>
+          <p class="mb-5 text-sm text-fantasy-gold-light/70">Votre mot de passe est demandé pour sécuriser cette modification.</p>
+          <form method="POST" action="/account/email" class="space-y-4 text-fantasy-gold-light">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label class="block">Nouvelle adresse e-mail<input type="email" name="email" required maxlength="255" autocomplete="email" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+            <label class="block">Confirmer l’adresse e-mail<input type="email" name="emailConfirmation" required maxlength="255" autocomplete="email" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+            <label class="block">Mot de passe actuel<input type="password" name="password" required autocomplete="current-password" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+            <button class="w-full sm:w-auto px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Modifier l’adresse e-mail</button>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <details data-account-panel="security" hidden class="mt-6 p-5 sm:p-6 bg-fantasy-dark border border-fantasy-red/50 rounded-2xl">
+      <summary class="cursor-pointer text-xl font-bold text-fantasy-red">Supprimer définitivement mon compte</summary>
+      <div class="mt-5 max-w-2xl">
+        <p class="text-sm leading-relaxed text-fantasy-gold-light">
+          Cette action est irréversible. Vos informations personnelles, votre avatar, vos jeux favoris et vos réservations seront supprimés. Les publications et données comptables devant être conservées seront dissociées de votre identité et attribuées à « Utilisateur supprimé ».
+        </p>
+        <form method="POST" action="/account/delete" class="mt-5 space-y-4 text-fantasy-gold-light" data-confirm="Confirmer la suppression et l’anonymisation définitive de votre compte ?">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <label class="block">Mot de passe actuel<input type="password" name="password" required autocomplete="current-password" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-red/40 rounded-lg"></label>
+          <label class="block">Écrivez SUPPRIMER pour confirmer<input name="confirmation" required autocomplete="off" pattern="SUPPRIMER" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-red/40 rounded-lg"></label>
+          <button class="w-full sm:w-auto px-5 py-3 bg-fantasy-red text-white font-bold rounded-lg">Supprimer définitivement mon compte</button>
+        </form>
+      </div>
+    </details>
+  </div>
+</section>
+<script src="/js/profile.js" defer></script>
+<%- include('../partials/footer') %>

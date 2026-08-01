@@ -1,0 +1,280 @@
+<%- include('../partials/header') %>
+
+<!-- SECTION : Hero / Introduction avec image de fond -->
+<section class="relative bg-fantasy-darkest text-white pt-28 pb-20 sm:pt-32 sm:pb-24 lg:py-32 overflow-hidden">
+    <!-- Overlay gradient sombre -->
+    <div class="absolute inset-0 bg-gradient-dark z-10"></div>
+    
+    <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-fantasy-brown via-fantasy-dark to-fantasy-darkest" aria-hidden="true"></div>
+    
+    <!-- Contenu -->
+    <div class="container mx-auto px-4 sm:px-6 relative z-20 text-center">
+        <h1 class="text-4xl sm:text-5xl md:text-7xl font-fantasy font-bold mb-6 text-fantasy-gold animate-pulse-glow">
+            Bienvenue chez Nord Stratégie
+        </h1>
+        <p class="text-xl md:text-2xl text-fantasy-gold-light max-w-3xl mx-auto font-body leading-relaxed">
+            Halte, voyageur ! Approche de l'âtre et tends l'oreille… Ici, les armées se rassemblent, 
+            les dés roulent et les légendes s'écrivent autour d'une table de jeu. 
+            Que tu sois jeune recrue ou vieux stratège, pousse la porte de Nord Stratégie : 
+            la bonne humeur est servie à volonté… pour les jets de dés, on ne promet rien.
+        </p>
+
+        <!-- Boutons CTA -->
+        <div class="mt-8 sm:mt-10 flex justify-center">
+            <a href="/about"
+               class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-3 border-fantasy-gold text-fantasy-gold font-fantasy font-bold text-lg rounded-lg
+                      hover:bg-fantasy-gold hover:text-fantasy-darkest transition-all duration-300">
+                Découvrir Nord Stratégie
+            </a>
+        </div>
+    </div>
+</section>
+
+
+<!-- SECTION : ACTUALITÉS (Carrousel) -->
+<section class="py-14 sm:py-20 bg-fantasy-dark relative">
+    <div class="absolute inset-0 opacity-5 bg-wood"></div>
+
+    <div class="container mx-auto px-4 sm:px-6 relative z-10">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
+            <div>
+                <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">La vie de l’association</p>
+                <h2 class="mt-2 text-3xl sm:text-4xl font-fantasy font-bold text-fantasy-gold">Dernières actualités</h2>
+            </div>
+            <a href="/news" class="text-fantasy-orange font-bold hover:text-fantasy-gold transition-colors">Toutes les actualités →</a>
+        </div>
+
+        <% if (latestNews.length) { %>
+            <div id="newsCarousel" class="w-full overflow-hidden rounded-2xl shadow-fantasy border-2 border-fantasy-gold/70 bg-fantasy-darker" aria-roledescription="carrousel" aria-label="Dernières actualités">
+                <div class="overflow-hidden">
+                    <div id="carousel" class="flex transition-transform duration-700 ease-out" aria-live="off">
+                        <% latestNews.forEach((newsPost, index) => { %>
+                            <% const plainContent = newsPost.content.replace(/\s+/g, ' ').trim(); %>
+                            <% const excerpt = plainContent.length > 260 ? `${plainContent.slice(0, 257).trimEnd()}...` : plainContent; %>
+                            <article class="min-w-full grid grid-cols-1 md:grid-cols-[45%_55%] bg-fantasy-darker" aria-label="Actualité <%= index + 1 %> sur <%= latestNews.length %>">
+                                <div class="h-60 sm:h-72 md:h-[28rem] bg-gradient-to-br from-fantasy-brown via-fantasy-dark to-fantasy-darkest overflow-hidden">
+                                    <% if (newsPost.imageUrl) { %>
+                                        <img src="<%= newsPost.imageUrl %>" alt="Illustration de l’actualité : <%= newsPost.title %>" loading="<%= index === 0 ? 'eager' : 'lazy' %>" <%= index === 0 ? 'fetchpriority="high"' : '' %> class="w-full h-full object-cover">
+                                    <% } else { %>
+                                        <div class="w-full h-full flex items-center justify-center text-7xl text-fantasy-gold/30" aria-hidden="true">⚔️</div>
+                                    <% } %>
+                                </div>
+                                <div class="p-6 sm:p-8 lg:p-12 flex flex-col justify-center items-start">
+                                    <time datetime="<%= newsPost.publishedAt.toISOString() %>" class="text-sm uppercase tracking-wider text-fantasy-orange"><%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(newsPost.publishedAt) %></time>
+                                    <h3 class="mt-3 text-2xl sm:text-3xl lg:text-4xl font-fantasy font-bold text-fantasy-gold break-words"><%= newsPost.title %></h3>
+                                    <p class="mt-4 text-fantasy-gold-light font-body text-base sm:text-lg leading-relaxed"><%= excerpt %></p>
+                                    <div class="mt-4"><%- include('../partials/news-author', { author: newsPost.author }) %></div>
+                                    <a href="/news/<%= newsPost.id %>" class="mt-7 px-6 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange transition-colors">Lire l’article</a>
+                                </div>
+                            </article>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <% if (latestNews.length > 1) { %>
+                    <div class="min-h-16 px-4 sm:px-6 flex items-center justify-between gap-4 border-t border-fantasy-gold/20 bg-fantasy-dark">
+                        <button id="prev" type="button" aria-label="Actualité précédente" class="w-10 h-10 rounded-full border border-fantasy-gold/50 text-fantasy-gold text-2xl font-bold hover:bg-fantasy-gold hover:text-fantasy-darkest transition-colors">‹</button>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2" aria-label="Choisir une actualité">
+                                <% latestNews.forEach((newsPost, index) => { %>
+                                    <button type="button" data-carousel-index="<%= index %>" aria-label="Afficher l’actualité <%= index + 1 %>" aria-current="<%= index === 0 ? 'true' : 'false' %>" class="news-carousel-dot group flex h-6 w-6 items-center justify-center rounded-full">
+                                        <span class="block h-2.5 w-2.5 rounded-full bg-fantasy-gold/25 transition group-aria-[current=true]:scale-125 group-aria-[current=true]:bg-fantasy-orange"></span>
+                                    </button>
+                                <% }) %>
+                            </div>
+                            <span id="newsCarouselCounter" class="text-sm tabular-nums text-fantasy-gold-light/65">1 / <%= latestNews.length %></span>
+                            <button id="carouselAutoplay" type="button" aria-pressed="false" class="min-h-10 px-3 rounded-lg border border-fantasy-gold/40 text-sm font-bold text-fantasy-gold hover:bg-fantasy-brown">
+                              <span data-carousel-autoplay-label>Pause</span>
+                            </button>
+                        </div>
+                        <button id="next" type="button" aria-label="Actualité suivante" class="w-10 h-10 rounded-full border border-fantasy-gold/50 text-fantasy-gold text-2xl font-bold hover:bg-fantasy-gold hover:text-fantasy-darkest transition-colors">›</button>
+                    </div>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div class="p-10 bg-fantasy-darker border border-fantasy-gold/30 rounded-xl text-center">
+                <p class="text-5xl" aria-hidden="true">📰</p>
+                <p class="mt-4 text-xl text-fantasy-gold">Aucune actualité publiée pour le moment.</p>
+            </div>
+        <% } %>
+    </div>
+</section>
+
+
+<!-- SECTION : Présentation de l'association -->
+<section class="py-14 sm:py-20 lg:py-24 bg-fantasy-darker relative">
+    <!-- Particules décoratives -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-10 left-10 w-32 h-32 border border-fantasy-gold rounded-full animate-pulse"></div>
+        <div class="absolute bottom-10 right-10 w-48 h-48 border border-fantasy-gold rounded-full animate-pulse"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 sm:px-6 relative z-10">
+        
+        <div class="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+
+            <!-- Texte avec cadre décoratif -->
+            <div class="bg-fantasy-dark/80 p-5 sm:p-8 rounded-xl border-3 border-fantasy-gold shadow-fantasy">
+                
+                <h2 class="text-3xl sm:text-4xl font-fantasy font-bold text-fantasy-gold mb-6 border-b-3 border-fantasy-gold pb-4">
+                    Qui sommes-nous ?
+                </h2>
+                
+                <p class="text-fantasy-gold-light font-body text-lg leading-relaxed mb-6">
+                    <span class="text-fantasy-orange font-bold">Nord Stratégie</span> est une association loi 1901 située à Bruay-sur-l'Escaut.
+                    Nous rassemblons des passionnés de jeux de figurines, de wargames en tout genre
+                    jeux de rôle, jeux de plateau modernes et modélisme.
+                </p>
+                
+                <div class="bg-fantasy-brown/50 p-4 sm:p-6 rounded-lg border-l-4 border-fantasy-orange mb-6">
+                    <p class="text-fantasy-gold-light font-body text-lg leading-relaxed">
+                        📍 Retrouvez-nous <span class="text-fantasy-orange font-bold">chaque vendredi soir</span>, 
+                        de 20h30 à 02h00 à la <span class="text-fantasy-gold font-bold">salle Musmeaux</span>, 
+                        rue Émile Zola à Bruay-sur-l'Escaut.
+                    </p>
+                </div>
+                
+                <p class="text-fantasy-gold-light font-body text-lg leading-relaxed italic">
+                    Que vous soyez débutant ou un vétéran du hobby, vous êtes les bienvenus !
+                </p>
+                
+            </div>
+
+            <!-- Galerie tactile sur mobile, grille sur tablette et ordinateur -->
+            <div class="min-w-0">
+                <p class="mb-3 text-sm text-fantasy-gold-light/65 md:hidden">Faites glisser les photos pour découvrir l’association →</p>
+                <div class="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 md:grid md:grid-cols-2 md:overflow-visible md:pb-0" aria-label="Photos de l’association">
+                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
+                            hover:shadow-glow-gold transition-all duration-300">
+                    <img src="/images/asso1.jpg" alt="" loading="lazy"
+                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
+                                transition-all duration-300"></div>
+                </div>
+                
+                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
+                            hover:shadow-glow-gold transition-all duration-300">
+                    <img src="/images/asso2.jpg" alt="" loading="lazy"
+                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
+                                transition-all duration-300"></div>
+                </div>
+                
+                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
+                            hover:shadow-glow-gold transition-all duration-300">
+                    <img src="/images/asso3.jpg" alt="" loading="lazy"
+                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
+                                transition-all duration-300"></div>
+                </div>
+                
+                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
+                            hover:shadow-glow-gold transition-all duration-300">
+                    <img src="/images/asso4.jpg" alt="" loading="lazy"
+                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
+                                transition-all duration-300"></div>
+                </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- SECTION : Nos activités (Cartes) -->
+<section id="activities" class="py-14 sm:py-20 lg:py-24 bg-fantasy-dark relative overflow-hidden">
+    
+    <div class="container mx-auto px-4 sm:px-6 relative z-10">
+        
+        <h2 class="text-3xl sm:text-4xl font-fantasy font-bold text-fantasy-gold mb-8 sm:mb-12 lg:mb-16 text-center">
+            Nos Activités
+        </h2>
+
+        <p class="-mt-5 mb-4 text-sm text-fantasy-gold-light/65 md:hidden">Faites glisser pour parcourir nos activités →</p>
+        <div class="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 xl:grid-cols-4 xl:gap-8">
+
+            <!-- Carte Wargames -->
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
+                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+                <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">⚔️📏</div>
+                <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Wargames</h3>
+                <p class="text-fantasy-gold-light font-body leading-relaxed">
+                    Warhammer 40k, Age of Sigmar, The Old World, Bolt Action ... Menez votre armée à la victoire ! (ou à la défaite, les 2 sont possibles)
+                </p>
+            </article>
+
+            <!-- Carte Plateau et Dungeon Crawler -->
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
+                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+                <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">🗺️🎲</div>
+                <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Dungeon Crawlers et jeux de plateau</h3>
+                <p class="text-fantasy-gold-light font-body leading-relaxed">
+                    Ranger of Shadow Deep, Deepsyx, Heroquest,Frostgrave, Stargrave ... Vivez des aventures épiques ! (ou mourrez en ouvrant un coffre-mimique)
+                </p>
+            </article>
+
+            <!-- Carte Modélisme -->
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
+                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+                <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">🎨🪚</div>
+                <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Modélisme & DIY</h3>
+                <p class="text-fantasy-gold-light font-body leading-relaxed">
+                    Adeptes des conversions de figurines, créations de décors et de peinture en tout genre, vous trouverez forcément un partenaire pour peindre et bricoler !
+                </p>
+            </article>
+
+            <!-- Carte Impression 3D -->
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
+                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+                <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">💻🛠</div>
+                <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Impression 3D </h3>
+                <p class="text-fantasy-gold-light font-body leading-relaxed">
+                    Vous voulez créer votre armée imprimée en 3D ? Venez discuter de PLA, de résine et de modélisation 3D avec nous !
+                </p>
+            </article>
+            
+        </div>
+    </div>
+</section>
+
+
+<!-- SECTION : Rejoignez-nous (CTA Final) -->
+<section class="py-20 sm:py-24 lg:py-32 bg-fantasy-darkest text-white relative overflow-hidden">
+    
+    <!-- Effet de particules -->
+    <div class="absolute inset-0 opacity-20">
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-fantasy-gold rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fantasy-orange rounded-full blur-3xl animate-pulse"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 sm:px-6 text-center relative z-10">
+        
+        <h2 class="text-3xl sm:text-5xl font-fantasy font-bold text-fantasy-gold mb-6 animate-pulse-glow">
+            Rejoignez Nord Stratégie !
+        </h2>
+        
+        <p class="text-xl text-fantasy-gold-light font-body max-w-3xl mx-auto mb-12 leading-relaxed">
+            Envie de nous rejoindre ? De rencontrer d'autres passionnés ou découvrir de nouveaux jeux ?<br>
+            L'inscription est ouverte à tous, petits et grands.
+        </p>
+
+    <button type="button" data-open-auth="register"
+           class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-3 border-fantasy-gold text-fantasy-gold font-fantasy font-bold text-lg rounded-lg
+                      hover:bg-fantasy-gold hover:text-fantasy-darkest transition-all duration-300">
+            ⚔️ Je m'inscris maintenant !
+    </button>
+        
+        <p class="mt-8 text-fantasy-gold-light font-body text-sm">
+            Ou venez nous rendre visite lors de nos soirées du vendredi !
+        </p>
+
+    </div>
+</section>
+
+
+<script src="/js/home-carousel.js" defer></script>
+
+<!-- Injecte le footer -->
+<%- include('../partials/footer') %>

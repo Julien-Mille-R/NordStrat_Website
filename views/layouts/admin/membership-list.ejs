@@ -1,0 +1,165 @@
+<%- include('../../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-7xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'memberships' }) %>
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-8">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-fantasy text-fantasy-gold">Suivi des cotisations</h1>
+        <p class="text-fantasy-gold-light mt-2">Gestion manuelle des cotisations du 1er septembre au 31 août.</p>
+      </div>
+      <form method="GET" action="/admindashboard/memberships" class="w-full sm:w-auto">
+        <label for="membershipSeason" class="block text-sm text-fantasy-gold-light mb-1">Saison affichée</label>
+        <select id="membershipSeason" name="season" data-submit-on-change class="w-full sm:w-auto p-3 bg-fantasy-brown border border-fantasy-gold/40 rounded-lg text-fantasy-gold-light">
+          <% seasons.forEach((season) => { %>
+            <option value="<%= season.year %>" <%= season.year === selectedSeason.year ? 'selected' : '' %>><%= season.label %></option>
+          <% }) %>
+        </select>
+      </form>
+    </div>
+
+    <div class="flex snap-x gap-3 overflow-x-auto pb-3 mb-6 lg:grid lg:grid-cols-5 lg:overflow-visible lg:pb-0 lg:mb-8">
+      <% [
+        ['Membres', summary.total, 'text-fantasy-gold'],
+        ['Payées', summary.paid, 'text-fantasy-emerald'],
+        ['Non payées', summary.unpaid, 'text-fantasy-red'],
+        ['Dispensées', summary.exempted, 'text-fantasy-orange'],
+        ['Annulées', summary.cancelled, 'text-fantasy-gold-light']
+      ].forEach(([label, value, color]) => { %>
+        <article class="min-w-32 snap-start p-3 sm:p-4 bg-fantasy-dark border border-fantasy-gold/20 rounded-xl lg:min-w-0">
+          <p class="text-sm text-fantasy-gold-light/70"><%= label %></p>
+          <p class="text-3xl font-bold <%= color %> mt-1"><%= value %></p>
+        </article>
+      <% }) %>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
+      <label class="text-fantasy-gold-light">Rechercher un membre
+        <input id="membershipSearch" type="search" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded-lg" placeholder="Pseudonyme ou adresse e-mail">
+      </label>
+      <label class="text-fantasy-gold-light">Filtrer par état
+        <select id="membershipStatusFilter" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded-lg">
+          <option value="">Tous les états</option>
+          <option value="paid">Payée</option>
+          <option value="unpaid">Non payée</option>
+          <option value="exempted">Dispensée</option>
+          <option value="cancelled">Annulée</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="bg-fantasy-dark border border-fantasy-gold/30 rounded-xl overflow-hidden">
+      <div class="hidden lg:grid lg:grid-cols-[1.1fr_1.8fr_1.2fr_1.4fr_1.4fr_1.3fr] gap-4 p-4 bg-fantasy-brown text-fantasy-gold font-bold">
+        <span>Pseudonyme</span><span>Adresse e-mail</span><span>État</span><span>Validité</span><span>Paiement</span><span>Enregistrement</span>
+      </div>
+      <div id="membershipRows">
+        <% players.forEach((player) => { %>
+          <% const membership = player.memberships[0] || null; %>
+          <% const status = membership?.status || 'unpaid'; %>
+          <% const statusLabels = { paid: 'Payée', unpaid: 'Non payée', exempted: 'Dispensée', cancelled: 'Annulée' }; %>
+          <% const paymentMethodLabels = { cash: 'Espèces', check: 'Chèque', bank_transfer: 'Virement bancaire', card: 'Carte', other: 'Autre' }; %>
+          <% const membershipIsValid = ['paid', 'exempted'].includes(status); %>
+          <article
+            class="membership-row border-t border-fantasy-gold/10"
+            data-search="<%= `${player.nickname || ''} ${player.email}`.toLocaleLowerCase('fr-FR') %>"
+            data-status="<%= status %>"
+          >
+            <div class="flex items-center justify-between gap-3 p-4 lg:hidden">
+              <div class="min-w-0">
+                <p class="font-bold text-fantasy-gold break-words"><%= player.nickname || '—' %></p>
+                <p class="mt-1 text-sm <%= membershipIsValid ? 'text-fantasy-emerald' : status === 'unpaid' ? 'text-fantasy-red' : 'text-fantasy-orange' %>"><%= statusLabels[status] %></p>
+                <p class="mt-1 text-xs text-fantasy-gold-light/60">
+                  <%= membershipIsValid ? `${new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeZone: 'Europe/Paris' }).format(new Date(`${selectedSeason.start}T12:00:00Z`))} – ${new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeZone: 'Europe/Paris' }).format(new Date(`${selectedSeason.end}T12:00:00Z`))}` : 'Adhésion non active' %>
+                </p>
+              </div>
+              <button type="button" data-open-membership="<%= player.id %>" class="min-h-11 shrink-0 px-4 py-2 border border-fantasy-gold text-fantasy-gold font-bold rounded-lg">Gérer</button>
+            </div>
+
+            <div class="hidden lg:grid lg:grid-cols-[1.1fr_1.8fr_1.2fr_1.4fr_1.4fr_1.3fr] lg:items-center gap-4 p-4">
+              <div><p class="font-bold text-fantasy-gold break-words"><%= player.nickname || '—' %></p></div>
+              <div><p class="text-fantasy-gold-light break-all"><%= player.email %></p></div>
+              <form method="POST" action="/admindashboard/members/<%= player.id %>/memberships" class="membership-form contents" data-current-status="<%= status %>">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="season" value="<%= selectedSeason.year %>">
+                <label class="block"><span class="sr-only">État</span>
+                  <select name="status" class="w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg text-fantasy-gold-light">
+                    <% Object.entries(statusLabels).forEach(([value, label]) => { %>
+                      <option value="<%= value %>" <%= status === value ? 'selected' : '' %>><%= label %></option>
+                    <% }) %>
+                  </select>
+                </label>
+                <div>
+                  <% if (membershipIsValid) { %>
+                    <p class="text-fantasy-emerald text-sm">Du <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeZone: 'Europe/Paris' }).format(new Date(`${selectedSeason.start}T12:00:00Z`)) %><br>au <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeZone: 'Europe/Paris' }).format(new Date(`${selectedSeason.end}T12:00:00Z`)) %></p>
+                  <% } else { %>
+                    <p class="text-fantasy-gold-light/50"><%= status === 'cancelled' ? 'Adhésion annulée' : 'Adhésion non active' %></p>
+                  <% } %>
+                </div>
+                <label class="block"><span class="sr-only">Mode de paiement</span>
+                  <select name="paymentMethod" class="membership-payment-method w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg text-fantasy-gold-light">
+                    <option value="">À sélectionner</option>
+                    <% Object.entries(paymentMethodLabels).forEach(([value, label]) => { %>
+                      <option value="<%= value %>" <%= membership?.paymentMethod === value ? 'selected' : '' %>><%= label %></option>
+                    <% }) %>
+                  </select>
+                </label>
+                <div>
+                  <button class="w-full px-4 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Enregistrer</button>
+                  <% if (membership) { %>
+                    <p class="text-xs text-fantasy-gold-light/50 mt-2">Le <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(membership.updatedAt) %> par <%= membership.recorder.nickname || membership.recorder.firstname %></p>
+                  <% } %>
+                </div>
+              </form>
+            </div>
+
+            <dialog id="membershipDialog-<%= player.id %>" aria-labelledby="membershipDialogTitle-<%= player.id %>" class="membership-management-dialog w-[calc(100%_-_2rem)] max-w-md max-h-[90vh] overflow-y-auto p-0 rounded-2xl bg-fantasy-dark text-fantasy-gold-light border-2 border-fantasy-gold/50 backdrop:bg-fantasy-darkest/80">
+              <div class="p-5">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="min-w-0">
+                    <p class="text-sm uppercase tracking-wider text-fantasy-orange">Cotisation <%= selectedSeason.label %></p>
+                    <h2 id="membershipDialogTitle-<%= player.id %>" class="mt-1 text-2xl font-fantasy text-fantasy-gold break-words"><%= player.nickname || 'Membre' %></h2>
+                    <p class="mt-1 text-sm break-all"><%= player.email %></p>
+                  </div>
+                  <button type="button" data-close-membership="<%= player.id %>" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-2xl text-fantasy-gold hover:bg-fantasy-brown" aria-label="Fermer">×</button>
+                </div>
+                <form method="POST" action="/admindashboard/members/<%= player.id %>/memberships" class="membership-form mt-6 space-y-4" data-current-status="<%= status %>">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input type="hidden" name="season" value="<%= selectedSeason.year %>">
+                  <label class="block">État
+                <select name="status" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg text-fantasy-gold-light">
+                  <% Object.entries(statusLabels).forEach(([value, label]) => { %>
+                    <option value="<%= value %>" <%= status === value ? 'selected' : '' %>><%= label %></option>
+                  <% }) %>
+                </select>
+              </label>
+                  <div class="p-3 bg-fantasy-darkest rounded-lg">
+                    <p class="text-xs text-fantasy-gold-light/50">Période de validité</p>
+                <% if (membershipIsValid) { %>
+                      <p class="mt-1 text-fantasy-emerald">Du <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeZone: 'Europe/Paris' }).format(new Date(`${selectedSeason.start}T12:00:00Z`)) %> au <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeZone: 'Europe/Paris' }).format(new Date(`${selectedSeason.end}T12:00:00Z`)) %></p>
+                <% } else { %>
+                      <p class="mt-1 text-fantasy-gold-light/60"><%= status === 'cancelled' ? 'Adhésion annulée' : 'Adhésion non active' %></p>
+                <% } %>
+              </div>
+                  <label class="block">Mode de paiement
+                <select name="paymentMethod" class="membership-payment-method mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg text-fantasy-gold-light">
+                  <option value="">À sélectionner</option>
+                  <% Object.entries(paymentMethodLabels).forEach(([value, label]) => { %>
+                    <option value="<%= value %>" <%= membership?.paymentMethod === value ? 'selected' : '' %>><%= label %></option>
+                  <% }) %>
+                </select>
+              </label>
+                  <button class="w-full px-4 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Enregistrer la cotisation</button>
+                <% if (membership) { %>
+                    <p class="text-xs text-fantasy-gold-light/50">Dernière modification le <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(membership.updatedAt) %> par <%= membership.recorder.nickname || membership.recorder.firstname %>.</p>
+                <% } %>
+            </form>
+              </div>
+            </dialog>
+          </article>
+        <% }) %>
+      </div>
+      <p id="membershipEmptyState" class="hidden p-6 text-center text-fantasy-gold-light/60">Aucun membre ne correspond aux filtres.</p>
+    </div>
+  </div>
+</section>
+<script src="/js/membership-list.js" defer></script>
+<%- include('../../partials/footer') %>

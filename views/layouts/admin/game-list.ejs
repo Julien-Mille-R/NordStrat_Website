@@ -1,0 +1,9 @@
+<%- include('../../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'games' }) %>
+    <div class="flex flex-col min-[380px]:flex-row min-[380px]:items-center min-[380px]:justify-between gap-4 mb-8"><h1 class="text-3xl sm:text-4xl font-fantasy text-fantasy-gold">Jeux</h1><a href="/admindashboard/games/create" class="w-full min-[380px]:w-auto px-4 py-3 text-center bg-fantasy-gold text-fantasy-darkest font-bold rounded">Ajouter</a></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><% games.forEach((game) => { %><article class="p-5 bg-fantasy-dark border border-fantasy-gold/30 rounded text-fantasy-gold-light"><div class="flex items-center gap-4"><div class="w-24 h-16 shrink-0 p-2 bg-white/90 border border-fantasy-gold/20 rounded-lg flex items-center justify-center"><% if (game.displayImageUrl) { %><img src="<%= game.displayImageUrl %>" alt="" loading="lazy" class="w-full h-full object-contain"><% } else { %><span aria-hidden="true" class="text-2xl text-fantasy-brown">🎲</span><% } %></div><div class="min-w-0"><h2 class="text-xl text-fantasy-gold break-words"><%= game.name %></h2><p><%= game.minPlayers || '?' %> à <%= game.maxPlayers || '?' %> joueurs — <%= game.isAvailable ? 'disponible' : 'désactivé' %></p></div></div><a href="/admindashboard/games/<%= game.id %>/edit" class="inline-block mt-3 text-fantasy-orange">Modifier</a></article><% }) %></div>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

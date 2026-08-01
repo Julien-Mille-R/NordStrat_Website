@@ -1,0 +1,30 @@
+<%- include('../partials/header') %>
+
+<article class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 sm:px-6 max-w-4xl">
+    <a href="/news" class="text-fantasy-orange hover:text-fantasy-gold transition-colors">← Retour aux actualités</a>
+
+    <header class="mt-7">
+      <time datetime="<%= newsPost.publishedAt.toISOString() %>" class="text-sm uppercase tracking-wider text-fantasy-orange"><%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(newsPost.publishedAt) %></time>
+      <h1 class="mt-3 text-4xl md:text-6xl font-fantasy text-fantasy-gold"><%= newsPost.title %></h1>
+      <div class="mt-5"><%- include('../partials/news-author', { author: newsPost.author }) %></div>
+      <% if (currentUser?.role?.name === 'Admin') { %>
+        <a href="/admindashboard/news/<%= newsPost.id %>/edit" class="inline-flex mt-5 px-4 py-2 border border-fantasy-gold/40 text-fantasy-gold rounded-lg">Modifier cette actualité</a>
+      <% } %>
+    </header>
+
+    <div class="mt-8 h-64 sm:h-96 overflow-hidden bg-gradient-to-br from-fantasy-brown via-fantasy-dark to-fantasy-darkest border border-fantasy-gold/30 rounded-2xl shadow-fantasy">
+      <% if (newsPost.imageUrl) { %>
+        <img src="<%= newsPost.imageUrl %>" alt="Illustration de l’actualité : <%= newsPost.title %>" class="w-full h-full object-cover">
+      <% } else { %>
+        <div class="w-full h-full flex items-center justify-center text-8xl text-fantasy-gold/30" aria-hidden="true">⚔️</div>
+      <% } %>
+    </div>
+
+    <div class="mt-10 p-6 sm:p-9 bg-fantasy-dark border border-fantasy-gold/25 rounded-2xl">
+      <p class="whitespace-pre-line text-lg leading-8 text-fantasy-gold-light"><%= newsPost.content %></p>
+    </div>
+  </div>
+</article>
+
+<%- include('../partials/footer') %>

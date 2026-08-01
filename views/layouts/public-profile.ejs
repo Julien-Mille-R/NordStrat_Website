@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-4xl">
+    <article class="bg-fantasy-dark border-2 border-fantasy-gold/40 rounded-2xl shadow-fantasy overflow-hidden">
+      <div class="h-28 bg-gradient-to-r from-fantasy-brown to-fantasy-darkest border-b border-fantasy-gold/20"></div>
+      <div class="px-5 sm:px-8 pb-8">
+        <div class="-mt-16 flex flex-col sm:flex-row sm:items-end gap-5">
+          <div class="w-32 h-32 shrink-0 rounded-full overflow-hidden border-4 border-fantasy-gold bg-fantasy-brown flex items-center justify-center shadow-fantasy">
+            <% if (player.avatarUrl) { %>
+              <img src="<%= player.avatarUrl %>" alt="Avatar de <%= player.nickname || 'membre' %>" loading="lazy" class="w-full h-full object-cover">
+            <% } else { %>
+              <span class="text-5xl font-fantasy text-fantasy-gold"><%= (player.nickname || 'M').slice(0, 1).toUpperCase() %></span>
+            <% } %>
+          </div>
+          <div class="pb-2">
+            <h1 class="text-4xl md:text-5xl font-fantasy text-fantasy-gold"><%= player.nickname || `Membre #${player.id}` %></h1>
+            <p class="text-fantasy-gold-light/70 mt-1">Membre de NordStrat</p>
+          </div>
+        </div>
+
+        <% if (!player.isProfilePublic) { %>
+          <p class="mt-6 p-4 border border-fantasy-orange/50 rounded-lg text-fantasy-gold-light">Ce profil est privé. Vous le voyez parce qu’il s’agit de votre compte ou que vous êtes administrateur.</p>
+        <% } %>
+
+        <section class="mt-8">
+          <h2 class="text-2xl font-fantasy text-fantasy-gold mb-3">Présentation</h2>
+          <% if (player.biography) { %>
+            <p class="text-fantasy-gold-light leading-relaxed whitespace-pre-line"><%= player.biography %></p>
+          <% } else { %>
+            <p class="text-fantasy-gold-light/60">Ce membre n’a pas encore ajouté de présentation.</p>
+          <% } %>
+        </section>
+
+        <section class="mt-8">
+          <h2 class="text-2xl font-fantasy text-fantasy-gold mb-4">Jeux favoris</h2>
+          <% if (player.favoriteGames.length) { %>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <% player.favoriteGames.forEach((game, index) => { %>
+                <article class="p-4 bg-fantasy-darkest border border-fantasy-gold/30 rounded-xl">
+                  <span class="text-xs text-fantasy-orange">Choix n° <%= index + 1 %></span>
+                  <h3 class="text-lg text-fantasy-gold mt-1"><%= game.name %></h3>
+                  <% if (game.universe) { %><p class="text-sm text-fantasy-gold-light/60 mt-1"><%= game.universe %></p><% } %>
+                </article>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="text-fantasy-gold-light/60">Aucun jeu favori sélectionné.</p>
+          <% } %>
+        </section>
+
+        <% if (currentUser?.id === player.id) { %>
+          <a href="/account" class="inline-block mt-8 px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Modifier mon profil</a>
+        <% } %>
+      </div>
+    </article>
+  </div>
+</section>
+<%- include('../partials/footer') %>

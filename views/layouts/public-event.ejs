@@ -1,0 +1,79 @@
+<%- include('../partials/header') %>
+
+<% if (publicEvent?.isVisible) { %>
+  <article class="pt-[74px] sm:pt-[82px] bg-fantasy-darkest min-h-screen">
+    <header>
+      <div class="relative w-full h-64 sm:h-80 lg:h-[32rem] overflow-hidden bg-gradient-to-br from-fantasy-brown via-fantasy-dark to-fantasy-darkest">
+        <% if (publicEvent.imageUrl) { %>
+          <img src="<%= publicEvent.imageUrl %>" alt="Présentation de <%= publicEvent.title %>" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-fantasy-darkest via-fantasy-darkest/15 to-transparent" aria-hidden="true"></div>
+        <% } %>
+        <div class="absolute inset-x-0 bottom-0">
+          <div class="container mx-auto max-w-6xl px-4 sm:px-6 pb-7 sm:pb-10">
+            <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">Le grand rendez-vous annuel de Nord Stratégie</p>
+            <h1 class="mt-2 max-w-4xl text-4xl sm:text-5xl lg:text-7xl font-fantasy text-fantasy-gold drop-shadow-lg"><%= publicEvent.title %></h1>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_22rem] gap-8 lg:gap-12 items-start">
+        <section>
+          <p class="text-sm uppercase tracking-wider text-fantasy-orange">À propos de l’événement</p>
+          <div class="mt-4 text-lg leading-relaxed text-fantasy-gold-light whitespace-pre-line"><%= publicEvent.description %></div>
+
+          <% if (ownApplications.length) { %>
+            <aside class="mt-8 p-5 bg-fantasy-brown/50 border border-fantasy-gold/30 rounded-xl">
+              <p class="text-fantasy-gold-light">
+                Vous avez déjà transmis <%= ownApplications.length %> demande<%= ownApplications.length > 1 ? 's' : '' %> pour cette édition.
+                <a href="/account/assaut-de-bruay" class="block sm:inline mt-2 sm:mt-0 sm:ml-1 text-fantasy-orange font-bold">Consulter mon suivi →</a>
+              </p>
+            </aside>
+          <% } %>
+        </section>
+
+        <aside class="lg:sticky lg:top-28 p-5 sm:p-6 bg-fantasy-dark border-2 border-fantasy-gold/55 rounded-2xl shadow-fantasy">
+          <h2 class="text-2xl font-fantasy text-fantasy-gold">Dates à retenir</h2>
+          <div class="mt-5 space-y-5">
+            <div class="pl-4 border-l-4 border-fantasy-orange">
+              <p class="text-sm uppercase tracking-wider text-fantasy-gold-light/60">L’événement</p>
+              <p class="mt-1 font-bold text-fantasy-gold-light">
+                Du <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(new Date(`${publicEvent.eventDate}T12:00:00Z`)) %>
+                au <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(new Date(`${publicEvent.eventEndDate}T12:00:00Z`)) %>
+              </p>
+            </div>
+            <div class="pl-4 border-l-4 <%= applicationsOpen ? 'border-fantasy-emerald' : 'border-fantasy-gold/40' %>">
+              <p class="text-sm uppercase tracking-wider text-fantasy-gold-light/60">Période d’inscription</p>
+              <p class="mt-1 text-fantasy-gold-light">
+                Du <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(new Date(`${publicEvent.registrationOpenAt}T12:00:00Z`)) %>
+                au <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(new Date(`${publicEvent.registrationCloseAt}T12:00:00Z`)) %>
+              </p>
+            </div>
+          </div>
+
+          <% if (applicationsOpen) { %>
+            <p class="mt-6 text-sm font-bold text-fantasy-emerald">Les inscriptions sont ouvertes.</p>
+            <a href="/events/assaut-de-bruay/registration" class="mt-3 flex min-h-12 w-full items-center justify-center px-5 py-3 text-center bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange transition-colors">Accéder au formulaire</a>
+          <% } else { %>
+            <p class="mt-6 text-sm leading-relaxed text-fantasy-gold-light/70">Les inscriptions ne sont pas ouvertes actuellement. La prochaine période sera annoncée courant mai ou juin.</p>
+            <a href="/contact" class="mt-4 inline-flex text-fantasy-orange font-bold">Contacter l’organisation →</a>
+          <% } %>
+        </aside>
+      </div>
+    </div>
+  </article>
+<% } else { %>
+  <section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+    <div class="container mx-auto px-4 sm:px-6 max-w-4xl">
+      <div class="p-6 sm:p-10 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl text-center">
+        <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">Assaut de Bruay</p>
+        <h1 class="mt-3 text-3xl sm:text-5xl font-fantasy text-fantasy-gold">La prochaine édition se prépare</h1>
+        <p class="mt-5 text-lg leading-relaxed text-fantasy-gold-light">Les inscriptions des partenaires, vendeurs et bénévoles sont généralement communiquées courant mai ou juin. Revenez bientôt pour découvrir toutes les informations.</p>
+        <a href="/contact" class="inline-flex mt-7 px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Contacter l’équipe</a>
+      </div>
+    </div>
+  </section>
+<% } %>
+
+<%- include('../partials/footer') %>

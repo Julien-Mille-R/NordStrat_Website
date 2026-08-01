@@ -1,0 +1,24 @@
+{
+  "name": "Nord Stratégie",
+  "short_name": "NordStrat",
+  "description": "Association de jeux de figurines à Bruay-sur-l’Escaut.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0806",
+  "theme_color": "#2d2520",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

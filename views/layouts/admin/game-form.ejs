@@ -1,0 +1,30 @@
+<%- include('../../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-2xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'games' }) %>
+    <h1 class="text-4xl font-fantasy text-fantasy-gold mb-8"><%= game ? 'Modifier le jeu' : 'Ajouter un jeu' %></h1>
+    <form method="POST" enctype="multipart/form-data" action="<%= game ? `/admindashboard/games/${game.id}/update` : '/admindashboard/games/create' %>" class="space-y-5 text-fantasy-gold-light">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label class="block">Nom<input name="name" required value="<%= game?.name || '' %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
+      <label class="block">Univers<input name="universe" value="<%= game?.universe || '' %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
+      <label class="block">Description<textarea name="description" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"><%= game?.description || '' %></textarea></label>
+      <div>
+        <label for="gameImage" class="block font-bold text-fantasy-gold">Logo du jeu</label>
+        <input id="gameImage" type="file" name="image" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded" aria-describedby="gameImageHelp">
+        <p id="gameImageHelp" class="mt-2 text-sm text-fantasy-gold-light/65">JPEG, PNG ou WebP, 2 Mo maximum. Un fond transparent est recommandé.</p>
+        <% if (game?.displayImageUrl) { %>
+          <div class="mt-3 flex items-center gap-4">
+            <div class="w-32 h-20 p-2 bg-white/90 border border-fantasy-gold/30 rounded-lg">
+              <img src="<%= game.displayImageUrl %>" alt="Logo actuel de <%= game.name %>" class="w-full h-full object-contain">
+            </div>
+            <% if (game.imageUrl) { %><label class="flex items-center gap-2"><input type="checkbox" name="removeImage"> Retirer le logo importé</label><% } else { %><p class="text-sm text-fantasy-gold-light/65">Logo fourni directement par le projet.</p><% } %>
+          </div>
+        <% } %>
+      </div>
+      <div class="grid grid-cols-1 min-[380px]:grid-cols-2 gap-4"><label>Minimum<input type="number" name="minPlayers" min="1" value="<%= game?.minPlayers || '' %>" class="mt-1 w-full min-w-0 p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label><label>Maximum<input type="number" name="maxPlayers" min="1" value="<%= game?.maxPlayers || '' %>" class="mt-1 w-full min-w-0 p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label></div>
+      <% if (game) { %><label class="flex gap-2"><input type="checkbox" name="isAvailable" <%= game.isAvailable ? 'checked' : '' %>> Disponible</label><% } %>
+      <button class="px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded">Enregistrer</button>
+    </form>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

@@ -1,0 +1,51 @@
+<%- include('../../partials/header') %>
+
+<section class="pt-28 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-4xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'news' }) %>
+
+    <header class="mb-8">
+      <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">Communication</p>
+      <h1 class="mt-2 text-4xl md:text-5xl font-fantasy text-fantasy-gold"><%= newsPost ? 'Modifier l’actualité' : 'Publier une actualité' %></h1>
+      <p class="mt-3 text-fantasy-gold-light"><%= newsPost ? 'Les modifications seront immédiatement visibles sur le site.' : 'L’article sera immédiatement visible par tous et pourra apparaître parmi les cinq actualités de l’accueil.' %></p>
+    </header>
+
+    <form method="POST" action="<%= newsPost ? `/admindashboard/news/${newsPost.id}/update` : '/admindashboard/news/create' %>" enctype="multipart/form-data" class="p-5 sm:p-8 bg-fantasy-dark border-2 border-fantasy-gold/35 rounded-2xl shadow-fantasy space-y-6">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <label class="block text-fantasy-gold-light">
+        <span class="font-bold text-fantasy-gold">Titre</span>
+        <input name="title" required minlength="3" maxlength="150" value="<%= newsPost?.title || '' %>" class="mt-2 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg" placeholder="Ex. Nouvelle campagne Star Wars Legion">
+        <span class="block mt-1 text-xs text-fantasy-gold-light/55">Entre 3 et 150 caractères.</span>
+      </label>
+
+      <label class="block text-fantasy-gold-light">
+        <span class="font-bold text-fantasy-gold">Contenu de l’article</span>
+        <textarea name="content" required minlength="20" maxlength="10000" rows="14" class="mt-2 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg leading-relaxed" placeholder="Rédigez votre actualité…"><%= newsPost?.content || '' %></textarea>
+        <span class="block mt-1 text-xs text-fantasy-gold-light/55">Entre 20 et 10 000 caractères. Les retours à la ligne seront conservés.</span>
+      </label>
+
+      <label class="block text-fantasy-gold-light">
+        <span class="font-bold text-fantasy-gold">Image d’illustration <span class="font-normal text-fantasy-gold-light/55">(facultative)</span></span>
+        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg file:mr-4 file:px-4 file:py-2 file:border-0 file:rounded file:bg-fantasy-gold file:text-fantasy-darkest file:font-bold">
+        <span class="block mt-1 text-xs text-fantasy-gold-light/55">JPEG, PNG ou WebP, 5 Mo maximum. Un fond graphique sera utilisé si aucune image n’est fournie.</span>
+        <% if (newsPost?.imageUrl) { %>
+          <span class="mt-4 flex items-center gap-4">
+            <img src="<%= newsPost.imageUrl %>" alt="Illustration actuelle" class="w-24 h-20 object-cover rounded-lg border border-fantasy-gold/30">
+            <span>
+              <span class="block text-sm">Une nouvelle image remplacera l’illustration actuelle.</span>
+              <span class="mt-2 flex items-center gap-2 text-sm"><input type="checkbox" name="removeImage"> Supprimer l’image actuelle</span>
+            </span>
+          </span>
+        <% } %>
+      </label>
+
+      <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-3 border-t border-fantasy-gold/15">
+        <a href="/admindashboard/news" class="px-5 py-3 text-center border border-fantasy-gold/40 text-fantasy-gold rounded-lg">Annuler</a>
+        <button data-loading-text="<%= newsPost ? 'Enregistrement en cours…' : 'Publication en cours…' %>" class="px-6 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange transition-colors"><%= newsPost ? 'Enregistrer les modifications' : 'Publier l’actualité' %></button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<%- include('../../partials/footer') %>

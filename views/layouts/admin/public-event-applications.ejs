@@ -1,0 +1,95 @@
+<%- include('../../partials/header') %>
+<section class="pt-28 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-7xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'assaut-de-bruay' }) %>
+    <header class="mb-7 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+      <div>
+        <p class="text-sm uppercase tracking-wider text-fantasy-orange">Assaut de Bruay</p>
+        <h1 class="mt-2 text-3xl sm:text-4xl font-fantasy text-fantasy-gold">Inscriptions reçues</h1>
+      </div>
+      <a href="/admindashboard/assaut-de-bruay" class="text-fantasy-orange font-bold">← Configuration</a>
+    </header>
+
+    <form method="GET" class="mb-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 p-4 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+      <label class="text-sm text-fantasy-gold-light">Type
+        <select name="type" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+          <option value="">Tous</option>
+          <% [['partner', 'Partenaires'], ['vendor', 'Vendeurs'], ['volunteer', 'Bénévoles']].forEach(([value, label]) => { %>
+            <option value="<%= value %>" <%= filters.type === value ? 'selected' : '' %>><%= label %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label class="text-sm text-fantasy-gold-light">Statut
+        <select name="status" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+          <option value="">Tous</option>
+          <% [['new', 'Nouvelles'], ['reviewing', 'En cours'], ['accepted', 'Acceptées'], ['waitlisted', 'Liste d’attente'], ['rejected', 'Refusées'], ['withdrawn', 'Retirées']].forEach(([value, label]) => { %>
+            <option value="<%= value %>" <%= filters.status === value ? 'selected' : '' %>><%= label %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label class="text-sm text-fantasy-gold-light">Présence
+        <select name="day" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+          <option value="">Tous les jours</option>
+          <option value="saturday" <%= filters.day === 'saturday' ? 'selected' : '' %>>Samedi</option>
+          <option value="sunday" <%= filters.day === 'sunday' ? 'selected' : '' %>>Dimanche</option>
+        </select>
+      </label>
+      <label class="text-sm text-fantasy-gold-light">Pseudo ou structure
+        <input type="search" name="search" maxlength="150" value="<%= filters.search %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+      <div class="flex items-end gap-2">
+        <button class="px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Filtrer</button>
+        <a href="/admindashboard/assaut-de-bruay/applications" class="px-4 py-3 border border-fantasy-gold/40 text-fantasy-gold rounded-lg">Effacer</a>
+      </div>
+    </form>
+
+    <% if (!publicEvent) { %>
+      <p class="p-6 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl text-fantasy-gold-light">Aucune édition n’est encore configurée.</p>
+    <% } else if (!applications.length) { %>
+      <p class="p-6 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl text-fantasy-gold-light">Aucune inscription ne correspond à ces critères.</p>
+    <% } else { %>
+      <% const typeLabels = { partner: 'Partenaire', vendor: 'Vendeur', volunteer: 'Bénévole' }; %>
+      <% const statusLabels = { new: 'Nouvelle', reviewing: 'En cours', accepted: 'Acceptée', waitlisted: 'Liste d’attente', rejected: 'Refusée', withdrawn: 'Retirée' }; %>
+      <div class="hidden lg:block overflow-hidden bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+        <table class="w-full table-fixed text-left text-fantasy-gold-light">
+          <thead class="bg-fantasy-brown text-fantasy-gold">
+            <tr><th scope="col" class="w-[13%] p-4">Type</th><th scope="col" class="w-[17%] p-4">Compte</th><th scope="col" class="w-[20%] p-4">Structure</th><th scope="col" class="w-[11%] p-4">Personnes</th><th scope="col" class="w-[15%] p-4">Présence</th><th scope="col" class="w-[12%] p-4">Statut</th><th scope="col" class="w-[12%] p-4"><span class="sr-only">Actions</span></th></tr>
+          </thead>
+          <tbody>
+            <% applications.forEach((application) => { %>
+              <tr class="border-t border-fantasy-gold/10">
+                <td class="p-4 text-fantasy-orange break-words"><%= typeLabels[application.applicationType] %></td>
+                <td class="p-4 break-words"><%= application.applicant?.nickname || application.contactName %></td>
+                <td class="p-4 break-words"><%= application.organizationName || '—' %></td>
+                <td class="p-4"><%= application.participantCount %></td>
+                <td class="p-4"><%= [application.presentSaturday ? 'Samedi' : '', application.presentSunday ? 'Dimanche' : ''].filter(Boolean).join(' et ') %></td>
+                <td class="p-4"><%= statusLabels[application.status] %></td>
+                <td class="p-4 text-right"><a href="/admindashboard/assaut-de-bruay/applications/<%= application.id %>" class="inline-block px-3 py-2 border border-fantasy-gold text-fantasy-gold rounded-lg">Consulter</a></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <div class="space-y-3 lg:hidden">
+        <% applications.forEach((application) => { %>
+          <article class="p-4 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl text-fantasy-gold-light">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p class="text-sm font-bold text-fantasy-orange"><%= typeLabels[application.applicationType] %></p>
+                <h2 class="mt-1 text-lg font-bold text-fantasy-gold break-words"><%= application.organizationName || application.applicant?.nickname || application.contactName %></h2>
+                <% if (application.organizationName) { %><p class="mt-1 text-sm break-words"><%= application.applicant?.nickname || application.contactName %></p><% } %>
+              </div>
+              <span class="shrink-0 rounded-full bg-fantasy-brown px-2.5 py-1 text-xs text-fantasy-gold"><%= statusLabels[application.status] %></span>
+            </div>
+            <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+              <div><dt class="text-fantasy-gold-light/55">Personnes</dt><dd class="mt-1"><%= application.participantCount %></dd></div>
+              <div><dt class="text-fantasy-gold-light/55">Présence</dt><dd class="mt-1"><%= [application.presentSaturday ? 'Samedi' : '', application.presentSunday ? 'Dimanche' : ''].filter(Boolean).join(' et ') %></dd></div>
+            </dl>
+            <a href="/admindashboard/assaut-de-bruay/applications/<%= application.id %>" class="mt-4 block w-full px-4 py-3 text-center font-bold border border-fantasy-gold text-fantasy-gold rounded-lg">Consulter la demande</a>
+          </article>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

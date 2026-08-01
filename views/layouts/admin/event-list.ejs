@@ -1,0 +1,54 @@
+<%- include('../../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'events' }) %>
+    <div class="flex flex-col min-[380px]:flex-row min-[380px]:items-center min-[380px]:justify-between gap-4 mb-8"><h1 class="text-3xl sm:text-4xl font-fantasy text-fantasy-gold">Événements</h1><a href="/admindashboard/events/create" class="w-full min-[380px]:w-auto px-4 py-3 text-center bg-fantasy-gold text-fantasy-darkest font-bold rounded">Créer</a></div>
+    <div class="space-y-4">
+      <% events.forEach((event) => { %>
+        <% const statusLabels = { upcoming: 'À venir', ongoing: 'En cours', completed: 'Clôturée', cancelled: 'Annulée' }; %>
+        <article class="p-5 bg-fantasy-dark border border-fantasy-gold/30 rounded-lg text-fantasy-gold-light">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 class="text-xl text-fantasy-gold"><%= event.title %></h2>
+              <p><%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(event.date) %></p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-sm font-bold <%= event.status === 'cancelled' ? 'bg-fantasy-red/20 text-fantasy-red' : 'bg-fantasy-brown text-fantasy-gold-light' %>"><%= statusLabels[event.status] %></span>
+          </div>
+          <div class="flex flex-wrap gap-4 mt-4">
+            <% if (event.status !== 'cancelled') { %>
+              <a href="/admindashboard/events/<%= event.id %>/edit" class="text-fantasy-orange">Modifier</a>
+              <a href="/admindashboard/events/<%= event.id %>/attendance" class="text-fantasy-orange">Présences</a>
+            <% } %>
+            <% if (['upcoming', 'ongoing'].includes(event.status)) { %><form method="POST" action="/admindashboard/events/<%= event.id %>/archive"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="text-fantasy-orange">Archiver</button></form><% } %>
+          </div>
+          <% if (['upcoming', 'ongoing'].includes(event.status)) { %>
+            <details class="mt-4 pt-4 border-t border-fantasy-red/20">
+              <summary class="cursor-pointer text-fantasy-red">Annuler cette soirée</summary>
+              <form method="POST" action="/admindashboard/events/<%= event.id %>/cancel" class="mt-3 space-y-3" data-confirm="Confirmer l’annulation définitive de cette soirée ?">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <label class="block">Motif communiqué aux joueurs
+                  <textarea name="cancellationReason" required minlength="5" maxlength="500" rows="2" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-red/40 rounded-lg"></textarea>
+                </label>
+                <button class="px-4 py-2 bg-fantasy-red text-white rounded-lg">Confirmer l’annulation</button>
+              </form>
+            </details>
+          <% } %>
+          <% if (event.status === 'cancelled') { %>
+            <div class="mt-4 pt-4 border-t border-fantasy-gold/15">
+              <p class="text-sm"><span class="font-bold text-fantasy-gold">Motif :</span> <%= event.cancellationReason %></p>
+              <% if (event.date > new Date()) { %>
+                <form method="POST" action="/admindashboard/events/<%= event.id %>/reopen" class="mt-4" data-confirm="Relancer cette soirée avec des tables vierges et rouvrir les inscriptions ?">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button class="px-4 py-2 bg-fantasy-emerald-dark text-white font-bold rounded-lg hover:bg-fantasy-emerald transition-colors">Relancer les inscriptions</button>
+                </form>
+              <% } else { %>
+                <p class="mt-3 text-sm text-fantasy-gold-light/50">Cette soirée est passée et ne peut plus être relancée.</p>
+              <% } %>
+            </div>
+          <% } %>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

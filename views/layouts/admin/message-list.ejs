@@ -1,0 +1,85 @@
+<%- include('../../partials/header') %>
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'inbox' }) %>
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 mb-8">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-fantasy text-fantasy-gold">Messagerie</h1>
+        <p class="text-fantasy-gold-light mt-2"><%= unreadCount %> message<%= unreadCount > 1 ? 's' : '' %> non lu<%= unreadCount > 1 ? 's' : '' %>.</p>
+      </div>
+      <nav class="flex flex-wrap gap-2">
+        <a href="/admindashboard/inbox" class="px-4 py-2 border rounded-lg <%= selectedView === 'inbox' ? 'bg-fantasy-gold text-fantasy-darkest border-fantasy-gold' : 'text-fantasy-gold border-fantasy-gold/30' %>">Boîte de réception</a>
+        <a href="/admindashboard/inbox?view=archived" class="px-4 py-2 border rounded-lg <%= selectedView === 'archived' ? 'bg-fantasy-gold text-fantasy-darkest border-fantasy-gold' : 'text-fantasy-gold border-fantasy-gold/30' %>">Archives (<%= archivedCount %>)</a>
+      </nav>
+    </div>
+
+    <% if (!messages.length) { %>
+      <p class="p-6 bg-fantasy-dark border border-fantasy-gold/30 rounded-xl text-fantasy-gold-light">Aucun message dans cette section.</p>
+    <% } %>
+
+    <div class="space-y-4">
+      <% messages.forEach((contactMessage) => { %>
+        <details class="group bg-fantasy-dark border-2 <%= contactMessage.status === 'unread' ? 'border-fantasy-orange/70' : 'border-fantasy-gold/25' %> rounded-xl overflow-hidden">
+          <summary class="cursor-pointer list-none p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <% if (contactMessage.status === 'unread') { %><span class="px-2 py-1 text-xs bg-fantasy-orange text-fantasy-darkest font-bold rounded">Nouveau</span><% } %>
+                <h2 class="text-xl font-bold text-fantasy-gold"><%= contactMessage.subject %></h2>
+              </div>
+              <p class="text-fantasy-gold-light mt-1 break-words">De <%= contactMessage.authorName %></p>
+              <p class="text-sm text-fantasy-gold-light/70 break-all"><%= contactMessage.email %></p>
+            </div>
+            <time class="text-sm text-fantasy-gold-light/60"><%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(contactMessage.createdAt) %></time>
+          </summary>
+
+          <div class="p-5 border-t border-fantasy-gold/20">
+            <div class="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-5">
+              <aside class="p-4 bg-fantasy-darkest rounded-lg">
+                <h3 class="font-bold text-fantasy-gold">Auteur</h3>
+                <p class="mt-2"><%= contactMessage.authorName %></p>
+                <a href="mailto:<%= encodeURIComponent(contactMessage.email) %>?subject=<%= encodeURIComponent(`Réponse : ${contactMessage.subject}`) %>" class="block mt-2 text-fantasy-orange break-all"><%= contactMessage.email %></a>
+                <% if (contactMessage.phone) { %><a href="tel:<%= contactMessage.phone.replace(/[^0-9+]/g, '') %>" class="block mt-2 text-fantasy-orange"><%= contactMessage.phone %></a><% } %>
+                <% if (contactMessage.player) { %>
+                  <p class="mt-4 text-sm text-fantasy-emerald">Membre inscrit : <%= contactMessage.player.nickname || contactMessage.player.firstname %></p>
+                  <a href="/members/<%= contactMessage.player.id %>" class="inline-block mt-2 text-fantasy-orange">Voir le profil</a>
+                <% } else { %>
+                  <p class="mt-4 text-sm text-fantasy-gold-light/50">Visiteur non connecté</p>
+                <% } %>
+              </aside>
+              <div>
+                <h3 class="font-bold text-fantasy-gold">Message</h3>
+                <p class="mt-3 whitespace-pre-line leading-relaxed text-fantasy-gold-light"><%= contactMessage.message %></p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-3 mt-6">
+              <% if (contactMessage.status === 'unread') { %>
+                <form method="POST" action="/admindashboard/inbox/<%= contactMessage.id %>/status">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="action" value="read"><input type="hidden" name="returnView" value="<%= selectedView %>">
+                  <button class="px-4 py-2 bg-fantasy-emerald text-fantasy-darkest font-bold rounded-lg">Marquer comme lu</button>
+                </form>
+              <% } else if (contactMessage.status === 'read') { %>
+                <form method="POST" action="/admindashboard/inbox/<%= contactMessage.id %>/status">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="action" value="unread"><input type="hidden" name="returnView" value="inbox">
+                  <button class="px-4 py-2 border border-fantasy-gold text-fantasy-gold rounded-lg">Marquer comme non lu</button>
+                </form>
+              <% } %>
+              <% if (contactMessage.status !== 'archived') { %>
+                <form method="POST" action="/admindashboard/inbox/<%= contactMessage.id %>/status">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="action" value="archive"><input type="hidden" name="returnView" value="inbox">
+                  <button class="px-4 py-2 border border-fantasy-red text-fantasy-gold-light rounded-lg">Archiver</button>
+                </form>
+              <% } else { %>
+                <form method="POST" action="/admindashboard/inbox/<%= contactMessage.id %>/status">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="action" value="read"><input type="hidden" name="returnView" value="archived">
+                  <button class="px-4 py-2 border border-fantasy-gold text-fantasy-gold rounded-lg">Remettre dans la boîte de réception</button>
+                </form>
+              <% } %>
+            </div>
+          </div>
+        </details>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<%- include('../../partials/footer') %>

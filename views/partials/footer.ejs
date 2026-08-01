@@ -1,0 +1,65 @@
+</main>
+
+<footer class="bg-fantasy-darkest border-t-3 border-fantasy-gold text-fantasy-gold-light relative">
+  <div class="absolute inset-0 opacity-5 bg-wood pointer-events-none"></div>
+  <div class="container max-w-7xl mx-auto px-4 sm:px-6 py-7 relative z-10">
+    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-7">
+      <div class="flex flex-col sm:flex-row sm:flex-wrap gap-5 sm:gap-x-8 text-sm">
+        <div class="flex items-start gap-3">
+          <span class="text-lg" aria-hidden="true">🏛️</span>
+          <div>
+            <p class="font-bold text-fantasy-gold">Nous trouver</p>
+            <p>Salle Musmeaux, rue Émile Zola</p>
+            <p>59860 Bruay-sur-l’Escaut</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-lg" aria-hidden="true">📧</span>
+          <div>
+            <p class="font-bold text-fantasy-gold">Nous contacter</p>
+            <a href="mailto:nord.strategie@gmail.com" class="hover:text-fantasy-orange transition-colors">nord.strategie@gmail.com</a>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-lg" aria-hidden="true">⏰</span>
+          <div>
+            <p class="font-bold text-fantasy-gold">Soirées jeux</p>
+            <p>Vendredi, de 20h30 à 2h00</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-7">
+        <nav aria-label="Liens légaux">
+          <ul class="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            <li><a href="/mentions-legales" class="hover:text-fantasy-orange transition-colors">Mentions légales</a></li>
+            <li><a href="/cgu" class="hover:text-fantasy-orange transition-colors">Conditions d’utilisation</a></li>
+            <li><a href="/politique-confidentialite" class="hover:text-fantasy-orange transition-colors">Confidentialité</a></li>
+            <li><a href="/accessibility" class="hover:text-fantasy-orange transition-colors">Accessibilité</a></li>
+          </ul>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="https://www.facebook.com/nordstrategie/?locale=fr_FR" target="_blank" rel="noopener noreferrer" aria-label="Nord Stratégie sur Facebook, nouvel onglet" class="w-9 h-9 rounded-full bg-fantasy-brown border-2 border-fantasy-gold/30 hover:border-fantasy-gold hover:bg-fantasy-gold hover:text-fantasy-darkest transition-all flex items-center justify-center font-bold">f</a>
+          <a href="https://discord.gg/ws3YHhukB8" target="_blank" rel="noopener noreferrer" aria-label="Rejoindre le Discord de Nord Stratégie, nouvel onglet" class="w-9 h-9 rounded-full bg-fantasy-brown border-2 border-fantasy-gold/30 hover:border-fantasy-gold hover:bg-fantasy-gold hover:text-fantasy-darkest transition-all flex items-center justify-center" title="Discord">💬</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 pt-4 border-t border-fantasy-gold/25 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-sm">
+      <p>© <%= new Date().getFullYear() %> <span class="font-fantasy text-fantasy-gold">Nord Stratégie</span> - Tous droits réservés</p>
+      <p class="text-fantasy-gold-light/60 text-xs">Fait par des passionnés, pour des passionnés.</p>
+    </div>
+  </div>
+  <div class="h-1 bg-gradient-gold"></div>
+</footer>
+
+<%- include('./auth-modal') %>
+
+<script src="/js/navigation.js"></script>
+<script src="/js/flash-message.js"></script>
+<script src="/js/modal-auth.js"></script>
+<script src="/js/ui-actions.js"></script>
+<script src="/js/form-accessibility.js"></script>
+<script src="/js/form-submission-state.js"></script>
+</body>
+</html>

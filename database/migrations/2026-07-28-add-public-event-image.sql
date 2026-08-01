@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE public_event
+  ADD COLUMN IF NOT EXISTS image_url VARCHAR(500);
+
+COMMIT;

@@ -1,0 +1,10 @@
+<div class="flex items-center gap-3 text-sm text-fantasy-gold-light/70">
+  <div class="w-9 h-9 shrink-0 rounded-full overflow-hidden border border-fantasy-gold/40 bg-fantasy-brown flex items-center justify-center">
+    <% if (author.avatarUrl) { %>
+      <img src="<%= author.avatarUrl %>" alt="" class="w-full h-full object-cover">
+    <% } else { %>
+      <span class="font-bold text-fantasy-gold" aria-hidden="true"><%= (author.nickname || author.firstname).slice(0, 1).toUpperCase() %></span>
+    <% } %>
+  </div>
+  <span>Par <strong class="text-fantasy-gold-light"><%= author.nickname || `${author.firstname} ${author.lastname}` %></strong></span>
+</div>

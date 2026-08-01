@@ -1,0 +1,131 @@
+<% const alreadyApplied = ownApplications.some((application) => application.applicationType === applicationType); %>
+<details class="group bg-fantasy-dark border-2 border-fantasy-gold/30 rounded-2xl overflow-hidden">
+  <summary class="p-6 cursor-pointer list-none flex items-center justify-between gap-4">
+    <div>
+      <p class="text-sm uppercase tracking-wider text-fantasy-orange"><%= eyebrow %></p>
+      <h2 class="mt-2 text-2xl font-fantasy text-fantasy-gold"><%= heading %></h2>
+    </div>
+    <span class="text-2xl text-fantasy-gold group-open:rotate-45 transition-transform" aria-hidden="true">+</span>
+  </summary>
+
+  <% if (alreadyApplied) { %>
+    <div class="p-6 pt-0 text-fantasy-gold-light">
+      <p class="p-4 bg-fantasy-brown/50 rounded-lg">Une demande de ce type a déjà été enregistrée pour votre compte.</p>
+      <a href="/account/assaut-de-bruay" class="inline-flex mt-4 text-fantasy-orange font-bold">Voir son état →</a>
+    </div>
+  <% } else { %>
+    <form method="POST" action="/events/assaut-de-bruay/apply" data-presence-required class="p-6 pt-0 space-y-5 text-fantasy-gold-light">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="applicationType" value="<%= applicationType %>">
+      <div class="absolute -left-[10000px]" aria-hidden="true"><label>Entreprise<input name="companyWebsite" tabindex="-1" autocomplete="off"></label></div>
+
+      <div class="p-4 bg-fantasy-brown/40 rounded-lg text-sm">
+        <p><strong class="text-fantasy-gold">Compte :</strong> <%= currentUser.nickname || currentUser.firstname %></p>
+        <p class="mt-1"><strong class="text-fantasy-gold">E-mail :</strong> <%= currentUser.email %></p>
+      </div>
+
+      <label class="block">Nom de la personne à contacter
+        <input name="contactName" required minlength="2" maxlength="120" autocomplete="name" value="<%= currentUser.nickname || `${currentUser.firstname} ${currentUser.lastname}` %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+
+      <% if (applicationType !== 'volunteer') { %>
+        <label class="block">Nom de la structure ou nom commercial
+          <input name="organizationName" required maxlength="150" autocomplete="organization" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+        </label>
+      <% } %>
+
+      <label class="block">Téléphone <span class="text-fantasy-gold-light/50">(facultatif)</span>
+        <input type="tel" name="phone" maxlength="30" autocomplete="tel" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+
+      <fieldset>
+        <legend class="text-fantasy-gold">Jours de présence <span aria-hidden="true" class="text-fantasy-red">*</span><span class="sr-only">, au moins un jour obligatoire</span></legend>
+        <div class="mt-2 flex flex-wrap gap-4">
+          <label class="flex items-center gap-2"><input type="checkbox" name="presentSaturday"> Samedi</label>
+          <label class="flex items-center gap-2"><input type="checkbox" name="presentSunday"> Dimanche</label>
+        </div>
+      </fieldset>
+
+      <label class="block">Nombre total de personnes présentes
+        <input type="number" name="participantCount" required min="1" max="100" value="1" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+      </label>
+
+      <% if (applicationType === 'volunteer') { %>
+        <% const taskOptions = [
+          ['setup', 'Installation'],
+          ['welcome', 'Accueil du public'],
+          ['refreshments', 'Buvette ou restauration'],
+          ['logistics', 'Aide logistique'],
+          ['game_hosting', 'Animation d’un espace de jeu'],
+          ['exhibitor_support', 'Accompagnement des exposants'],
+          ['communication', 'Photographie ou communication'],
+          ['cleanup', 'Rangement et nettoyage'],
+          ['where_needed', 'Là où il y aura besoin']
+        ]; %>
+        <fieldset>
+          <legend class="text-fantasy-gold">Missions souhaitées</legend>
+          <div class="mt-2 grid grid-cols-1 gap-2">
+            <% taskOptions.forEach(([value, label]) => { %>
+              <label class="flex items-start gap-2"><input type="checkbox" name="volunteerTasks" value="<%= value %>" class="mt-1"> <%= label %></label>
+            <% }) %>
+          </div>
+        </fieldset>
+        <label class="block">Disponibilités ou horaires
+          <input name="availability" maxlength="1000" placeholder="Toute la journée, uniquement le matin…" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+        </label>
+      <% } else { %>
+        <fieldset class="p-4 border border-fantasy-gold/20 rounded-xl">
+          <legend class="px-2 text-fantasy-gold">Besoins matériels</legend>
+          <p class="mb-4 p-3 bg-fantasy-darkest/50 border border-fantasy-gold/20 rounded-lg text-sm">
+            L’emplacement disponible est limité à <strong class="text-fantasy-gold">6 m × 2,50 m</strong>,
+            avec un maximum de <strong class="text-fantasy-gold">6 tables</strong>.
+          </p>
+          <label class="block mb-4">Longueur d’emplacement souhaitée
+            <select name="spaceLength" required class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+              <option value="">Choisir une longueur</option>
+              <% for (let length = 2; length <= 6; length += 1) { %>
+                <option value="<%= length %>"><%= length %> m × 2,50 m</option>
+              <% } %>
+            </select>
+            <span class="block mt-2 text-sm text-fantasy-gold-light/60">
+              Indiquez la longueur réellement nécessaire. La profondeur reste fixée à 2,50 m et l’attribution définitive dépendra de l’organisation.
+            </span>
+          </label>
+          <div class="grid grid-cols-1 min-[380px]:grid-cols-2 gap-3">
+            <label>Tables <span class="text-fantasy-gold-light/50">(6 maximum)</span><input type="number" name="tableCount" min="0" max="6" value="0" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+            <label>Chaises<input type="number" name="chairCount" min="0" max="500" value="0" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+          </div>
+          <div class="mt-4 space-y-3">
+            <label class="flex items-center gap-2"><input type="checkbox" name="needsElectricity"> Branchement électrique</label>
+            <label class="flex items-center gap-2"><input type="checkbox" name="needsWater"> Point d’eau</label>
+          </div>
+        </fieldset>
+      <% } %>
+
+      <% if (applicationType !== 'volunteer') { %>
+        <fieldset class="p-4 border border-fantasy-gold/20 rounded-xl">
+          <legend class="px-2 text-fantasy-gold">Présence en ligne <span class="text-fantasy-gold-light/50">(facultatif)</span></legend>
+          <div class="space-y-4">
+            <label class="block">Site internet
+              <input type="url" name="websiteUrl" maxlength="500" autocomplete="url" placeholder="https://votre-site.fr" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+            </label>
+            <label class="block">Réseau social 1
+              <input type="url" name="socialUrl1" maxlength="500" placeholder="https://…" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+            </label>
+            <label class="block">Réseau social 2
+              <input type="url" name="socialUrl2" maxlength="500" placeholder="https://…" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg">
+            </label>
+          </div>
+        </fieldset>
+      <% } %>
+
+      <label class="block"><%= descriptionLabel %>
+        <textarea name="description" required minlength="20" maxlength="5000" rows="5" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></textarea>
+      </label>
+      <label class="block">Autres besoins ou remarques <span class="text-fantasy-gold-light/50">(facultatif)</span>
+        <textarea name="needs" maxlength="3000" rows="3" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></textarea>
+      </label>
+      <button data-loading-text="Envoi de la demande…" class="w-full px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg"><%= buttonLabel %></button>
+    </form>
+  <% } %>
+</details>

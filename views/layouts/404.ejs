@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+
+<section class="pt-28 sm:pt-32 pb-16 sm:pb-20 bg-fantasy-darkest min-h-screen flex items-center">
+  <div class="container mx-auto px-4 sm:px-6 max-w-4xl">
+    <div class="relative overflow-hidden p-6 sm:p-10 lg:p-14 bg-fantasy-dark border-2 border-fantasy-gold/40 rounded-2xl text-center shadow-fantasy">
+      <div class="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-fantasy-orange/10 blur-2xl" aria-hidden="true"></div>
+      <p class="text-7xl sm:text-8xl font-fantasy font-bold text-fantasy-orange" aria-hidden="true">404</p>
+      <p class="mt-3 text-sm uppercase tracking-[0.2em] text-fantasy-gold-light/60">Jet de repérage raté</p>
+      <h1 class="mt-3 text-3xl sm:text-5xl font-fantasy text-fantasy-gold">Cette page a quitté la table</h1>
+      <p class="mt-5 max-w-2xl mx-auto text-lg leading-relaxed text-fantasy-gold-light">
+        La page demandée est introuvable. Elle a peut-être été déplacée, supprimée, ou vaincue lors d’une bataille particulièrement disputée.
+      </p>
+      <p class="mt-3 text-fantasy-gold-light/70">Pas de panique : votre armée, elle, est toujours intacte.</p>
+      <div class="mt-8 flex flex-col sm:flex-row justify-center gap-3">
+        <a href="/" class="min-h-12 px-6 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange transition-colors">Retourner à l’accueil</a>
+        <a href="/contact" class="min-h-12 px-6 py-3 border border-fantasy-gold text-fantasy-gold font-bold rounded-lg hover:bg-fantasy-brown transition-colors">Signaler un problème</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
