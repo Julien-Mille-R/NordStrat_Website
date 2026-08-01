@@ -173,6 +173,7 @@ CREATE TABLE public_event (
     registration_open_at DATE NOT NULL,
     registration_close_at DATE NOT NULL,
     description TEXT NOT NULL,
+    image_url VARCHAR(500),
     is_visible BOOLEAN NOT NULL DEFAULT false,
     applications_enabled BOOLEAN NOT NULL DEFAULT false,
     created_by INTEGER NOT NULL REFERENCES player(id) ON DELETE RESTRICT,

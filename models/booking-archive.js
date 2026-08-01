@@ -3,6 +3,7 @@ import path from 'node:path';
 import { DataTypes, Op } from 'sequelize';
 
 const PARIS_TIME_ZONE = 'Europe/Paris';
+const ARCHIVE_DIRECTORY = process.env.ARCHIVE_DIRECTORY || path.join(process.cwd(), 'archives');
 
 function archiveDateParts(date) {
   const parts = new Intl.DateTimeFormat('en-CA', {
@@ -68,7 +69,7 @@ export default function defineBookingArchive(sequelize) {
 
   BookingArchive.prototype.getFilePath = function getFilePath() {
     const { year } = archiveDateParts(this.eventDate);
-    return path.join(process.cwd(), 'archives', year, this.getFilename());
+    return path.join(ARCHIVE_DIRECTORY, year, this.getFilename());
   };
 
   BookingArchive.prototype.exportToFile = async function exportToFile() {

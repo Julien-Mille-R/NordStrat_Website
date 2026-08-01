@@ -95,16 +95,22 @@ export function rejectCrossSiteUnsafeRequest(req, res, next) {
 
 export function validateCsrfToken(req, res, next) {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
-  const multipartCsrfRoutes = new Set([
-    '/account/avatar',
-    '/admindashboard/news/create',
-    '/admindashboard/assaut-de-bruay/save',
-  ]);
-  const isNewsUpdateRoute = /^\/admindashboard\/news\/\d+\/update$/.test(req.path);
-  if ((multipartCsrfRoutes.has(req.path) || isNewsUpdateRoute)
-    && req.is('multipart/form-data')) return next();
+  if (isMultipartCsrfRoute(req.path) && req.is('multipart/form-data')) return next();
 
   return rejectInvalidCsrfToken(req, res, next);
+}
+
+const MULTIPART_CSRF_ROUTE_PATTERNS = [
+  /^\/account\/avatar$/,
+  /^\/admindashboard\/assaut-de-bruay\/save$/,
+  /^\/admindashboard\/games\/create$/,
+  /^\/admindashboard\/games\/\d+\/update$/,
+  /^\/admindashboard\/news\/create$/,
+  /^\/admindashboard\/news\/\d+\/update$/,
+];
+
+export function isMultipartCsrfRoute(pathname) {
+  return MULTIPART_CSRF_ROUTE_PATTERNS.some((pattern) => pattern.test(pathname));
 }
 
 export function validateMultipartCsrfToken(req, res, next) {

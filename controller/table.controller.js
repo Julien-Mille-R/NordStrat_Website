@@ -276,23 +276,7 @@ export async function updateTable(req, res, next) {
         || (game.maxPlayers != null && maxPlayers > game.maxPlayers);
       if (invalidCapacity) throw new Error('INVALID_GAME_CAPACITY');
 
-      const previousCapacity = gameTable.maxPlayers;
-      const changes = [];
-      if (previousGame.id !== game.id) changes.push(`jeu modifié de « ${previousGame.name} » à « ${game.name} »`);
-      if (previousCapacity !== maxPlayers) changes.push(`capacité modifiée de ${previousCapacity} à ${maxPlayers} joueurs`);
       await gameTable.update({ gameId: game.id, maxPlayers }, { transaction });
-      if (isAdmin(req)) {
-        await recordAdminAction({
-          admin: req.currentUser,
-          category: 'game_tables',
-          action: 'table_updated',
-          targetType: 'game_table',
-          targetId: gameTable.id,
-          targetLabel: tableLabel(gameTable),
-          description: changes.length ? `${changes.join(' ; ')}.` : 'Paramètres de la table enregistrés sans changement.',
-          transaction,
-        });
-      }
     });
 
     return res.redirect('/booking?message=table-updated');

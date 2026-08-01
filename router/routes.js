@@ -262,9 +262,9 @@ router.post('/admindashboard/events/:eventId/archive', archiveEvent);
 
 router.get('/admindashboard/games', showGameList);
 router.get('/admindashboard/games/create', showCreateGameForm);
-router.post('/admindashboard/games/create', parseGameImageUpload, createGame);
+router.post('/admindashboard/games/create', uploadLimiter, parseGameImageUpload, createGame);
 router.get('/admindashboard/games/:gameId/edit', showEditGameForm);
-router.post('/admindashboard/games/:gameId/update', parseGameImageUpload, updateGame);
+router.post('/admindashboard/games/:gameId/update', uploadLimiter, parseGameImageUpload, updateGame);
 router.post('/admindashboard/games/:gameId/disable', disableGame);
 
 router.get('/admindashboard/archives', showArchiveList);

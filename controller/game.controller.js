@@ -12,7 +12,8 @@ import { Game } from '../models/index.js';
 import { setFlash, validateMultipartCsrfToken } from './access.controller.js';
 import { attachGameImageUrl } from '../services/game-image.service.js';
 
-const GAME_IMAGE_DIRECTORY = path.join(process.cwd(), 'public', 'uploads', 'games');
+const GAME_IMAGE_DIRECTORY = process.env.GAME_IMAGE_DIRECTORY
+  || path.join(process.cwd(), 'public', 'uploads', 'games');
 const PUBLIC_GAME_IMAGE_PREFIX = '/uploads/games/';
 const MAX_GAME_IMAGE_SIZE = 2 * 1024 * 1024;
 
