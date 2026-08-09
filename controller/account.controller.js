@@ -1,7 +1,5 @@
 import bcrypt from 'bcrypt';
 import crypto from 'node:crypto';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import {
   col,
   fn,
@@ -28,19 +26,14 @@ import {
   renewAuthenticatedSession,
 } from '../services/session-security.service.js';
 import { DEFAULT_AVATARS } from '../services/default-avatar.service.js';
-
-const AVATAR_DIRECTORY = path.join(process.cwd(), 'public', 'uploads', 'avatars');
-const PUBLIC_AVATAR_PREFIX = '/uploads/avatars/';
+import { deleteUploadedImage } from '../services/upload-storage.service.js';
 
 function normalizedText(value) {
   return value?.trim();
 }
 
 async function removeLocalAvatar(avatarUrl) {
-  if (!avatarUrl?.startsWith(PUBLIC_AVATAR_PREFIX)) return;
-  await fs.unlink(path.join(AVATAR_DIRECTORY, path.basename(avatarUrl))).catch((error) => {
-    if (error.code !== 'ENOENT') throw error;
-  });
+  return deleteUploadedImage(avatarUrl, 'avatars');
 }
 
 export async function register(req, res, next) {

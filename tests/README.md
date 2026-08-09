@@ -14,6 +14,6 @@ npm run test:unit
 npm run test:integration
 ```
 
-Les tests d’intégration sont ignorés si `TEST_DATABASE_URL` n’est pas défini. La base indiquée doit être dédiée aux tests et son nom doit obligatoirement se terminer par `_test`. Son schéma est entièrement réinitialisé pendant les tests.
+Les tests d’intégration sont ignorés si aucune cible de test n’est définie. En local, `TEST_DATABASE_SCHEMA=nordstrat_test` crée un schéma isolé dans la base configurée par `.env`. En CI, `TEST_DATABASE_URL` peut cibler une base éphémère. Le nom de la base ou du schéma doit obligatoirement se terminer par `_test` et son contenu est entièrement réinitialisé.
 
 Exemple de configuration : copier `.env.test.example` vers `.env.test`, renseigner les secrets puis lancer `npm run test:integration`. Ce fichier local est ignoré par Git.

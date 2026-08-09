@@ -5,6 +5,11 @@ node_modules/
 .env
 .env.local
 .env.test
+.env.docker
+.env.production
+.env.production.local
+*.pem
+*.key
 
 # Build outputs
 dist/
@@ -25,6 +30,7 @@ Thumbs.db
 
 # Generated booking archives
 archives/
+backups/
 
 # User-uploaded avatars
 public/uploads/avatars/*

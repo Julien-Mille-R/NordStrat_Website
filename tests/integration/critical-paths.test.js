@@ -4,20 +4,32 @@ import os from 'node:os';
 import path from 'node:path';
 import { after, before, describe, test } from 'node:test';
 import bcrypt from 'bcrypt';
+import pg from 'pg';
 import request from 'supertest';
 import 'dotenv/config';
 
-function configuredTestDatabaseUrl() {
-  if (process.env.TEST_DATABASE_URL) return process.env.TEST_DATABASE_URL;
-  if (!process.env.TEST_DB_NAME) return null;
-  const user = encodeURIComponent(process.env.DB_USER || 'postgres');
-  const password = encodeURIComponent(process.env.DB_PASSWORD || '');
-  const host = process.env.DB_HOST || '127.0.0.1';
-  const port = process.env.DB_PORT || '5432';
-  return `postgres://${user}:${password}@${host}:${port}/${process.env.TEST_DB_NAME}`;
+function databaseUrlFromLocalConfiguration(databaseName, schemaName = null) {
+  const url = new URL('postgres://localhost');
+  url.username = process.env.DB_USER || 'postgres';
+  url.password = process.env.DB_PASSWORD || '';
+  url.hostname = process.env.DB_HOST || '127.0.0.1';
+  url.port = process.env.DB_PORT || '5432';
+  url.pathname = `/${databaseName}`;
+  if (schemaName) url.searchParams.set('options', `-c search_path=${schemaName}`);
+  return url.toString();
 }
 
-const testDatabaseUrl = configuredTestDatabaseUrl();
+function configuredTestTarget() {
+  if (process.env.TEST_DATABASE_URL) return process.env.TEST_DATABASE_URL;
+  if (process.env.TEST_DB_NAME) return databaseUrlFromLocalConfiguration(process.env.TEST_DB_NAME);
+  if (process.env.TEST_DATABASE_SCHEMA) {
+    return databaseUrlFromLocalConfiguration(process.env.DB_NAME, process.env.TEST_DATABASE_SCHEMA);
+  }
+  return null;
+}
+
+const testDatabaseUrl = configuredTestTarget();
+const testSchema = process.env.TEST_DATABASE_SCHEMA || null;
 
 function csrfToken(response) {
   const match = response.text.match(/name="_csrf" value="([^"]+)"/);
@@ -38,20 +50,45 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
 
   before(async () => {
     const databaseName = decodeURIComponent(new URL(testDatabaseUrl).pathname.slice(1));
-    if (!databaseName.endsWith('_test')) {
+    const isolatedDatabase = databaseName.endsWith('_test');
+    const isolatedSchema = testSchema?.endsWith('_test');
+    if (!isolatedDatabase && !isolatedSchema) {
       throw new Error('REFUS_DETRUIRE_BASE_NON_TEST : TEST_DATABASE_URL doit cibler une base terminant par _test.');
+    }
+
+    if (testSchema) {
+      if (!/^[a-z][a-z0-9_]*_test$/.test(testSchema)) {
+        throw new Error('REFUS_SCHEMA_NON_TEST : nom de schéma de test invalide.');
+      }
+      const client = new pg.Client({
+        host: process.env.DB_HOST,
+        port: Number(process.env.DB_PORT || 5432),
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+      });
+      await client.connect();
+      await client.query(`CREATE SCHEMA IF NOT EXISTS "${testSchema}"`);
+      await client.end();
     }
 
     temporaryDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'nordstrat-tests-'));
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_URL = testDatabaseUrl;
+    if (testSchema) process.env.DB_SCHEMA = testSchema;
     process.env.SESSION_SECRET = 'integration-test-session-secret-with-sufficient-length';
     process.env.RATE_LIMIT_SECRET = 'integration-test-rate-limit-secret-with-sufficient-length';
-    process.env.GAME_IMAGE_DIRECTORY = path.join(temporaryDirectory, 'games');
+    process.env.UPLOAD_ROOT = path.join(temporaryDirectory, 'uploads');
     process.env.ARCHIVE_DIRECTORY = path.join(temporaryDirectory, 'archives');
 
     ({ default: app } = await import('../../app.js'));
     ({ sequelize, ...models } = await import('../../models/index.js'));
+    const [schemaRows] = await sequelize.query('SELECT current_schema() AS name');
+    if (testSchema && schemaRows[0].name !== testSchema) {
+      throw new Error('REFUS_DETRUIRE_SCHEMA_PUBLIC : search_path de test incorrect.');
+    }
+    await sequelize.query('DROP TABLE IF EXISTS session');
+    await sequelize.query('DROP TABLE IF EXISTS rate_limit_counter');
     await sequelize.sync({ force: true });
     await sequelize.query(`CREATE TABLE rate_limit_counter (
       key_hash CHAR(64) PRIMARY KEY,
@@ -88,26 +125,33 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
     const home = await agent.get('/').expect(200);
     return agent.post('/auth/login')
       .type('form')
-      .send({ _csrf: csrfToken(home), email, password });
+      .send({ _csrf: csrfToken(home), email, password })
+      .expect(302);
   }
+
+  test('le contrôle de santé confirme la base et les stockages persistants', async () => {
+    const response = await request(app).get('/health').expect(200);
+    assert.equal(response.body.status, 'healthy');
+  });
 
   test('la connexion échoue explicitement avec un mauvais mot de passe', async () => {
     const agent = request.agent(app);
-    await login(agent, firstUser.email, 'mauvais-mot-de-passe').expect(302).expect('Location', '/?auth=login');
+    const loginResponse = await login(agent, firstUser.email, 'mauvais-mot-de-passe');
+    assert.equal(loginResponse.headers.location, '/?auth=login');
     const response = await agent.get('/?auth=login').expect(200);
     assert.match(response.text, /Adresse email ou mot de passe incorrect/);
   });
 
   test('un membre connecté reste exclu de l’administration', async () => {
     const agent = request.agent(app);
-    await login(agent, firstUser.email).expect(302);
+    await login(agent, firstUser.email);
     await agent.get('/booking').expect(200);
     await agent.get('/admindashboard').expect(403);
   });
 
   test('une réservation peut être créée puis discutée par un autre membre', async () => {
     const hostAgent = request.agent(app);
-    await login(hostAgent, firstUser.email).expect(302);
+    await login(hostAgent, firstUser.email);
     const bookingPage = await hostAgent.get('/booking').expect(200);
     await hostAgent.post('/tables/create')
       .type('form')
@@ -125,7 +169,7 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
     assert.ok(gameTable);
 
     const visitorAgent = request.agent(app);
-    await login(visitorAgent, secondUser.email).expect(302);
+    await login(visitorAgent, secondUser.email);
     const visitorBooking = await visitorAgent.get('/booking').expect(200);
     await visitorAgent.post(`/tables/${gameTable.id}/comments`)
       .type('form')
@@ -136,7 +180,7 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
 
   test('un admin peut importer un logo avec CSRF multipart', async () => {
     const agent = request.agent(app);
-    await login(agent, admin.email).expect(302);
+    await login(agent, admin.email);
     const form = await agent.get('/admindashboard/games/create').expect(200);
     const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64');
     await agent.post('/admindashboard/games/create')
@@ -149,8 +193,9 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
 
     const createdGame = await models.Game.findOne({ where: { name: 'Jeu Avec Logo' } });
     assert.match(createdGame.imageUrl, /^\/uploads\/games\/[0-9a-f-]+\.png$/);
-    const storedFiles = await fs.readdir(process.env.GAME_IMAGE_DIRECTORY);
+    const storedFiles = await fs.readdir(path.join(process.env.UPLOAD_ROOT, 'games'));
     assert.equal(storedFiles.length, 1);
+    await agent.get(createdGame.imageUrl).expect(200).expect('Content-Type', /image\/png/);
   });
 
   test('l’archivage conserve les données finales et produit le JSON', async () => {

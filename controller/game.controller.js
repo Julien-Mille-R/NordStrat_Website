@@ -1,6 +1,3 @@
-import crypto from 'node:crypto';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import multer from 'multer';
 import {
   col,
@@ -11,10 +8,8 @@ import {
 import { Game } from '../models/index.js';
 import { setFlash, validateMultipartCsrfToken } from './access.controller.js';
 import { attachGameImageUrl } from '../services/game-image.service.js';
+import { deleteUploadedImage, saveUploadedImage } from '../services/upload-storage.service.js';
 
-const GAME_IMAGE_DIRECTORY = process.env.GAME_IMAGE_DIRECTORY
-  || path.join(process.cwd(), 'public', 'uploads', 'games');
-const PUBLIC_GAME_IMAGE_PREFIX = '/uploads/games/';
 const MAX_GAME_IMAGE_SIZE = 2 * 1024 * 1024;
 
 const gameImageUpload = multer({
@@ -27,43 +22,8 @@ const gameImageUpload = multer({
   },
 }).single('image');
 
-function imageExtension(buffer) {
-  const isJpeg = buffer.length >= 3
-    && buffer[0] === 0xff
-    && buffer[1] === 0xd8
-    && buffer[2] === 0xff;
-  const isPng = buffer.length >= 8
-    && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
-  const isWebp = buffer.length >= 12
-    && buffer.subarray(0, 4).toString('ascii') === 'RIFF'
-    && buffer.subarray(8, 12).toString('ascii') === 'WEBP';
-
-  if (isJpeg) return 'jpg';
-  if (isPng) return 'png';
-  if (isWebp) return 'webp';
-  return null;
-}
-
-function storedGameImagePath(imageUrl) {
-  if (!imageUrl?.startsWith(PUBLIC_GAME_IMAGE_PREFIX)) return null;
-  return path.join(GAME_IMAGE_DIRECTORY, path.basename(imageUrl));
-}
-
-async function deleteStoredGameImage(imageUrl) {
-  const imagePath = storedGameImagePath(imageUrl);
-  if (imagePath) await fs.unlink(imagePath).catch(() => {});
-}
-
 async function saveUploadedGameImage(file) {
-  if (!file) return null;
-  const extension = imageExtension(file.buffer);
-  if (!extension) throw new Error('INVALID_GAME_IMAGE_CONTENT');
-
-  await fs.mkdir(GAME_IMAGE_DIRECTORY, { recursive: true });
-  const filename = `${crypto.randomUUID()}.${extension}`;
-  const imagePath = path.join(GAME_IMAGE_DIRECTORY, filename);
-  await fs.writeFile(imagePath, file.buffer, { mode: 0o600 });
-  return { imagePath, imageUrl: `${PUBLIC_GAME_IMAGE_PREFIX}${filename}` };
+  return saveUploadedImage(file, 'games', 'INVALID_GAME_IMAGE_CONTENT');
 }
 
 export function parseGameImageUpload(req, res, next) {
@@ -154,7 +114,7 @@ export async function createGame(req, res, next) {
     setFlash(req, 'success', `Le jeu « ${name} » a été ajouté au catalogue.`);
     return res.redirect(redirectTo);
   } catch (error) {
-    if (uploadedImage?.imagePath) await fs.unlink(uploadedImage.imagePath).catch(() => {});
+    if (uploadedImage) await deleteUploadedImage(uploadedImage.imageUrl, 'games');
     if (error.message === 'INVALID_GAME_IMAGE_CONTENT') {
       setFlash(req, 'error', 'Le contenu du fichier ne correspond pas à une image autorisée.');
       return res.redirect(redirectTo);
@@ -208,12 +168,12 @@ export async function updateGame(req, res, next) {
       isAvailable: req.body.isAvailable === 'on',
     });
     if ((uploadedImage || removeImage) && previousImageUrl) {
-      await deleteStoredGameImage(previousImageUrl);
+      await deleteUploadedImage(previousImageUrl, 'games');
     }
     setFlash(req, 'success', `Le jeu « ${name} » a été mis à jour.`);
     return res.redirect('/admindashboard/games');
   } catch (error) {
-    if (uploadedImage?.imagePath) await fs.unlink(uploadedImage.imagePath).catch(() => {});
+    if (uploadedImage) await deleteUploadedImage(uploadedImage.imageUrl, 'games');
     if (error.message === 'INVALID_GAME_IMAGE_CONTENT') {
       setFlash(req, 'error', 'Le contenu du fichier ne correspond pas à une image autorisée.');
       return res.redirect(`/admindashboard/games/${req.params.gameId}/edit`);

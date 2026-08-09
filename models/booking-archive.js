@@ -3,7 +3,9 @@ import path from 'node:path';
 import { DataTypes, Op } from 'sequelize';
 
 const PARIS_TIME_ZONE = 'Europe/Paris';
-const ARCHIVE_DIRECTORY = process.env.ARCHIVE_DIRECTORY || path.join(process.cwd(), 'archives');
+export const ARCHIVE_DIRECTORY = path.resolve(
+  process.env.ARCHIVE_DIRECTORY || path.join(process.cwd(), 'archives'),
+);
 
 function archiveDateParts(date) {
   const parts = new Intl.DateTimeFormat('en-CA', {

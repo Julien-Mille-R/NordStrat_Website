@@ -16,6 +16,8 @@ import {
 import { providePublicEventNavigation } from './controller/public-event.controller.js';
 import { provideSeo } from './controller/seo.controller.js';
 import { showNotFound, showServerError } from './controller/error.controller.js';
+import { showHealth } from './controller/health.controller.js';
+import { UPLOAD_ROOT } from './services/upload-storage.service.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
@@ -72,6 +74,8 @@ export function createApp() {
     next();
   });
 
+  app.get('/health', showHealth);
+
   if (isProduction) {
     app.use((req, res, next) => {
       if (req.secure) return next();
@@ -81,6 +85,11 @@ export function createApp() {
 
   app.set('view engine', 'ejs');
   app.set('views', path.join(__dirname, 'views'));
+  app.use('/uploads', express.static(UPLOAD_ROOT, {
+    dotfiles: 'deny',
+    index: false,
+    maxAge: isProduction ? '1d' : 0,
+  }));
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(rejectCrossSiteUnsafeRequest);
   app.use(express.urlencoded({ extended: true }));
@@ -97,6 +106,7 @@ export function createApp() {
           password: process.env.DB_PASSWORD,
         },
       tableName: 'session',
+      ...(process.env.DB_SCHEMA ? { schemaName: process.env.DB_SCHEMA } : {}),
       createTableIfMissing: true,
     }),
     name: 'nordstrat.sid',

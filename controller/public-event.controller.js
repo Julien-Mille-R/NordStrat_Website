@@ -1,6 +1,3 @@
-import crypto from 'node:crypto';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import multer from 'multer';
 import { Op } from 'sequelize';
 import {
@@ -11,13 +8,12 @@ import {
 import { setFlash, validateMultipartCsrfToken } from './access.controller.js';
 import { recordAdminAction } from '../services/audit-log.service.js';
 import { applySeo } from './seo.controller.js';
+import { deleteUploadedImage, saveUploadedImage } from '../services/upload-storage.service.js';
 
 const EVENT_SLUG_PREFIX = 'assaut-de-bruay-';
 const PUBLIC_EVENT_PATH = '/events/assaut-de-bruay';
 const PUBLIC_EVENT_REGISTRATION_PATH = `${PUBLIC_EVENT_PATH}/registration`;
 const ADMIN_EVENT_PATH = '/admindashboard/assaut-de-bruay';
-const PUBLIC_EVENT_IMAGE_DIRECTORY = path.join(process.cwd(), 'public', 'uploads', 'public-events');
-const PUBLIC_EVENT_IMAGE_PREFIX = '/uploads/public-events/';
 const MAX_PUBLIC_EVENT_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_APPLICATION_TYPES = new Set(['partner', 'vendor', 'volunteer']);
 const ALLOWED_APPLICATION_STATUSES = new Set(['new', 'reviewing', 'accepted', 'waitlisted', 'rejected', 'withdrawn']);
@@ -53,43 +49,8 @@ const publicEventImageUpload = multer({
   },
 }).single('image');
 
-function imageExtension(buffer) {
-  const isJpeg = buffer.length >= 3
-    && buffer[0] === 0xff
-    && buffer[1] === 0xd8
-    && buffer[2] === 0xff;
-  const isPng = buffer.length >= 8
-    && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
-  const isWebp = buffer.length >= 12
-    && buffer.subarray(0, 4).toString('ascii') === 'RIFF'
-    && buffer.subarray(8, 12).toString('ascii') === 'WEBP';
-
-  if (isJpeg) return 'jpg';
-  if (isPng) return 'png';
-  if (isWebp) return 'webp';
-  return null;
-}
-
-function storedPublicEventImagePath(imageUrl) {
-  if (!imageUrl?.startsWith(PUBLIC_EVENT_IMAGE_PREFIX)) return null;
-  return path.join(PUBLIC_EVENT_IMAGE_DIRECTORY, path.basename(imageUrl));
-}
-
-async function deleteStoredPublicEventImage(imageUrl) {
-  const imagePath = storedPublicEventImagePath(imageUrl);
-  if (imagePath) await fs.unlink(imagePath).catch(() => {});
-}
-
 async function saveUploadedPublicEventImage(file) {
-  if (!file) return null;
-  const extension = imageExtension(file.buffer);
-  if (!extension) throw new Error('INVALID_PUBLIC_EVENT_IMAGE_CONTENT');
-
-  await fs.mkdir(PUBLIC_EVENT_IMAGE_DIRECTORY, { recursive: true });
-  const filename = `${crypto.randomUUID()}.${extension}`;
-  const imagePath = path.join(PUBLIC_EVENT_IMAGE_DIRECTORY, filename);
-  await fs.writeFile(imagePath, file.buffer, { mode: 0o600 });
-  return { imagePath, imageUrl: `${PUBLIC_EVENT_IMAGE_PREFIX}${filename}` };
+  return saveUploadedImage(file, 'public-events', 'INVALID_PUBLIC_EVENT_IMAGE_CONTENT');
 }
 
 export function parsePublicEventImageUpload(req, res, next) {
@@ -649,12 +610,12 @@ export async function savePublicEvent(req, res, next) {
     });
 
     if ((uploadedImage || req.body.removeImage === 'on') && previousImageUrl) {
-      await deleteStoredPublicEventImage(previousImageUrl);
+      await deleteUploadedImage(previousImageUrl, 'public-events');
     }
     setFlash(req, 'success', 'La page de l’Assaut de Bruay a été mise à jour.');
     return res.redirect(ADMIN_EVENT_PATH);
   } catch (error) {
-    if (uploadedImage?.imagePath) await fs.unlink(uploadedImage.imagePath).catch(() => {});
+    if (uploadedImage) await deleteUploadedImage(uploadedImage.imageUrl, 'public-events');
     if (error.message === 'INVALID_PUBLIC_EVENT_IMAGE_CONTENT') {
       setFlash(req, 'error', 'Le contenu du fichier ne correspond pas à une image JPEG, PNG ou WebP valide.');
       return res.redirect(ADMIN_EVENT_PATH);

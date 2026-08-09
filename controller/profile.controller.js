@@ -1,6 +1,3 @@
-import crypto from 'node:crypto';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import multer from 'multer';
 import { Op } from 'sequelize';
 import {
@@ -13,9 +10,8 @@ import { setFlash, validateMultipartCsrfToken } from './access.controller.js';
 import {
   findDefaultAvatar,
 } from '../services/default-avatar.service.js';
+import { deleteUploadedImage, saveUploadedImage } from '../services/upload-storage.service.js';
 
-const AVATAR_DIRECTORY = path.join(process.cwd(), 'public', 'uploads', 'avatars');
-const PUBLIC_AVATAR_PREFIX = '/uploads/avatars/';
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
 
 const avatarUpload = multer({
@@ -27,33 +23,8 @@ const avatarUpload = multer({
   },
 }).single('avatar');
 
-function avatarExtension(buffer) {
-  const isJpeg = buffer.length >= 3
-    && buffer[0] === 0xff
-    && buffer[1] === 0xd8
-    && buffer[2] === 0xff;
-  const isPng = buffer.length >= 8
-    && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
-  const isWebp = buffer.length >= 12
-    && buffer.subarray(0, 4).toString('ascii') === 'RIFF'
-    && buffer.subarray(8, 12).toString('ascii') === 'WEBP';
-
-  if (isJpeg) return 'jpg';
-  if (isPng) return 'png';
-  if (isWebp) return 'webp';
-  return null;
-}
-
 async function removeLocalAvatar(avatarUrl) {
-  if (!avatarUrl?.startsWith(PUBLIC_AVATAR_PREFIX)) return;
-  const filename = path.basename(avatarUrl);
-  const avatarPath = path.join(AVATAR_DIRECTORY, filename);
-
-  try {
-    await fs.unlink(avatarPath);
-  } catch (error) {
-    if (error.code !== 'ENOENT') throw error;
-  }
+  return deleteUploadedImage(avatarUrl, 'avatars');
 }
 
 function normalizedGameIds(value) {
@@ -156,7 +127,7 @@ export async function updatePublicProfile(req, res, next) {
 }
 
 export async function updateAvatar(req, res, next) {
-  let avatarPath;
+  let uploadedAvatar;
 
   try {
     if (!req.file) {
@@ -164,27 +135,19 @@ export async function updateAvatar(req, res, next) {
       return res.redirect('/account');
     }
 
-    const extension = avatarExtension(req.file.buffer);
-    if (!extension) {
-      setFlash(req, 'error', 'Le contenu du fichier ne correspond pas à une image autorisée.');
-      return res.redirect('/account');
-    }
-
-    await fs.mkdir(AVATAR_DIRECTORY, { recursive: true });
-    const filename = `${crypto.randomUUID()}.${extension}`;
-    avatarPath = path.join(AVATAR_DIRECTORY, filename);
-    const avatarUrl = `${PUBLIC_AVATAR_PREFIX}${filename}`;
+    uploadedAvatar = await saveUploadedImage(req.file, 'avatars', 'INVALID_AVATAR_CONTENT');
     const previousAvatarUrl = req.currentUser.avatarUrl;
 
-    await fs.writeFile(avatarPath, req.file.buffer, { mode: 0o600 });
-    await req.currentUser.update({ avatarUrl });
+    await req.currentUser.update({ avatarUrl: uploadedAvatar.imageUrl });
     await removeLocalAvatar(previousAvatarUrl);
 
     setFlash(req, 'success', 'Votre avatar a été mis à jour.');
     return res.redirect('/account');
   } catch (error) {
-    if (avatarPath) {
-      await fs.unlink(avatarPath).catch(() => {});
+    if (uploadedAvatar) await deleteUploadedImage(uploadedAvatar.imageUrl, 'avatars');
+    if (error.message === 'INVALID_AVATAR_CONTENT') {
+      setFlash(req, 'error', 'Le contenu du fichier ne correspond pas à une image autorisée.');
+      return res.redirect('/account');
     }
     return next(error);
   }

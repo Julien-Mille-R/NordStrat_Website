@@ -5,6 +5,7 @@ import initModels from './relations.js';
 const commonOptions = {
   dialect: 'postgres',
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
+  ...(process.env.DB_SCHEMA ? { define: { schema: process.env.DB_SCHEMA } } : {}),
 };
 
 export const sequelize = process.env.DATABASE_URL

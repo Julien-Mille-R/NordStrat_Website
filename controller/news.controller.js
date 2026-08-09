@@ -1,14 +1,10 @@
-import crypto from 'node:crypto';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import multer from 'multer';
 import { NewsPost, sequelize } from '../models/index.js';
 import { setFlash, validateMultipartCsrfToken } from './access.controller.js';
 import { recordAdminAction } from '../services/audit-log.service.js';
 import { applySeo } from './seo.controller.js';
+import { deleteUploadedImage, saveUploadedImage } from '../services/upload-storage.service.js';
 
-const NEWS_IMAGE_DIRECTORY = path.join(process.cwd(), 'public', 'uploads', 'news');
-const PUBLIC_NEWS_IMAGE_PREFIX = '/uploads/news/';
 const MAX_NEWS_IMAGE_SIZE = 5 * 1024 * 1024;
 
 const newsImageUpload = multer({
@@ -21,46 +17,8 @@ const newsImageUpload = multer({
   },
 }).single('image');
 
-function imageExtension(buffer) {
-  const isJpeg = buffer.length >= 3
-    && buffer[0] === 0xff
-    && buffer[1] === 0xd8
-    && buffer[2] === 0xff;
-  const isPng = buffer.length >= 8
-    && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
-  const isWebp = buffer.length >= 12
-    && buffer.subarray(0, 4).toString('ascii') === 'RIFF'
-    && buffer.subarray(8, 12).toString('ascii') === 'WEBP';
-
-  if (isJpeg) return 'jpg';
-  if (isPng) return 'png';
-  if (isWebp) return 'webp';
-  return null;
-}
-
-function storedNewsImagePath(imageUrl) {
-  if (!imageUrl?.startsWith(PUBLIC_NEWS_IMAGE_PREFIX)) return null;
-  return path.join(NEWS_IMAGE_DIRECTORY, path.basename(imageUrl));
-}
-
-async function deleteStoredNewsImage(imageUrl) {
-  const imagePath = storedNewsImagePath(imageUrl);
-  if (imagePath) await fs.unlink(imagePath).catch(() => {});
-}
-
 async function saveUploadedNewsImage(file) {
-  if (!file) return null;
-  const extension = imageExtension(file.buffer);
-  if (!extension) throw new Error('INVALID_NEWS_IMAGE_CONTENT');
-
-  await fs.mkdir(NEWS_IMAGE_DIRECTORY, { recursive: true });
-  const filename = `${crypto.randomUUID()}.${extension}`;
-  const imagePath = path.join(NEWS_IMAGE_DIRECTORY, filename);
-  await fs.writeFile(imagePath, file.buffer, { mode: 0o600 });
-  return {
-    imagePath,
-    imageUrl: `${PUBLIC_NEWS_IMAGE_PREFIX}${filename}`,
-  };
+  return saveUploadedImage(file, 'news', 'INVALID_NEWS_IMAGE_CONTENT');
 }
 
 export function parseNewsImageUpload(req, res, next) {
@@ -112,7 +70,7 @@ export async function showEditNewsForm(req, res, next) {
 export async function createNewsPost(req, res, next) {
   const title = req.body.title?.trim() || '';
   const content = req.body.content?.trim() || '';
-  let imagePath;
+  let uploadedImage;
 
   try {
     if (title.length < 3 || title.length > 150 || content.length < 20 || content.length > 10000) {
@@ -120,8 +78,7 @@ export async function createNewsPost(req, res, next) {
       return res.redirect('/admindashboard/news/create');
     }
 
-    const uploadedImage = await saveUploadedNewsImage(req.file);
-    imagePath = uploadedImage?.imagePath;
+    uploadedImage = await saveUploadedNewsImage(req.file);
 
     const newsPost = await sequelize.transaction(async (transaction) => {
       const createdPost = await NewsPost.create({
@@ -147,7 +104,7 @@ export async function createNewsPost(req, res, next) {
     setFlash(req, 'success', 'L’actualité a été publiée.');
     return res.redirect(`/news/${newsPost.id}`);
   } catch (error) {
-    if (imagePath) await fs.unlink(imagePath).catch(() => {});
+    if (uploadedImage) await deleteUploadedImage(uploadedImage.imageUrl, 'news');
     if (error.message === 'INVALID_NEWS_IMAGE_CONTENT') {
       setFlash(req, 'error', 'Le contenu du fichier ne correspond pas à une image autorisée.');
       return res.redirect('/admindashboard/news/create');
@@ -193,13 +150,13 @@ export async function updateNewsPost(req, res, next) {
       });
     });
     if ((uploadedImage || removeImage) && previousImageUrl) {
-      await deleteStoredNewsImage(previousImageUrl);
+      await deleteUploadedImage(previousImageUrl, 'news');
     }
 
     setFlash(req, 'success', 'L’actualité a été modifiée.');
     return res.redirect(`/news/${newsPost.id}`);
   } catch (error) {
-    if (uploadedImage?.imagePath) await fs.unlink(uploadedImage.imagePath).catch(() => {});
+    if (uploadedImage) await deleteUploadedImage(uploadedImage.imageUrl, 'news');
     if (error.message === 'INVALID_NEWS_IMAGE_CONTENT' || error.name === 'SequelizeValidationError') {
       setFlash(req, 'error', 'Impossible de modifier cette actualité. Vérifiez son contenu et son image.');
       return res.redirect(`/admindashboard/news/${postId}/edit`);
@@ -226,7 +183,7 @@ export async function deleteNewsPost(req, res, next) {
       });
       await newsPost.destroy({ transaction });
     });
-    await deleteStoredNewsImage(imageUrl);
+    await deleteUploadedImage(imageUrl, 'news');
     setFlash(req, 'success', 'L’actualité a été supprimée.');
     return res.redirect('/admindashboard/news');
   } catch (error) {
