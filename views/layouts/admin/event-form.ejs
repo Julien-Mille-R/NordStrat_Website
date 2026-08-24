@@ -5,14 +5,15 @@
     <h1 class="text-4xl font-fantasy text-fantasy-gold mb-8"><%= event ? 'Modifier la soirée' : 'Créer une soirée' %></h1>
     <form method="POST" action="<%= event ? `/admindashboard/events/${event.id}/update` : '/admindashboard/events/create' %>" class="space-y-5 text-fantasy-gold-light">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <label class="block">Titre<input name="title" required value="<%= event?.title || '' %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
-      <label class="block">Date<input type="datetime-local" name="date" required value="<%= event ? new Date(event.date.getTime() - event.date.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '' %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
-      <label class="block">Fin des inscriptions<input type="datetime-local" name="registrationDeadline" required value="<%= event ? new Date(event.registrationDeadline.getTime() - event.registrationDeadline.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '' %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
-      <label class="block">Nombre de tables<input type="number" name="maxTable" min="1" max="8" value="<%= event?.maxTable || 8 %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
+      <label class="block">Titre<input name="title" maxlength="255" required value="<%= formValues?.title ?? event?.title ?? '' %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
+      <label class="block">Date<input id="event-date" type="datetime-local" name="date" required value="<%= formValues?.date ?? (event ? new Date(event.date.getTime() - event.date.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '') %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
+      <label class="block">Fin des inscriptions<input id="registration-deadline" type="datetime-local" name="registrationDeadline" required value="<%= formValues?.registrationDeadline ?? (event ? new Date(event.registrationDeadline.getTime() - event.registrationDeadline.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '') %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"><span class="block mt-1 text-sm text-fantasy-gold-light/80">Cette date doit précéder le début de la soirée.</span></label>
+      <label class="block">Nombre de tables<input type="number" name="maxTable" min="1" max="8" value="<%= formValues?.maxTable ?? event?.maxTable ?? 8 %>" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"></label>
       <% if (event) { %><label class="block">Statut<select name="status" class="mt-1 w-full p-3 bg-fantasy-dark border border-fantasy-gold/30 rounded"><% ['upcoming', 'ongoing', 'completed'].forEach((status) => { %><option value="<%= status %>" <%= event.status === status ? 'selected' : '' %>><%= status %></option><% }) %></select></label><% } %>
-      <label class="flex gap-2"><input type="checkbox" name="reservable" <%= !event || event.reservable ? 'checked' : '' %>> Réservations ouvertes</label>
+      <label class="flex gap-2"><input type="checkbox" name="reservable" <%= formValues?.reservable ?? (!event || event.reservable) ? 'checked' : '' %>> Réservations ouvertes</label>
       <button class="px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded">Enregistrer</button>
     </form>
   </div>
 </section>
+<script src="/js/event-form.js" defer></script>
 <%- include('../../partials/footer') %>

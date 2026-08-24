@@ -1,0 +1,12 @@
+services:
+  nginx:
+    environment:
+      NGINX_ENVSUBST_TEMPLATE_DIR: /etc/nginx/templates-production
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx/conf.d
+      NGINX_SERVER_NAME: ${NGINX_SERVER_NAME}
+      NGINX_CERTIFICATE_NAME: ${NGINX_CERTIFICATE_NAME}
+    ports:
+      - "${NGINX_HTTPS_BIND_ADDRESS:-0.0.0.0}:${NGINX_HTTPS_PORT:-443}:8443"
+    volumes:
+      - ${LETSENCRYPT_DIRECTORY:-/etc/letsencrypt}:/etc/letsencrypt:ro
+      - ${CERTBOT_WEBROOT:-/var/www/certbot}:/var/www/certbot:ro

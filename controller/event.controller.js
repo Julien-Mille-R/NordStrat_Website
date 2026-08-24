@@ -20,6 +20,11 @@ function eventLabel(event) {
   return event.title || `Soirée #${event.id}`;
 }
 
+function renderCreateEventError(res, message, formValues) {
+  res.locals.flash = { type: 'error', message };
+  return res.status(422).render('layouts/admin/event-form', { event: null, formValues });
+}
+
 export async function showEventList(req, res, next) {
   try {
     const events = await Event.findAll({ order: [['date', 'DESC']] });
@@ -30,17 +35,42 @@ export async function showEventList(req, res, next) {
 }
 
 export function showCreateEventForm(req, res) {
-  return res.render('layouts/admin/event-form', { event: null });
+  return res.render('layouts/admin/event-form', { event: null, formValues: {} });
 }
 
 export async function createEvent(req, res, next) {
+  const title = req.body.title?.trim() || '';
+  const date = new Date(req.body.date);
+  const registrationDeadline = new Date(req.body.registrationDeadline);
+  const maxTable = Number(req.body.maxTable || 8);
+  const formValues = {
+    title,
+    date: req.body.date || '',
+    registrationDeadline: req.body.registrationDeadline || '',
+    maxTable: req.body.maxTable || '8',
+    reservable: req.body.reservable === 'on',
+  };
+
   try {
+    if (!title || title.length > 255) {
+      return renderCreateEventError(res, 'Le titre est obligatoire et ne doit pas dépasser 255 caractères.', formValues);
+    }
+    if (Number.isNaN(date.getTime()) || Number.isNaN(registrationDeadline.getTime())) {
+      return renderCreateEventError(res, 'Renseignez une date de soirée et une fin des inscriptions valides.', formValues);
+    }
+    if (registrationDeadline >= date) {
+      return renderCreateEventError(res, 'La fin des inscriptions doit être antérieure à la date de la soirée.', formValues);
+    }
+    if (!Number.isInteger(maxTable) || maxTable < 1 || maxTable > 8) {
+      return renderCreateEventError(res, 'Le nombre de tables doit être compris entre 1 et 8.', formValues);
+    }
+
     await sequelize.transaction(async (transaction) => {
       const event = await Event.create({
-        title: req.body.title,
-        date: req.body.date,
-        registrationDeadline: req.body.registrationDeadline,
-        maxTable: Number(req.body.maxTable || 8),
+        title,
+        date,
+        registrationDeadline,
+        maxTable,
         reservable: req.body.reservable === 'on',
         createdBy: req.currentUser.id,
       }, { transaction });
@@ -66,7 +96,7 @@ export async function showEditEventForm(req, res, next) {
     const event = await Event.findByPk(Number(req.params.eventId));
     if (!event) return res.status(404).send('Événement introuvable.');
     if (event.status === 'cancelled') return res.status(409).send('Une soirée annulée ne peut plus être modifiée.');
-    return res.render('layouts/admin/event-form', { event });
+    return res.render('layouts/admin/event-form', { event, formValues: {} });
   } catch (error) {
     return next(error);
   }

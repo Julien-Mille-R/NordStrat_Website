@@ -1,8 +1,14 @@
 # Exécution avec Docker
 
-Cette configuration lance trois services : PostgreSQL (`db`), les migrations
-SQL (`migrate`) puis le site (`app`). Les données PostgreSQL, les fichiers
-envoyés et les archives disposent chacun d'un volume persistant.
+Cette configuration sépare l'exécution en trois conteneurs permanents : Nginx
+(`nginx`), Node.js/Express (`app`) et PostgreSQL (`db`). Le service ponctuel
+`migrate` applique les migrations puis `seed` synchronise le catalogue initial
+des jeux avant Node.js. Nginx est la seule entrée
+publiée ; Node.js et PostgreSQL restent privés sur les réseaux Docker.
+
+Nginx sert directement CSS, JavaScript, images, icônes et uploads. Il transmet
+les pages EJS et les actions HTTP à Node.js. Les données PostgreSQL, les
+fichiers envoyés et les archives disposent chacun d'un volume persistant.
 
 ## Première installation locale
 
@@ -15,13 +21,13 @@ envoyés et les archives disposent chacun d'un volume persistant.
    ```bash
    docker compose --env-file .env.docker up -d --build
    docker compose --env-file .env.docker ps
-   curl --fail http://127.0.0.1:3000/health
+   curl --fail http://127.0.0.1:8080/health
    ```
 
 Les journaux sont consultables avec :
 
 ```bash
-docker compose --env-file .env.docker logs -f app
+docker compose --env-file .env.docker logs -f nginx app db
 ```
 
 Un arrêt normal conserve toutes les données :
@@ -88,9 +94,50 @@ doit être utilisée qu'après analyse et avec une sauvegarde validée.
 - définir `NODE_ENV=production`, l'URL HTTPS réelle dans `SITE_URL` et la bonne
   valeur de `TRUST_PROXY` selon le reverse proxy ;
 - ne jamais versionner `.env.docker` ni les sauvegardes ;
-- exposer le port applicatif uniquement au reverse proxy ;
+- exposer uniquement Nginx ; les services `app` et `db` n'ont aucun port hôte ;
 - sauvegarder les trois volumes et tester périodiquement une restauration ;
 - conserver au moins l'image en cours et l'image précédente pour le rollback.
 
 La procédure de remise à l'hébergeur, le modèle Nginx et le contrôle des
 secrets sont détaillés dans `docs/production-handoff.md`.
+
+La variante HTTPS conteneurisée se lance avec les deux fichiers Compose :
+
+```bash
+ENV_FILE=.env.production docker compose --env-file .env.production \
+  -f compose.yaml -f compose.production.yaml up -d
+```
+
+Elle suppose que Certbot a déjà créé le certificat dans
+`LETSENCRYPT_DIRECTORY`. Nginx publie alors HTTP pour la redirection et HTTPS
+pour le site.
+
+## Premier administrateur
+
+Sur une base neuve, créer localement un fichier contenant uniquement un mot de
+passe initial robuste, le protéger avec `chmod 600`, puis le monter en lecture
+seule pour la commande ponctuelle :
+
+```bash
+docker compose --env-file .env.production run --rm --no-deps \
+  -v /chemin/absolu/admin-password:/run/secrets/admin-password:ro \
+  app npm run admin:create -- \
+  --firstname "Prénom" --lastname "Nom" --nickname "Pseudo" \
+  --email "adresse@example.org" \
+  --password-file /run/secrets/admin-password
+```
+
+La commande refuse de fonctionner si un administrateur existe déjà. Supprimer
+immédiatement le fichier de mot de passe après la première connexion réussie.
+
+## Import initial des fichiers publics
+
+Pour copier les avatars et images administratives présents dans
+`public/uploads` vers le volume Docker, sans importer la base locale :
+
+```bash
+npm run docker:import-files
+```
+
+Les futurs fichiers seront directement écrits dans le volume persistant et
+seront inclus par `npm run docker:backup`.

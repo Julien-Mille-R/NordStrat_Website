@@ -23,15 +23,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
 function productionConfiguration(app) {
+  const trustProxyEnabled = process.env.TRUST_PROXY === '1';
+  if (trustProxyEnabled) app.set('trust proxy', 1);
   if (!isProduction) return null;
-  if (process.env.TRUST_PROXY !== '1') {
+  if (!trustProxyEnabled) {
     throw new Error('TRUST_PROXY=1 doit être défini en production derrière le proxy HTTPS.');
   }
   if (!process.env.SITE_URL) throw new Error('SITE_URL doit être défini en production.');
 
   const siteUrl = new URL(process.env.SITE_URL);
   if (siteUrl.protocol !== 'https:') throw new Error('SITE_URL doit utiliser HTTPS en production.');
-  app.set('trust proxy', 1);
   return siteUrl;
 }
 

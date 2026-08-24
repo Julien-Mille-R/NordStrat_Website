@@ -6,7 +6,9 @@ const required = [
   'NODE_ENV', 'SITE_URL', 'TRUST_PROXY', 'SESSION_SECRET', 'RATE_LIMIT_SECRET',
   'POSTGRES_DB', 'POSTGRES_USER', 'POSTGRES_PASSWORD', 'DB_HOST', 'DB_PORT',
   'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'UPLOAD_ROOT', 'ARCHIVE_DIRECTORY',
-  'APP_BIND_ADDRESS', 'APP_PORT', 'APP_IMAGE',
+  'NGINX_BIND_ADDRESS', 'NGINX_HTTP_PORT', 'NGINX_HTTPS_BIND_ADDRESS',
+  'NGINX_HTTPS_PORT', 'NGINX_SERVER_NAME', 'NGINX_CERTIFICATE_NAME',
+  'LETSENCRYPT_DIRECTORY', 'CERTBOT_WEBROOT', 'APP_IMAGE', 'NGINX_IMAGE',
 ];
 
 function parseEnvironment(content) {
@@ -56,12 +58,16 @@ if (!fs.existsSync(filename)) {
   if (/replace|example/i.test(environment.APP_IMAGE)) {
     fail('APP_IMAGE doit désigner une image réellement versionnée.');
   }
+  if (/replace|example/i.test(environment.NGINX_IMAGE)) {
+    fail('NGINX_IMAGE doit désigner une image réellement versionnée.');
+  }
   if (environment.POSTGRES_DB !== environment.DB_NAME
     || environment.POSTGRES_USER !== environment.DB_USER) {
     fail('les noms de base et d’utilisateur PostgreSQL doivent correspondre aux variables DB_*.');
   }
-  if (!['127.0.0.1', '::1'].includes(environment.APP_BIND_ADDRESS)) {
-    fail('APP_BIND_ADDRESS doit rester local afin de ne pas contourner Nginx.');
+  if (!environment.NGINX_SERVER_NAME
+    || environment.NGINX_SERVER_NAME.split(/\s+/).some((name) => name === 'example.org')) {
+    fail('NGINX_SERVER_NAME doit contenir le ou les domaines réels.');
   }
 
   if (process.platform !== 'win32') {

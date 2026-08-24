@@ -1,6 +1,39 @@
 name: nordstrat
 
 services:
+  nginx:
+    image: ${NGINX_IMAGE:-nordstrat-nginx:local}
+    build:
+      context: .
+      dockerfile: deploy/nginx/Dockerfile
+    restart: unless-stopped
+    init: true
+    ports:
+      - "${NGINX_BIND_ADDRESS:-127.0.0.1}:${NGINX_HTTP_PORT:-8080}:8080"
+    volumes:
+      - uploads_data:/srv/uploads:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8080/nginx-health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    read_only: true
+    tmpfs:
+      - /etc/nginx/conf.d:uid=101,gid=101,mode=0755
+      - /var/cache/nginx:uid=101,gid=101,mode=0755
+      - /var/run:uid=101,gid=101,mode=0755
+      - /tmp:uid=101,gid=101,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - frontend
+
   db:
     image: postgres:17-alpine
     restart: unless-stopped
@@ -17,6 +50,8 @@ services:
       start_period: 10s
     security_opt:
       - no-new-privileges:true
+    networks:
+      - backend
 
   migrate:
     image: ${APP_IMAGE:-nordstrat-website:local}
@@ -37,6 +72,32 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    networks:
+      - backend
+
+  seed:
+    image: ${APP_IMAGE:-nordstrat-website:local}
+    build:
+      context: .
+      target: runtime
+    env_file:
+      - ${ENV_FILE:-.env.docker}
+    command: ["npm", "run", "seed:games"]
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - backend
 
   app:
     image: ${APP_IMAGE:-nordstrat-website:local}
@@ -47,8 +108,8 @@ services:
     init: true
     env_file:
       - ${ENV_FILE:-.env.docker}
-    ports:
-      - "${APP_BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-3000}:3000"
+    expose:
+      - "3000"
     volumes:
       - uploads_data:/app/data/uploads
       - archives_data:/app/data/archives
@@ -56,6 +117,8 @@ services:
       db:
         condition: service_healthy
       migrate:
+        condition: service_completed_successfully
+      seed:
         condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "node", "scripts/healthcheck.js"]
@@ -70,6 +133,14 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    networks:
+      - frontend
+      - backend
+
+networks:
+  frontend:
+  backend:
+    internal: true
 
 volumes:
   postgres_data:

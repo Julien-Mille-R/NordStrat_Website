@@ -149,6 +149,25 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
     await agent.get('/admindashboard').expect(403);
   });
 
+  test('la création d’une soirée affiche une erreur utile si la clôture est trop tardive', async () => {
+    const agent = request.agent(app);
+    await login(agent, admin.email);
+    const form = await agent.get('/admindashboard/events/create').expect(200);
+    const response = await agent.post('/admindashboard/events/create')
+      .type('form')
+      .send({
+        _csrf: csrfToken(form),
+        title: 'Soirée invalide',
+        date: '2030-09-06T20:30',
+        registrationDeadline: '2030-09-06T21:00',
+        maxTable: '8',
+        reservable: 'on',
+      })
+      .expect(422);
+    assert.match(response.text, /La fin des inscriptions doit être antérieure/);
+    assert.equal(await models.Event.count({ where: { title: 'Soirée invalide' } }), 0);
+  });
+
   test('une réservation peut être créée puis discutée par un autre membre', async () => {
     const hostAgent = request.agent(app);
     await login(hostAgent, firstUser.email);
