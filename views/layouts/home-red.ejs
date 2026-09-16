@@ -1,0 +1,408 @@
+<%- include('../partials/header') %>
+
+<!-- Variante graphique indépendante. L’accueil original reste dans home.ejs. -->
+<style>
+  body:has(.home-red) { background:#090a0d; }
+  .home-red { --red:#d52c40; --bright:#ff6374; --ink:#090a0d; --panel:#14161b; --paper:#f3efe8; --steel:#b7bdc7; color:var(--paper); font-family:Arial,Helvetica,sans-serif; }
+  .home-red *, .home-red *::before, .home-red *::after { box-sizing:border-box; }
+  .home-red .container { max-width:1200px; }
+  .home-red section { background:var(--ink); padding-top:80px; padding-bottom:80px; }
+  .home-red section:nth-of-type(even) { background:#101216; }
+  .home-red h1, .home-red h2, .home-red h3 { color:var(--paper); font-family:Arial,Helvetica,sans-serif; letter-spacing:-.035em; }
+  .home-red h2 { font-size:clamp(1.8rem,3.5vw,2.8rem); }
+  .home-red h3 { font-size:clamp(1.3rem,2vw,1.7rem); }
+  .home-red p { color:#c8c9ce; }
+  .home-red [class*="text-fantasy-orange"] { color:var(--bright); }
+  .home-red [class*="text-fantasy-gold-light"] { color:#c8c9ce; }
+  .home-red [class*="text-fantasy-gold"] { color:var(--paper); }
+  .home-red [class*="font-fantasy"], .home-red [class*="font-body"] { font-family:inherit; }
+  .home-red [class*="animate-"] { animation:none; }
+  .home-red section > .absolute { display:none; }
+  .home-red a, .home-red button { transition:background-color .2s,border-color .2s,color .2s; }
+  .home-red a:focus-visible, .home-red button:focus-visible, .home-red [tabindex]:focus-visible { outline:3px solid #fff; outline-offset:5px; }
+  .home-red section:first-of-type { position:relative; padding:160px 0 90px; background:radial-gradient(ellipse at 85% 35%,#59172555,transparent 55%),linear-gradient(135deg,#14161b,#090a0d 65%); }
+  .home-red section:first-of-type::before { content:""; position:absolute; inset:0; background-image:linear-gradient(#ffffff04 1px,transparent 1px),linear-gradient(90deg,#ffffff04 1px,transparent 1px); background-size:48px 48px; pointer-events:none; }
+  .home-red .hero-layout { display:grid; grid-template-columns:1.25fr 1fr; gap:60px; align-items:center; text-align:left; }
+  .home-red .hero-copy { position:relative; z-index:1; }
+  .home-red .hero-kicker { display:flex; align-items:center; gap:12px; margin-bottom:24px; color:#ff8997; font-size:.72rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; }
+  .home-red .hero-kicker::before { content:""; width:30px; height:3px; background:var(--red); }
+  .home-red h1 { font-size:clamp(2.65rem,5.2vw,4.8rem); line-height:1.03; max-width:12ch; text-wrap:balance; margin-bottom:28px; }
+  .home-red section:first-of-type .hero-copy > p:not(.hero-kicker) { font-size:1.08rem; line-height:1.85; max-width:52ch; }
+  .home-red section:first-of-type .hero-copy > div { justify-content:flex-start; }
+  .home-red section:first-of-type a, .home-red section:last-of-type button { background:var(--red); color:#fff; border:1px solid var(--red); border-radius:3px; font-family:inherit; font-size:.95rem; box-shadow:5px 5px 0 #d52c4025; }
+  .home-red section:first-of-type a:hover, .home-red section:last-of-type button:hover { background:#b91e32; border-color:#ff8997; }
+  .home-red .tactical-art { aspect-ratio:1; position:relative; display:grid; place-items:center; isolation:isolate; }
+  .home-red .tactical-art::before { content:""; position:absolute; inset:6%; border:1px solid #ffffff16; border-radius:50%; background:repeating-radial-gradient(circle,transparent 0 53px,#ffffff09 54px 55px); }
+  .home-red .tactical-art::after { content:""; position:absolute; inset:0; border:1px solid #d52c4055; clip-path:polygon(0 0,20% 0,20% 1%,1% 1%,1% 20%,0 20%,0 0,100% 0,100% 20%,99% 20%,99% 1%,80% 1%,80% 0,100% 0,100% 100%,80% 100%,80% 99%,99% 99%,99% 80%,100% 80%,100% 100%,0 100%,0 80%,1% 80%,1% 99%,20% 99%,20% 100%,0 100%); }
+  .home-red .tactical-art svg { width:72%; height:auto; filter:drop-shadow(0 20px 35px #0009); }
+  .home-red .art-label { position:absolute; font:10px monospace; letter-spacing:.15em; color:#bd9ca3; }
+  .home-red .art-label:first-child { top:0; left:0; }
+  .home-red .art-label:last-child { bottom:0; right:0; }
+  .home-red section:nth-of-type(2) > .container > div:first-child { margin-bottom:32px; }
+  .home-red section:nth-of-type(2) > .container > div:first-child p { color:var(--bright); font-size:.72rem; font-weight:700; letter-spacing:.18em; }
+  .home-red section:nth-of-type(2) > .container > div:first-child a { color:#ff8997; font-size:.9rem; }
+  .home-red #newsCarousel { border:1px solid #ffffff1a; border-radius:6px; box-shadow:none; background:var(--panel); }
+  .home-red #carousel article { background:var(--panel); }
+  .home-red #carousel article > div:first-child { background:radial-gradient(circle at center,#5c1c2b,#15171c 75%); }
+  .home-red #carousel time { color:#ff8997; font-size:.7rem; letter-spacing:.12em; }
+  .home-red #carousel a { background:var(--red); color:white; border-radius:3px; }
+  .home-red #carousel a:hover { background:#b91e32; }
+  .home-red #newsCarousel > div:last-child { background:#101216; border-color:#ffffff1a; }
+  .home-red #newsCarousel button { border-color:#ffffff40; color:var(--paper); }
+  .home-red #newsCarousel button:hover { background:#531823; color:white; }
+  .home-red .news-carousel-dot span { background:#ffffff40; }
+  .home-red .news-carousel-dot[aria-current="true"] span { background:#ff6374; }
+  .home-red section:nth-of-type(2) > .container > div:last-child:not(#newsCarousel) { background:var(--panel); border:1px dashed #ffffff26; border-radius:6px; padding:48px 24px; }
+  .home-red section:nth-of-type(3) .grid > div:first-child { padding:0; border:0; border-radius:0; background:none; box-shadow:none; }
+  .home-red section:nth-of-type(3) h2 { border:0; padding-bottom:0; }
+  .home-red section:nth-of-type(3) h2::before { content:""; display:block; width:44px; height:4px; background:var(--red); margin-bottom:22px; }
+  .home-red section:nth-of-type(3) p { font-size:1rem; line-height:1.85; }
+  .home-red section:nth-of-type(3) .grid > div:first-child > div { background:#191219; border:0; border-left:3px solid var(--red); border-radius:0; padding:20px; }
+  .home-red section:nth-of-type(3) [role="region"] > div { border:1px solid #ffffff24; border-radius:3px; background:linear-gradient(135deg,#24151a,#16191e); box-shadow:none; }
+  .home-red section:nth-of-type(3) img { filter:saturate(.65); }
+  .home-red #activities h2 { text-align:left; margin-bottom:32px; }
+  .home-red #activities article { position:relative; padding:28px 24px; background:var(--panel); border:1px solid #ffffff1c; border-top:3px solid var(--red); border-radius:4px; box-shadow:none; }
+  .home-red #activities article:hover { transform:none; background:#1c1d23; border-color:#d52c4099; }
+  .home-red #activities article > div:first-child { font-size:2rem; margin-bottom:26px; color:#ff8997; }
+  .home-red #activities article p { font-size:.94rem; line-height:1.8; }
+  .home-red section:last-of-type { background:linear-gradient(115deg,#4a101c,#230e14 55%,#0f1014); border-top:1px solid #b6233655; padding:80px 0; }
+  .home-red section:last-of-type h2 { font-size:clamp(2rem,4vw,3.4rem); }
+  .home-red section:last-of-type p { font-size:1.05rem; }
+  .home-red section:last-of-type p:last-child { font-size:.85rem; color:#c8b8be; }
+  .home-red [role="region"] { scrollbar-color:#d52c40 #14161b; scrollbar-width:thin; }
+  body:has(.home-red) #siteHeader { background:#101216; border-bottom:1px solid #ffffff20; box-shadow:none; }
+  body:has(.home-red) #siteHeader [class*="bg-wood"], body:has(.home-red) footer [class*="bg-wood"] { display:none; }
+  body:has(.home-red) #siteHeader [class*="text-fantasy-gold"], body:has(.home-red) footer [class*="text-fantasy-gold"] { color:#f3efe8; }
+  body:has(.home-red) #siteHeader [class*="text-fantasy-orange"] { color:#ff8997; }
+  body:has(.home-red) #siteHeader [class*="bg-fantasy-brown"], body:has(.home-red) #siteHeader [data-dropdown-panel], body:has(.home-red) #mobileNavigation { background:#1a1c22; }
+  body:has(.home-red) #siteHeader [class*="border-fantasy-gold"] { border-color:#a92b3d; }
+  body:has(.home-red) footer { background:#090a0d; color:#c8c9ce; border-top:1px solid #ffffff20; }
+  body:has(.home-red) footer > .h-1 { background:#a51e31; height:2px; }
+  body:has(.home-red) footer [class*="bg-fantasy-brown"] { background:#191b20; }
+  body:has(.home-red) footer [class*="border-fantasy-gold"] { border-color:#ffffff24; }
+  @media(max-width:900px) {
+    .home-red .hero-layout { gap:28px; grid-template-columns:1.4fr 1fr; }
+    .home-red section:first-of-type { padding-top:130px; }
+    .home-red h1 { font-size:clamp(2.5rem,6vw,3.8rem); }
+  }
+  @media(max-width:767px) {
+    .home-red section { padding-top:52px; padding-bottom:52px; }
+    .home-red section:first-of-type { padding:120px 0 52px; }
+    .home-red .hero-layout { display:block; }
+    .home-red .tactical-art { display:none; }
+    .home-red h1 { max-width:13ch; font-size:clamp(2.55rem,9vw,4rem); }
+    .home-red .hero-kicker { font-size:.65rem; letter-spacing:.12em; }
+    .home-red section:first-of-type .hero-copy > p:not(.hero-kicker) { font-size:1rem; line-height:1.8; }
+    .home-red section:last-of-type { padding:56px 0; }
+    .home-red #activities article { padding:26px 22px; }
+    .home-red #newsCarousel > div:last-child { gap:6px; padding:12px 8px; }
+    .home-red #newsCarousel > div:last-child > div { gap:6px; }
+    .home-red #newsCarouselCounter { font-size:.7rem; }
+    .home-red #carouselAutoplay { padding:0 8px; }
+  }
+  @media(prefers-reduced-motion:reduce) {
+    .home-red *, .home-red *::before, .home-red *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+  }
+</style>
+<div class="home-red">
+
+
+<!-- SECTION : Hero / Introduction avec image de fond -->
+<section class="relative bg-fantasy-darkest text-white pt-28 pb-20 sm:pt-32 sm:pb-24 lg:py-32 overflow-hidden">
+    <!-- Overlay gradient sombre -->
+    <div class="absolute inset-0 bg-gradient-dark z-10"></div>
+    
+    <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-fantasy-brown via-fantasy-dark to-fantasy-darkest" aria-hidden="true"></div>
+    
+    <!-- Contenu -->
+    <div class="container mx-auto px-4 sm:px-6 relative z-20 hero-layout">
+        <div class="hero-copy">
+        <p class="hero-kicker">Bruay-sur-l’Escaut · Association de jeux de figurines</p>
+        <h1 class="text-4xl sm:text-5xl md:text-7xl font-fantasy font-bold mb-6 text-fantasy-gold animate-pulse-glow">
+            Bienvenue chez Nord Stratégie
+        </h1>
+        <p class="text-xl md:text-2xl text-fantasy-gold-light max-w-3xl mx-auto font-body leading-relaxed">
+            Halte, voyageur ! Approche de l'âtre et tends l'oreille… Ici, les armées se rassemblent, 
+            les dés roulent et les légendes s'écrivent autour d'une table de jeu. 
+            Que tu sois jeune recrue ou vieux stratège, pousse la porte de Nord Stratégie : 
+            la bonne humeur est servie à volonté… pour les jets de dés, on ne promet rien.
+        </p>
+
+        <!-- Boutons CTA -->
+        <div class="mt-8 sm:mt-10 flex justify-center">
+            <a href="/about"
+               class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-3 border-fantasy-gold text-fantasy-gold font-fantasy font-bold text-lg rounded-lg
+                      hover:bg-fantasy-gold hover:text-fantasy-darkest transition-all duration-300">
+                Découvrir Nord Stratégie
+            </a>
+        </div>
+        </div>
+        <div class="tactical-art" aria-hidden="true">
+            <span class="art-label">NORD STRATÉGIE / SECTEUR 2007</span>
+            <svg viewBox="0 0 320 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M160 15 276 65v119c0 72-72 120-116 143C116 304 44 256 44 184V65Z" fill="#17191f" stroke="#d52c40" stroke-width="2"/>
+                <path d="m160 33 98 44v107c0 60-61 105-98 125-37-20-98-65-98-125V77Z" stroke="#ffffff22"/>
+                <path d="M160 39v263M67 171h186" stroke="#ffffff10" stroke-dasharray="3 7"/>
+                <path d="m100 104 99 113-12 11-96-118 5-18ZM220 104 121 217l12 11 96-118-5-18Z" fill="#cbd1da"/>
+                <path d="m165 224 46-39m-99 0 46 39" stroke="#d52c40" stroke-width="9"/>
+                <path d="m130 215-21 25m83-25 21 25" stroke="#cbd1da" stroke-width="8"/>
+                <path d="m160 111 43 25v50l-43 25-43-25v-50Z" fill="#9d2033" stroke="#ff6374" stroke-width="2"/>
+                <path d="m160 111 1 50 42-25m-86 0 44 25-1 50" stroke="#ff8997"/>
+                <circle cx="141" cy="146" r="3" fill="#fff"/><circle cx="179" cy="145" r="3" fill="#fff"/><circle cx="180" cy="169" r="3" fill="#fff"/><circle cx="141" cy="173" r="3" fill="#fff"/>
+                <path d="M142 267h36" stroke="#d52c40" stroke-width="3"/>
+            </svg>
+            <span class="art-label">FIGURINES · STRATÉGIE · BONNE HUMEUR</span>
+        </div>
+    </div>
+</section>
+
+
+<!-- SECTION : ACTUALITÉS (Carrousel) -->
+<section class="py-14 sm:py-20 bg-fantasy-dark relative">
+    <div class="absolute inset-0 opacity-5 bg-wood"></div>
+
+    <div class="container mx-auto px-4 sm:px-6 relative z-10">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
+            <div>
+                <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">La vie de l’association</p>
+                <h2 class="mt-2 text-3xl sm:text-4xl font-fantasy font-bold text-fantasy-gold">Dernières actualités</h2>
+            </div>
+            <a href="/news" class="text-fantasy-orange font-bold hover:text-fantasy-gold transition-colors">Toutes les actualités →</a>
+        </div>
+
+        <% if (latestNews.length) { %>
+            <div id="newsCarousel" class="w-full overflow-hidden rounded-2xl shadow-fantasy border-2 border-fantasy-gold/70 bg-fantasy-darker" role="region" aria-roledescription="carrousel" aria-label="Dernières actualités">
+                <div class="overflow-hidden">
+                    <div id="carousel" class="flex transition-transform duration-700 ease-out" aria-live="off">
+                        <% latestNews.forEach((newsPost, index) => { %>
+                            <% const plainContent = newsPost.content.replace(/\s+/g, ' ').trim(); %>
+                            <% const excerpt = plainContent.length > 260 ? `${plainContent.slice(0, 257).trimEnd()}...` : plainContent; %>
+                            <article class="min-w-full grid grid-cols-1 md:grid-cols-[45%_55%] bg-fantasy-darker" aria-label="Actualité <%= index + 1 %> sur <%= latestNews.length %>">
+                                <div class="h-60 sm:h-72 md:h-[28rem] bg-gradient-to-br from-fantasy-brown via-fantasy-dark to-fantasy-darkest overflow-hidden">
+                                    <% if (newsPost.imageUrl) { %>
+                                        <img src="<%= newsPost.imageUrl %>" alt="Illustration de l’actualité : <%= newsPost.title %>" loading="<%= index === 0 ? 'eager' : 'lazy' %>" <%= index === 0 ? 'fetchpriority="high"' : '' %> class="w-full h-full object-cover">
+                                    <% } else { %>
+                                        <div class="w-full h-full flex items-center justify-center text-7xl text-fantasy-gold/30" aria-hidden="true">⚔️</div>
+                                    <% } %>
+                                </div>
+                                <div class="p-6 sm:p-8 lg:p-12 flex flex-col justify-center items-start">
+                                    <time datetime="<%= newsPost.publishedAt.toISOString() %>" class="text-sm uppercase tracking-wider text-fantasy-orange"><%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(newsPost.publishedAt) %></time>
+                                    <h3 class="mt-3 text-2xl sm:text-3xl lg:text-4xl font-fantasy font-bold text-fantasy-gold break-words"><%= newsPost.title %></h3>
+                                    <p class="mt-4 text-fantasy-gold-light font-body text-base sm:text-lg leading-relaxed"><%= excerpt %></p>
+                                    <div class="mt-4"><%- include('../partials/news-author', { author: newsPost.author }) %></div>
+                                    <a href="/news/<%= newsPost.id %>" class="mt-7 px-6 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange transition-colors">Lire l’article</a>
+                                </div>
+                            </article>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <% if (latestNews.length > 1) { %>
+                    <div class="min-h-16 px-4 sm:px-6 flex items-center justify-between gap-4 border-t border-fantasy-gold/20 bg-fantasy-dark">
+                        <button id="prev" type="button" aria-label="Actualité précédente" class="w-10 h-10 rounded-full border border-fantasy-gold/50 text-fantasy-gold text-2xl font-bold hover:bg-fantasy-gold hover:text-fantasy-darkest transition-colors">‹</button>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2" aria-label="Choisir une actualité">
+                                <% latestNews.forEach((newsPost, index) => { %>
+                                    <button type="button" data-carousel-index="<%= index %>" aria-label="Afficher l’actualité <%= index + 1 %>" aria-current="<%= index === 0 ? 'true' : 'false' %>" class="news-carousel-dot group flex h-6 w-6 items-center justify-center rounded-full">
+                                        <span class="block h-2.5 w-2.5 rounded-full bg-fantasy-gold/25 transition group-aria-[current=true]:scale-125 group-aria-[current=true]:bg-fantasy-orange"></span>
+                                    </button>
+                                <% }) %>
+                            </div>
+                            <span id="newsCarouselCounter" class="text-sm tabular-nums text-fantasy-gold-light/65">1 / <%= latestNews.length %></span>
+                            <button id="carouselAutoplay" type="button" aria-pressed="false" class="min-h-10 px-3 rounded-lg border border-fantasy-gold/40 text-sm font-bold text-fantasy-gold hover:bg-fantasy-brown">
+                              <span data-carousel-autoplay-label>Pause</span>
+                            </button>
+                        </div>
+                        <button id="next" type="button" aria-label="Actualité suivante" class="w-10 h-10 rounded-full border border-fantasy-gold/50 text-fantasy-gold text-2xl font-bold hover:bg-fantasy-gold hover:text-fantasy-darkest transition-colors">›</button>
+                    </div>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div class="p-10 bg-fantasy-darker border border-fantasy-gold/30 rounded-xl text-center">
+                <p class="text-5xl" aria-hidden="true">📰</p>
+                <p class="mt-4 text-xl text-fantasy-gold">Aucune actualité publiée pour le moment.</p>
+            </div>
+        <% } %>
+    </div>
+</section>
+
+
+<!-- SECTION : Présentation de l'association -->
+<section class="py-14 sm:py-20 lg:py-24 bg-fantasy-darker relative">
+    <!-- Particules décoratives -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-10 left-10 w-32 h-32 border border-fantasy-gold rounded-full animate-pulse"></div>
+        <div class="absolute bottom-10 right-10 w-48 h-48 border border-fantasy-gold rounded-full animate-pulse"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 sm:px-6 relative z-10">
+        
+        <div class="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+
+            <!-- Texte avec cadre décoratif -->
+            <div class="bg-fantasy-dark/80 p-5 sm:p-8 rounded-xl border-3 border-fantasy-gold shadow-fantasy">
+                
+                <h2 class="text-3xl sm:text-4xl font-fantasy font-bold text-fantasy-gold mb-6 border-b-3 border-fantasy-gold pb-4">
+                    Qui sommes-nous ?
+                </h2>
+                
+                <p class="text-fantasy-gold-light font-body text-lg leading-relaxed mb-6">
+                    <span class="text-fantasy-orange font-bold">Nord Stratégie</span> est une association loi 1901 située à Bruay-sur-l'Escaut.
+                    Nous rassemblons des passionnés de jeux de figurines, de wargames en tout genre
+                    jeux de rôle, jeux de plateau modernes et modélisme.
+                </p>
+                
+                <div class="bg-fantasy-brown/50 p-4 sm:p-6 rounded-lg border-l-4 border-fantasy-orange mb-6">
+                    <p class="text-fantasy-gold-light font-body text-lg leading-relaxed">
+                        📍 Retrouvez-nous <span class="text-fantasy-orange font-bold">chaque vendredi soir</span>, 
+                        de 20h30 à 02h00 à la <span class="text-fantasy-gold font-bold">salle Musmeaux</span>, 
+                        rue Émile Zola à Bruay-sur-l'Escaut.
+                    </p>
+                </div>
+                
+                <p class="text-fantasy-gold-light font-body text-lg leading-relaxed italic">
+                    Que vous soyez débutant ou un vétéran du hobby, vous êtes les bienvenus !
+                </p>
+                
+            </div>
+
+            <!-- Galerie tactile sur mobile, grille sur tablette et ordinateur -->
+            <div class="min-w-0">
+                <p class="mb-3 text-sm text-fantasy-gold-light/65 md:hidden">Faites glisser les photos pour découvrir l’association →</p>
+                <div class="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 md:grid md:grid-cols-2 md:overflow-visible md:pb-0" role="region" aria-label="Photos de l’association" tabindex="0">
+                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
+                            hover:shadow-glow-gold transition-all duration-300">
+                    <img src="/images/asso1.jpg" alt="" loading="lazy"
+                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
+                                transition-all duration-300"></div>
+                </div>
+                
+                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
+                            hover:shadow-glow-gold transition-all duration-300">
+                    <img src="/images/asso2.jpg" alt="" loading="lazy"
+                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
+                                transition-all duration-300"></div>
+                </div>
+                
+                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
+                            hover:shadow-glow-gold transition-all duration-300">
+                    <img src="/images/asso3.jpg" alt="" loading="lazy"
+                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
+                                transition-all duration-300"></div>
+                </div>
+                
+                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
+                            hover:shadow-glow-gold transition-all duration-300">
+                    <img src="/images/asso4.jpg" alt="" loading="lazy"
+                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
+                                transition-all duration-300"></div>
+                </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- SECTION : Nos activités (Cartes) -->
+<section id="activities" class="py-14 sm:py-20 lg:py-24 bg-fantasy-dark relative overflow-hidden">
+    
+    <div class="container mx-auto px-4 sm:px-6 relative z-10">
+        
+        <h2 class="text-3xl sm:text-4xl font-fantasy font-bold text-fantasy-gold mb-8 sm:mb-12 lg:mb-16 text-center">
+            Nos Activités
+        </h2>
+
+        <p class="-mt-5 mb-4 text-sm text-fantasy-gold-light/65 md:hidden">Faites glisser pour parcourir nos activités →</p>
+        <div role="region" aria-label="Nos activités" tabindex="0" class="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 xl:grid-cols-4 xl:gap-8">
+
+            <!-- Carte Wargames -->
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
+                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+                <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">⚔️📏</div>
+                <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Wargames</h3>
+                <p class="text-fantasy-gold-light font-body leading-relaxed">
+                    Warhammer 40k, Age of Sigmar, The Old World, Bolt Action ... Menez votre armée à la victoire ! (ou à la défaite, les 2 sont possibles)
+                </p>
+            </article>
+
+            <!-- Carte Plateau et Dungeon Crawler -->
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
+                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+                <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">🗺️🎲</div>
+                <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Dungeon Crawlers et jeux de plateau</h3>
+                <p class="text-fantasy-gold-light font-body leading-relaxed">
+                    Ranger of Shadow Deep, Deepsyx, Heroquest,Frostgrave, Stargrave ... Vivez des aventures épiques ! (ou mourrez en ouvrant un coffre-mimique)
+                </p>
+            </article>
+
+            <!-- Carte Modélisme -->
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
+                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+                <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">🎨🪚</div>
+                <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Modélisme & DIY</h3>
+                <p class="text-fantasy-gold-light font-body leading-relaxed">
+                    Adeptes des conversions de figurines, créations de décors et de peinture en tout genre, vous trouverez forcément un partenaire pour peindre et bricoler !
+                </p>
+            </article>
+
+            <!-- Carte Impression 3D -->
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
+                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+                <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">💻🛠</div>
+                <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Impression 3D </h3>
+                <p class="text-fantasy-gold-light font-body leading-relaxed">
+                    Vous voulez créer votre armée imprimée en 3D ? Venez discuter de PLA, de résine et de modélisation 3D avec nous !
+                </p>
+            </article>
+            
+        </div>
+    </div>
+</section>
+
+
+<!-- SECTION : Rejoignez-nous (CTA Final) -->
+<section class="py-20 sm:py-24 lg:py-32 bg-fantasy-darkest text-white relative overflow-hidden">
+    
+    <!-- Effet de particules -->
+    <div class="absolute inset-0 opacity-20">
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-fantasy-gold rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fantasy-orange rounded-full blur-3xl animate-pulse"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 sm:px-6 text-center relative z-10">
+        
+        <h2 class="text-3xl sm:text-5xl font-fantasy font-bold text-fantasy-gold mb-6 animate-pulse-glow">
+            Rejoignez Nord Stratégie !
+        </h2>
+        
+        <p class="text-xl text-fantasy-gold-light font-body max-w-3xl mx-auto mb-12 leading-relaxed">
+            Envie de nous rejoindre ? De rencontrer d'autres passionnés ou découvrir de nouveaux jeux ?<br>
+            L'inscription est ouverte à tous, petits et grands.
+        </p>
+
+    <button type="button" data-open-auth="register"
+           class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-3 border-fantasy-gold text-fantasy-gold font-fantasy font-bold text-lg rounded-lg
+                      hover:bg-fantasy-gold hover:text-fantasy-darkest transition-all duration-300">
+            ⚔️ Je m'inscris maintenant !
+    </button>
+        
+        <p class="mt-8 text-fantasy-gold-light font-body text-sm">
+            Ou venez nous rendre visite lors de nos soirées du vendredi !
+        </p>
+
+    </div>
+</section>
+
+
+</div>
+
+<script src="/js/home-carousel.js" defer></script>
+
+<!-- Injecte le footer -->
+<%- include('../partials/footer') %>
