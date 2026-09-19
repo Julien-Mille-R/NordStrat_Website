@@ -27,8 +27,8 @@ server {
     http2 on;
     server_name ${NGINX_SERVER_NAME};
 
-    ssl_certificate /etc/letsencrypt/live/${NGINX_CERTIFICATE_NAME}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${NGINX_CERTIFICATE_NAME}/privkey.pem;
+    ssl_certificate /etc/nordstrat/tls/fullchain.pem;
+    ssl_certificate_key /etc/nordstrat/tls/privkey.pem;    
     ssl_protocols TLSv1.2 TLSv1.3;
     client_max_body_size 6m;
 

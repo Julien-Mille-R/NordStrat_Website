@@ -40,7 +40,7 @@ export async function saveUploadedImage(file, category, invalidContentCode) {
   await fs.mkdir(directory, { recursive: true });
   const filename = `${crypto.randomUUID()}.${extension}`;
   const imagePath = path.join(directory, filename);
-  await fs.writeFile(imagePath, file.buffer, { mode: 0o600, flag: 'wx' });
+  await fs.writeFile(imagePath, file.buffer, { mode: 0o644, flag: 'wx' });
   return { imagePath, imageUrl: `/uploads/${category}/${filename}` };
 }
 
