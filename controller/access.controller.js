@@ -125,6 +125,19 @@ export function requireUser(req, res, next) {
   return next();
 }
 
+export function requireTableBooking(req, res, next) {
+  if (!req.currentUser) {
+    setFlash(req, 'error', 'Vous devez être connecté pour effectuer cette action.');
+    return res.redirect('/?auth=login');
+  }
+
+  if (req.currentUser.role.name === 'Admin' || req.currentUser.canBookTables) {
+    return next();
+  }
+
+  return res.redirect('/booking?error=table-booking-not-authorized');
+}
+
 export function requireGuest(req, res, next) {
   if (req.currentUser) return res.redirect('/account');
   return next();
