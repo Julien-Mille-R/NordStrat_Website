@@ -13,6 +13,7 @@ import {
   resetPassword,
   showForgotPassword,
   showResetPassword,
+  verifyEmail,
 } from '../controller/auth.controller.js';
 import {
   changeEmail,
@@ -175,6 +176,7 @@ router.get('/politique-confidentialite', (req, res) => res.render('layouts/priva
 router.get('/contact', showContactPage);
 router.post('/contact', contactLimiter, sendContactMessage);
 
+router.get('/verify-email', verifyEmail);
 router.get('/forgot-password', requireGuest, showForgotPassword);
 router.post('/auth/forgot-password', requireGuest, authLimiter, requestPasswordReset);
 router.get('/reset-password', requireGuest, showResetPassword);

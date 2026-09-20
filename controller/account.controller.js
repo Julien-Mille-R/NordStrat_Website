@@ -7,6 +7,10 @@ import {
   where,
 } from 'sequelize';
 import {
+  createEmailVerificationToken,
+} from '../services/email-verification.service.js';
+import { sendEmail } from '../services/mail.service.js';
+import {
   BookingArchive,
   ContactMessage,
   EventAttendance,
@@ -85,10 +89,55 @@ export async function register(req, res, next) {
       acceptedTermsVersion: '2026-07',
     });
 
-    await regenerateSession(req);
-    req.session.userId = player.id;
-    setFlash(req, 'success', 'Votre compte a été créé.');
-    return res.redirect('/account');
+    const verificationToken = await createEmailVerificationToken(
+      player.id,
+      player.email,
+    );
+
+    const verificationUrl = `${process.env.SITE_URL}/verify-email?token=${encodeURIComponent(verificationToken)}`;
+
+    await sendEmail({
+      to: player.email,
+      subject: 'Validez votre adresse e-mail - Nord Stratégie',
+      text: [
+        'Bonjour,',
+        '',
+        'Votre compte Nord Stratégie vient d’être créé.',
+        '',
+        `Pour valider votre adresse e-mail, utilisez ce lien : ${verificationUrl}`,
+        '',
+        'Ce lien est valable pendant 1 heure et ne peut être utilisé qu’une seule fois.',
+        '',
+        'Nord Stratégie',
+      ].join('\n'),
+      html: `
+        <p>Bonjour,</p>
+
+        <p>
+          Votre compte <strong>Nord Stratégie</strong> vient d’être créé.
+        </p>
+
+        <p>
+          <a href="${verificationUrl}">
+            Valider mon adresse e-mail
+          </a>
+        </p>
+
+        <p>
+          Ce lien est valable pendant 1 heure et ne peut être utilisé
+          qu’une seule fois.
+        </p>
+
+        <p>Nord Stratégie</p>
+      `,
+    });
+
+    setFlash(
+      req,
+      'success',
+      'Votre compte a été créé. Un e-mail de validation vient de vous être envoyé.',
+    );
+    return res.redirect('/?auth=login');
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError' || error.name === 'SequelizeValidationError') {
       setFlash(req, 'error', 'Impossible de créer ce compte. Vérifiez les informations saisies.');

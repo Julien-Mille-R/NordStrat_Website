@@ -7,7 +7,85 @@ import {
   createPasswordResetToken,
   findValidPasswordResetToken,
 } from '../services/password-reset.service.js';
+import {
+  consumeEmailVerificationToken,
+} from '../services/email-verification.service.js';
 import { sendEmail } from '../services/mail.service.js';
+
+export async function verifyEmail(req, res, next) {
+  const token = req.query.token;
+
+  if (!token) {
+    setFlash(req, 'error', 'Le lien de validation est invalide ou a expiré.');
+    return res.redirect('/?auth=login');
+  }
+
+  try {
+    await sequelize.transaction(async (transaction) => {
+      const verificationToken = await consumeEmailVerificationToken(
+        token,
+        transaction,
+      );
+
+      if (!verificationToken) {
+        const error = new Error('Invalid or expired email verification token.');
+        error.code = 'EMAIL_VERIFICATION_TOKEN_INVALID';
+        throw error;
+      }
+
+      const player = await Player.unscoped().findByPk(
+        verificationToken.playerId,
+        {
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        },
+      );
+
+      if (
+        !player
+        || player.moderationStatus === 'deleted'
+        || !player.isActive
+      ) {
+        const error = new Error('Email verification account invalid.');
+        error.code = 'EMAIL_VERIFICATION_ACCOUNT_INVALID';
+        throw error;
+      }
+
+      if (player.email.toLowerCase() !== verificationToken.email.toLowerCase()) {
+        const error = new Error('Email verification address mismatch.');
+        error.code = 'EMAIL_VERIFICATION_ADDRESS_MISMATCH';
+        throw error;
+      }
+
+      await player.update({
+        emailVerifiedAt: new Date(),
+      }, { transaction });
+    });
+
+    setFlash(
+      req,
+      'success',
+      'Votre adresse e-mail a été validée. Vous pouvez maintenant vous connecter.',
+    );
+
+    return res.redirect('/?auth=login');
+  } catch (error) {
+    if (
+      error.code === 'EMAIL_VERIFICATION_TOKEN_INVALID'
+      || error.code === 'EMAIL_VERIFICATION_ACCOUNT_INVALID'
+      || error.code === 'EMAIL_VERIFICATION_ADDRESS_MISMATCH'
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Le lien de validation est invalide ou a expiré.',
+      );
+      return res.redirect('/?auth=login');
+    }
+
+    return next(error);
+  }
+}
 
 export async function login(req, res, next) {
   const email = req.body.email?.trim().toLowerCase();
