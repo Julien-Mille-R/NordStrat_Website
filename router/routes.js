@@ -6,7 +6,12 @@ import {
   requireTableBooking,
   requireUser,
 } from '../controller/access.controller.js';
-import { login, logout } from '../controller/auth.controller.js';
+import {
+  login,
+  logout,
+  requestPasswordReset,
+  showForgotPassword,
+} from '../controller/auth.controller.js';
 import {
   changeEmail,
   changePassword,
@@ -168,6 +173,8 @@ router.get('/politique-confidentialite', (req, res) => res.render('layouts/priva
 router.get('/contact', showContactPage);
 router.post('/contact', contactLimiter, sendContactMessage);
 
+router.get('/forgot-password', requireGuest, showForgotPassword);
+router.post('/auth/forgot-password', requireGuest, authLimiter, requestPasswordReset);
 router.post('/auth/login', requireGuest, authLimiter, login);
 router.post('/auth/logout', requireUser, logout);
 router.post('/account/register', requireGuest, authLimiter, register);

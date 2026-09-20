@@ -37,6 +37,10 @@ export async function login(req, res, next) {
   }
 }
 
+export function showForgotPassword(req, res) {
+  return res.render('layouts/forgot-password');
+}
+
 export async function requestPasswordReset(req, res, next) {
   const email = req.body.email?.trim().toLowerCase();
 
