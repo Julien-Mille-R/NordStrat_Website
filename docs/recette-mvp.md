@@ -36,8 +36,6 @@ Cette checklist complète les tests automatisés. Elle doit être rejouée sur o
 
 ## Production
 
-- mail mensuel de test reçu en HTML et en texte, avec la période attendue ;
-- aucun second envoi automatique pour un mois déjà marqué comme traité ;
 - page 404 et page 500 sans détail technique ;
 - HTTPS, cookies sécurisés, CSP et redirection HTTP ;
 - `robots.txt`, sitemap, canoniques et données structurées ;

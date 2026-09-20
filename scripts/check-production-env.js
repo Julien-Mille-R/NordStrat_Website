@@ -9,7 +9,6 @@ const required = [
   'NGINX_BIND_ADDRESS', 'NGINX_HTTP_PORT', 'NGINX_HTTPS_BIND_ADDRESS',
   'NGINX_HTTPS_PORT', 'NGINX_SERVER_NAME', 'NGINX_CERTIFICATE_NAME',
   'LETSENCRYPT_DIRECTORY', 'CERTBOT_WEBROOT', 'APP_IMAGE', 'NGINX_IMAGE',
-  'MONTHLY_REPORT_ENABLED',
 ];
 
 function parseEnvironment(content) {
@@ -65,20 +64,6 @@ if (!fs.existsSync(filename)) {
   if (environment.POSTGRES_DB !== environment.DB_NAME
     || environment.POSTGRES_USER !== environment.DB_USER) {
     fail('les noms de base et d’utilisateur PostgreSQL doivent correspondre aux variables DB_*.');
-  }
-
-  if (!['true', 'false'].includes(environment.MONTHLY_REPORT_ENABLED)) {
-    fail('MONTHLY_REPORT_ENABLED doit valoir true ou false.');
-  }
-  if (environment.MONTHLY_REPORT_ENABLED === 'true') {
-    const mailVariables = [
-      'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASSWORD',
-      'MAIL_FROM_ADDRESS', 'MONTHLY_REPORT_RECIPIENT',
-    ];
-    const missingMailVariables = mailVariables.filter((name) => !environment[name]);
-    if (missingMailVariables.length) {
-      fail(`rapport mensuel activé mais variables mail absentes : ${missingMailVariables.join(', ')}.`);
-    }
   }
   if (!environment.NGINX_SERVER_NAME
     || environment.NGINX_SERVER_NAME.split(/\s+/).some((name) => name === 'example.org')) {

@@ -141,23 +141,3 @@ npm run docker:import-files
 
 Les futurs fichiers seront directement écrits dans le volume persistant et
 seront inclus par `npm run docker:backup`.
-
-## Rapport mensuel par e-mail
-
-Renseigner les variables SMTP Brevo et le destinataire dans `.env.docker`,
-puis activer l'automatisation avec :
-
-```env
-MONTHLY_REPORT_ENABLED=true
-MONTHLY_REPORT_RECIPIENT=nord.strategie@gmail.com
-```
-
-Pour envoyer immédiatement un mail de test sans modifier le suivi mensuel :
-
-```bash
-npm run report:test -- --docker
-```
-
-Le marqueur anti-doublon est conservé dans le volume `archives_data`, sous
-`system/monthly-report-state.json`. Il est inclus dans les sauvegardes des
-archives.
