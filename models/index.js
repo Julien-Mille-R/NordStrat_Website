@@ -26,6 +26,7 @@ export const models = initModels(sequelize);
 export const {
   Role,
   Player,
+  PasswordResetToken,
   AuditLog,
   PlayerGame,
   Event,
