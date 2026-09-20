@@ -125,6 +125,32 @@
               </form>
             <% } %>
           </section>
+          <% if (player.id !== currentUser.id) { %>
+          <section class="mt-6 p-4 border border-fantasy-red/60 rounded-lg bg-fantasy-red/5">
+            <h3 class="text-xl text-fantasy-red">Suppression du compte</h3>
+            <p class="mt-2 text-sm text-fantasy-gold-light/80">
+              Cette action anonymise définitivement le compte.
+              Les données personnelles seront supprimées, le compte ne pourra plus être utilisé
+              et il ne sera plus visible dans les listes administratives.
+              Les historiques de cotisation sont conservés.
+            </p>
+
+            <form
+              method="POST"
+              action="/admindashboard/members/<%= player.id %>/delete"
+              class="mt-4"
+              data-confirm="Confirmer l’anonymisation définitive de ce compte ? Cette action est irréversible."
+            >
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button
+                type="submit"
+                class="px-4 py-3 bg-fantasy-red text-white font-bold rounded hover:opacity-90 transition-opacity"
+              >
+                Anonymiser définitivement le compte
+              </button>
+            </form>
+          </section>
+          <% } %>
           <% } else { %>
             <p class="mt-6 p-4 border border-fantasy-gold/20 rounded-lg text-fantasy-gold-light/60">Ce compte a été anonymisé définitivement et ne peut plus être réactivé ni modifié.</p>
           <% } %>
