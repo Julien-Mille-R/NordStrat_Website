@@ -231,38 +231,133 @@ export async function changeEmail(req, res, next) {
 
   try {
     const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || '');
+
     if (!emailIsValid || email !== emailConfirmation) {
-      setFlash(req, 'error', 'La nouvelle adresse e-mail est invalide ou sa confirmation ne correspond pas.');
+      setFlash(
+        req,
+        'error',
+        'La nouvelle adresse e-mail est invalide ou sa confirmation ne correspond pas.',
+      );
       return res.redirect('/account');
     }
 
     const player = await Player.scope('withPassword').findByPk(req.currentUser.id);
+
+    if (!player || player.moderationStatus === 'deleted' || !player.isActive) {
+      return res.redirect('/');
+    }
+
     if (!await bcrypt.compare(password, player.password)) {
       setFlash(req, 'error', 'Le mot de passe est incorrect.');
       return res.redirect('/account');
     }
-    if (email === player.email) {
-      setFlash(req, 'error', 'Cette adresse e-mail est déjà associée à votre compte.');
+
+    if (email === player.email.toLowerCase()) {
+      setFlash(
+        req,
+        'error',
+        'Cette adresse e-mail est déjà associée à votre compte.',
+      );
+      return res.redirect('/account');
+    }
+
+    if (player.pendingEmail?.toLowerCase() === email) {
+      setFlash(
+        req,
+        'error',
+        'Cette adresse e-mail est déjà en attente de validation.',
+      );
       return res.redirect('/account');
     }
 
     const existingPlayer = await Player.unscoped().findOne({
       where: where(fn('LOWER', col('email')), email),
     });
-    if (existingPlayer) {
+
+    if (existingPlayer && existingPlayer.id !== player.id) {
       setFlash(req, 'error', 'Cette adresse e-mail est déjà utilisée.');
       return res.redirect('/account');
     }
 
-    await player.update({ email });
-    await renewAuthenticatedSession(req, player.id);
-    setFlash(req, 'success', 'Votre adresse e-mail a été modifiée.');
+    const verificationToken = await createEmailVerificationToken(
+      player.id,
+      email,
+    );
+
+    await player.update({
+      pendingEmail: email,
+    });
+
+    const verificationUrl =
+      `${process.env.SITE_URL}/verify-email?token=${encodeURIComponent(verificationToken)}`;
+
+    await sendEmail({
+      to: email,
+      subject: 'Validez votre nouvelle adresse e-mail - Nord Stratégie',
+      text: [
+        'Bonjour,',
+        '',
+        'Vous avez demandé à modifier l’adresse e-mail de votre compte Nord Stratégie.',
+        '',
+        `Pour confirmer cette nouvelle adresse, utilisez ce lien : ${verificationUrl}`,
+        '',
+        'Ce lien est valable pendant 1 heure et ne peut être utilisé qu’une seule fois.',
+        '',
+        'Votre adresse e-mail actuelle reste inchangée tant que cette nouvelle adresse n’est pas validée.',
+        '',
+        'Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-mail.',
+        '',
+        'Nord Stratégie',
+      ].join('\n'),
+      html: `
+        <p>Bonjour,</p>
+
+        <p>
+          Vous avez demandé à modifier l’adresse e-mail de votre compte
+          <strong>Nord Stratégie</strong>.
+        </p>
+
+        <p>
+          <a href="${verificationUrl}">
+            Valider ma nouvelle adresse e-mail
+          </a>
+        </p>
+
+        <p>
+          Ce lien est valable pendant 1 heure et ne peut être utilisé
+          qu’une seule fois.
+        </p>
+
+        <p>
+          Votre adresse e-mail actuelle reste inchangée tant que cette
+          nouvelle adresse n’est pas validée.
+        </p>
+
+        <p>
+          Si vous n’êtes pas à l’origine de cette demande,
+          vous pouvez ignorer cet e-mail.
+        </p>
+
+        <p>Nord Stratégie</p>
+      `,
+    });
+
+    setFlash(
+      req,
+      'success',
+      'Votre nouvelle adresse e-mail est enregistrée. Un e-mail de validation vient de vous être envoyé.',
+    );
+
     return res.redirect('/account');
   } catch (error) {
-    if (error.name === 'SequelizeUniqueConstraintError' || error.name === 'SequelizeValidationError') {
+    if (
+      error.name === 'SequelizeUniqueConstraintError'
+      || error.name === 'SequelizeValidationError'
+    ) {
       setFlash(req, 'error', 'Impossible de modifier cette adresse e-mail.');
       return res.redirect('/account');
     }
+
     return next(error);
   }
 }

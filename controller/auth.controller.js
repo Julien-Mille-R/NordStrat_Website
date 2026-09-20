@@ -1,4 +1,9 @@
 import bcrypt from 'bcrypt';
+import {
+  col,
+  fn,
+  where,
+} from 'sequelize';
 import { Player, sequelize } from '../models/index.js';
 import { reactivateExpiredSuspension, setFlash } from './access.controller.js';
 import { regenerateSession, invalidatePlayerSessions } from '../services/session-security.service.js';
@@ -12,6 +17,7 @@ import {
 } from '../services/email-verification.service.js';
 import { sendEmail } from '../services/mail.service.js';
 
+
 export async function verifyEmail(req, res, next) {
   const token = req.query.token;
 
@@ -21,6 +27,8 @@ export async function verifyEmail(req, res, next) {
   }
 
   try {
+    let verificationType = 'account';
+
     await sequelize.transaction(async (transaction) => {
       const verificationToken = await consumeEmailVerificationToken(
         token,
@@ -51,16 +59,54 @@ export async function verifyEmail(req, res, next) {
         throw error;
       }
 
-      if (player.email.toLowerCase() !== verificationToken.email.toLowerCase()) {
+      const tokenEmail = verificationToken.email.toLowerCase();
+
+      // Validation initiale du compte.
+      if (player.email.toLowerCase() === tokenEmail) {
+        await player.update({
+          emailVerifiedAt: new Date(),
+        }, { transaction });
+
+        return;
+      }
+
+      // Changement d'adresse e-mail.
+      if (!player.pendingEmail || player.pendingEmail.toLowerCase() !== tokenEmail) {
         const error = new Error('Email verification address mismatch.');
         error.code = 'EMAIL_VERIFICATION_ADDRESS_MISMATCH';
         throw error;
       }
 
+      const existingPlayer = await Player.unscoped().findOne({
+        where: where(fn('LOWER', col('email')), tokenEmail),
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+
+      if (existingPlayer && existingPlayer.id !== player.id) {
+        const error = new Error('Email verification address already used.');
+        error.code = 'EMAIL_VERIFICATION_ADDRESS_USED';
+        throw error;
+      }
+
       await player.update({
+        email: player.pendingEmail,
+        pendingEmail: null,
         emailVerifiedAt: new Date(),
       }, { transaction });
+
+      verificationType = 'email_change';
     });
+
+    if (verificationType === 'email_change') {
+      setFlash(
+        req,
+        'success',
+        'Votre nouvelle adresse e-mail a été validée et associée à votre compte.',
+      );
+
+      return res.redirect('/account');
+    }
 
     setFlash(
       req,
@@ -74,6 +120,7 @@ export async function verifyEmail(req, res, next) {
       error.code === 'EMAIL_VERIFICATION_TOKEN_INVALID'
       || error.code === 'EMAIL_VERIFICATION_ACCOUNT_INVALID'
       || error.code === 'EMAIL_VERIFICATION_ADDRESS_MISMATCH'
+      || error.code === 'EMAIL_VERIFICATION_ADDRESS_USED'
     ) {
       setFlash(
         req,

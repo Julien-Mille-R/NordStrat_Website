@@ -16,7 +16,7 @@ export async function createEmailVerificationToken(playerId, email) {
 
   await EmailVerificationToken.create({
     playerId,
-    email,
+    email: email.trim().toLowerCase(),
     tokenHash: hashToken(token),
     expiresAt: new Date(Date.now() + TOKEN_TTL_MS),
   });
