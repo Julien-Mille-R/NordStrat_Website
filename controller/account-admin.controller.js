@@ -1,3 +1,6 @@
+import bcrypt from 'bcrypt';
+import crypto from 'node:crypto';
+import { Op } from 'sequelize';
 import {
   Player,
   Role,
@@ -6,6 +9,8 @@ import {
 import { reactivateExpiredSuspension, setFlash } from './access.controller.js';
 import { recordAdminAction, targetDisplayName } from '../services/audit-log.service.js';
 import { invalidatePlayerSessions } from '../services/session-security.service.js';
+import { deleteUploadedImage } from '../services/upload-storage.service.js';
+
 
 function memberRedirect() {
   return '/admindashboard/members';
@@ -14,6 +19,11 @@ function memberRedirect() {
 export async function showMemberList(req, res, next) {
   try {
     const players = await Player.findAll({
+      where: {
+        moderationStatus: {
+          [Op.ne]: 'deleted',
+        },
+      },
       include: [
         { association: 'role' },
         { association: 'moderator', required: false },
@@ -186,8 +196,104 @@ export async function updateMemberModeration(req, res, next) {
       return res.redirect('/admindashboard/members');
     }
 
+    
+
     return res.status(400).send('Action de modération invalide.');
   } catch (error) {
+    return next(error);
+  }
+}
+
+export async function deleteMemberAccount(req, res, next) {
+  const playerId = Number(req.params.playerId);
+
+  try {
+    if (!Number.isInteger(playerId)) {
+      return res.status(400).send('Compte invalide.');
+    }
+
+    if (playerId === req.currentUser.id) {
+      setFlash(req, 'error', 'Vous ne pouvez pas anonymiser votre propre compte administrateur.');
+      return res.redirect(memberRedirect());
+    }
+
+    const player = await Player.findByPk(playerId);
+
+    if (!player) {
+      return res.status(404).send('Compte introuvable.');
+    }
+
+    if (player.moderationStatus === 'deleted') {
+      setFlash(req, 'error', 'Ce compte est déjà anonymisé.');
+      return res.redirect(memberRedirect());
+    }
+
+    const targetLabel = targetDisplayName(player);
+    const avatarUrl = player.avatarUrl;
+    const deletedEmail = `deleted-${player.id}-${crypto.randomUUID()}@anonymized.invalid`;
+    const deletedPassword = await bcrypt.hash(
+      crypto.randomBytes(48).toString('hex'),
+      12,
+    );
+    const anonymizedAt = new Date();
+
+    await sequelize.transaction(async (transaction) => {
+      const lockedPlayer = await Player.findByPk(playerId, {
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+
+      if (!lockedPlayer || lockedPlayer.moderationStatus === 'deleted') {
+        throw new Error('ACCOUNT_NOT_AVAILABLE');
+      }
+
+      await lockedPlayer.update({
+        firstname: 'Utilisateur',
+        lastname: 'supprimé',
+        nickname: 'Utilisateur supprimé',
+        email: deletedEmail,
+        password: deletedPassword,
+        avatarUrl: null,
+        biography: null,
+        isProfilePublic: false,
+        isActive: false,
+        moderationStatus: 'deleted',
+        suspendedUntil: null,
+        moderationReason: null,
+        moderatedAt: new Date(),
+        moderatedBy: req.currentUser.id,
+        membershipExpiresAt: null,
+        acceptedTermsAt: null,
+        acceptedTermsVersion: null,
+        anonymizedAt,
+      }, { transaction });
+
+      await recordAdminAction({
+        admin: req.currentUser,
+        category: 'members',
+        action: 'member_deleted',
+        targetType: 'member',
+        targetId: lockedPlayer.id,
+        targetLabel,
+        description: `Compte anonymisé par un administrateur. Identité initiale : ${targetLabel}.`,
+        transaction,
+      });
+    });
+
+    await invalidatePlayerSessions(playerId);
+
+    if (avatarUrl) {
+      await deleteUploadedImage(avatarUrl, 'avatars');
+    }
+
+    setFlash(req, 'success', 'Le compte a été anonymisé. Il n’apparaît plus dans les listes administratives.');
+    return res.redirect(memberRedirect());
+  } catch (error) {
+    if (error.message === 'ACCOUNT_NOT_AVAILABLE') {
+      setFlash(req, 'error', 'Ce compte a déjà été anonymisé ou est indisponible.');
+      return res.redirect(memberRedirect());
+    }
+
     return next(error);
   }
 }
