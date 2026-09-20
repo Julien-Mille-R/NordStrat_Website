@@ -3,6 +3,7 @@ import { rateLimit } from 'express-rate-limit';
 import {
   requireAdmin,
   requireGuest,
+  requireTableBooking,
   requireUser,
 } from '../controller/access.controller.js';
 import { login, logout } from '../controller/auth.controller.js';
@@ -189,8 +190,8 @@ router.get('/booking', showBookingPage);
 router.post('/events/:eventId/attendance/cancel', requireUser, cancelOwnAttendance);
 router.post('/events/:eventId/attendance/confirm', requireUser, confirmOwnAttendance);
 
-router.post('/tables/create', requireUser, createTable);
-router.post('/tables/:tableId/join', requireUser, joinTable);
+router.post('/tables/create', requireTableBooking, createTable);
+router.post('/tables/:tableId/join', requireTableBooking, joinTable);
 router.post('/tables/:tableId/leave', requireUser, leaveTable);
 router.post('/tables/:tableId/update', requireUser, updateTable);
 router.post('/tables/:tableId/close', requireUser, closeTable);
