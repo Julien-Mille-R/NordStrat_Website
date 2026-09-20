@@ -193,7 +193,6 @@
                 </details>
               <% } %>
             <% } else if (!currentReservation && gameTable.status === 'open' && !isFull) { %>
-            <% } else if (!currentReservation && gameTable.status === 'open' && !isFull) { %>
               <% if (canBookTables) { %>
                 <form method="POST" action="/tables/<%= gameTable.id %>/join">
                   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
