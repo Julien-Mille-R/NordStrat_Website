@@ -10,7 +10,9 @@ import {
   login,
   logout,
   requestPasswordReset,
+  resetPassword,
   showForgotPassword,
+  showResetPassword,
 } from '../controller/auth.controller.js';
 import {
   changeEmail,
@@ -175,6 +177,8 @@ router.post('/contact', contactLimiter, sendContactMessage);
 
 router.get('/forgot-password', requireGuest, showForgotPassword);
 router.post('/auth/forgot-password', requireGuest, authLimiter, requestPasswordReset);
+router.get('/reset-password', requireGuest, showResetPassword);
+router.post('/reset-password', requireGuest, authLimiter, resetPassword);
 router.post('/auth/login', requireGuest, authLimiter, login);
 router.post('/auth/logout', requireUser, logout);
 router.post('/account/register', requireGuest, authLimiter, register);

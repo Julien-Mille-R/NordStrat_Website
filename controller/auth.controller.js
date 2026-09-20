@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
-import { Player } from '../models/index.js';
+import { Player, sequelize } from '../models/index.js';
 import { reactivateExpiredSuspension, setFlash } from './access.controller.js';
-import { regenerateSession } from '../services/session-security.service.js';
+import { regenerateSession, invalidatePlayerSessions } from '../services/session-security.service.js';
 import { createPasswordResetToken } from '../services/password-reset.service.js';
 import { sendEmail } from '../services/mail.service.js';
 
@@ -115,6 +115,103 @@ export async function requestPasswordReset(req, res, next) {
   } catch (error) {
     return next(error);
   }
+}
+
+export async function showResetPassword(req, res, next) {
+  const token = req.query.token;
+
+  try {
+    const resetToken = await findValidPasswordResetToken(token);
+
+    if (!resetToken) {
+      setFlash(
+        req,
+        'error',
+        'Ce lien de réinitialisation est invalide ou a expiré.',
+      );
+      return res.redirect('/forgot-password');
+    }
+
+    return res.render('layouts/reset-password', { token });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export async function resetPassword(req, res, next) {
+  const token = req.body.token;
+  const newPassword = req.body.newPassword || '';
+  const passwordConfirmation = req.body.passwordConfirmation || '';
+
+  if (
+    newPassword.length < 10
+    || newPassword.length > 128
+    || newPassword !== passwordConfirmation
+  ) {
+    setFlash(
+      req,
+      'error',
+      'Le mot de passe doit contenir entre 10 et 128 caractères et les deux saisies doivent être identiques.',
+    );
+    return res.redirect(`/reset-password?token=${encodeURIComponent(token || '')}`);
+  }
+
+  let playerId;
+
+  try {
+    await sequelize.transaction(async (transaction) => {
+      const resetToken = await consumePasswordResetToken(token, transaction);
+
+      if (!resetToken) {
+        const error = new Error('Invalid or expired password reset token.');
+        error.code = 'PASSWORD_RESET_TOKEN_INVALID';
+        throw error;
+      }
+
+      playerId = resetToken.playerId;
+
+      const player = await Player.unscoped().findByPk(
+        playerId,
+        { transaction },
+      );
+
+      if (!player || !player.isActive || player.moderationStatus !== 'active') {
+        const error = new Error('Password reset account is not active.');
+        error.code = 'PASSWORD_RESET_ACCOUNT_INVALID';
+        throw error;
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+      await player.update({
+        password: hashedPassword,
+      }, { transaction });
+    });
+
+    await invalidatePlayerSessions(playerId);
+  } catch (error) {
+    if (
+      error.code === 'PASSWORD_RESET_TOKEN_INVALID'
+      || error.code === 'PASSWORD_RESET_ACCOUNT_INVALID'
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Ce lien de réinitialisation est invalide ou a expiré.',
+      );
+      return res.redirect('/forgot-password');
+    }
+
+    return next(error);
+  }
+
+  setFlash(
+    req,
+    'success',
+    'Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter.',
+  );
+
+  return res.redirect('/?auth=login');
 }
 
 export function logout(req, res, next) {

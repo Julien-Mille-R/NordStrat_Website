@@ -41,9 +41,14 @@ export async function findValidPasswordResetToken(token, options = {}) {
 }
 
 export async function consumePasswordResetToken(token, transaction) {
-  const options = transaction ? { transaction } : {};
+  if (!transaction) {
+    throw new Error('Une transaction est requise pour consommer un token de réinitialisation.');
+  }
 
-  const resetToken = await findValidPasswordResetToken(token, options);
+  const resetToken = await findValidPasswordResetToken(token, {
+    transaction,
+    lock: transaction.LOCK.UPDATE,
+  });
 
   if (!resetToken) {
     return null;
@@ -51,7 +56,7 @@ export async function consumePasswordResetToken(token, transaction) {
 
   await resetToken.update({
     usedAt: new Date(),
-  }, options);
+  }, { transaction });
 
   return resetToken;
 }
