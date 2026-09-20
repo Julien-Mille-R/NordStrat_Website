@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { Membership, Player, sequelize } from '../models/index.js';
 import { setFlash } from './access.controller.js';
 import { recordAdminAction, targetDisplayName } from '../services/audit-log.service.js';
@@ -50,6 +51,11 @@ export async function showMembershipList(req, res, next) {
       (_, index) => membershipSeasonForYear(currentSeason.year + 1 - index),
     );
     const players = await Player.findAll({
+      where: {
+        moderationStatus: {
+          [Op.ne]: 'deleted',
+        },
+      },
       include: [{
         association: 'memberships',
         required: false,
@@ -104,6 +110,11 @@ export async function updateMembership(req, res, next) {
 
     const player = await Player.findByPk(playerId);
     if (!player) return res.status(404).send('Membre introuvable.');
+
+    if (player.moderationStatus === 'deleted') {
+      setFlash(req, 'error', 'La cotisation d’un compte anonymisé ne peut plus être modifiée.');
+      return res.redirect(`/admindashboard/memberships?season=${season.year}`);
+    }
 
     await sequelize.transaction(async (transaction) => {
       const existingMembership = await Membership.findOne({
