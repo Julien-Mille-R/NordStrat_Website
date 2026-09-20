@@ -29,6 +29,7 @@ export const {
   PasswordResetToken,
   AuditLog,
   PlayerGame,
+  EmailVerificationToken,
   Event,
   Game,
   Membership,
