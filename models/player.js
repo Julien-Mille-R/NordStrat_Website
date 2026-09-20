@@ -29,6 +29,12 @@ export default function definePlayer(sequelize) {
     },
     password: { type: DataTypes.STRING(255), allowNull: false },
     roleId: { type: DataTypes.INTEGER, allowNull: false, field: 'role_id' },
+    canBookTables: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      field: 'can_book_tables',
+    },
     isActive: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true, field: 'is_active' },
     moderationStatus: {
       type: DataTypes.STRING(30),
