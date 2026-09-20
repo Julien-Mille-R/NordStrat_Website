@@ -28,10 +28,16 @@ export default function definePasswordResetToken(sequelize) {
       allowNull: true,
       field: 'used_at',
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      field: 'created_at',
+      defaultValue: DataTypes.NOW,
+    },
   }, {
     tableName: 'password_reset_token',
     underscored: true,
-    timestamps: true,
+    timestamps: false,
     indexes: [
       { fields: ['player_id'] },
       { fields: ['expires_at'] },
