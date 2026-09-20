@@ -42,12 +42,16 @@ try {
   for (const filename of await migrationFiles()) {
     const sql = await fs.readFile(path.join(MIGRATION_DIRECTORY, filename), 'utf8');
     const fileChecksum = checksum(sql);
+    const compatibleChecksums = new Set([
+      fileChecksum,
+      checksum(sql.replace(/\r?\n$/, '')),
+    ]);
     const applied = await client.query(
       'SELECT checksum FROM schema_migration WHERE filename = $1',
       [filename],
     );
     if (applied.rowCount) {
-      if (applied.rows[0].checksum.trim() !== fileChecksum) {
+      if (!compatibleChecksums.has(applied.rows[0].checksum.trim())) {
         throw new Error(`La migration déjà appliquée ${filename} a été modifiée.`);
       }
       console.log(`Migration déjà appliquée : ${filename}`);
