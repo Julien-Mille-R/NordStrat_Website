@@ -18,6 +18,7 @@ import {
   showMemberList,
   updateAccountRole,
   updateMemberModeration,
+  deleteMemberAccount,
 } from '../controller/account-admin.controller.js';
 import { showDashboard } from '../controller/admin.controller.js';
 import { showAuditLog } from '../controller/audit-log.controller.js';
@@ -241,6 +242,7 @@ router.post('/admindashboard/inbox/:messageId/status', updateMessageStatus);
 router.get('/admindashboard/members', showMemberList);
 router.post('/admindashboard/members/:playerId/role', updateAccountRole);
 router.post('/admindashboard/members/:playerId/moderation', updateMemberModeration);
+router.post('/admindashboard/members/:playerId/delete', deleteMemberAccount);
 
 router.get('/admindashboard/memberships', showMembershipList);
 router.post('/admindashboard/members/:playerId/memberships', updateMembership);
