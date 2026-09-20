@@ -455,6 +455,8 @@ export async function deleteAccount(req, res, next) {
         nickname: 'Utilisateur supprimé',
         email: deletedEmail,
         password: deletedPassword,
+        pendingEmail: null,
+        emailVerifiedAt: null,
         avatarUrl: null,
         biography: null,
         isProfilePublic: false,
