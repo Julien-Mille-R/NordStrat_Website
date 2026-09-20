@@ -14,6 +14,7 @@ import {
 } from '../services/password-reset.service.js';
 import {
   consumeEmailVerificationToken,
+  createEmailVerificationToken,
 } from '../services/email-verification.service.js';
 import { sendEmail } from '../services/mail.service.js';
 
