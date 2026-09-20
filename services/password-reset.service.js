@@ -23,22 +23,35 @@ export async function createPasswordResetToken(playerId) {
   return token;
 }
 
-export async function consumePasswordResetToken(token) {
+export async function findValidPasswordResetToken(token, options = {}) {
   if (!token) return null;
 
   const tokenHash = hashToken(token);
 
   const resetToken = await PasswordResetToken.findOne({
     where: { tokenHash },
+    ...options,
   });
 
   if (!resetToken || resetToken.usedAt || resetToken.expiresAt <= new Date()) {
     return null;
   }
 
+  return resetToken;
+}
+
+export async function consumePasswordResetToken(token, transaction) {
+  const options = transaction ? { transaction } : {};
+
+  const resetToken = await findValidPasswordResetToken(token, options);
+
+  if (!resetToken) {
+    return null;
+  }
+
   await resetToken.update({
     usedAt: new Date(),
-  });
+  }, options);
 
   return resetToken;
 }
