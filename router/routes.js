@@ -18,6 +18,7 @@ import {
 import {
   showMemberList,
   updateAccountRole,
+  updateTableBookingPermission,
   updateMemberModeration,
   deleteMemberAccount,
 } from '../controller/account-admin.controller.js';
@@ -243,6 +244,7 @@ router.post('/admindashboard/inbox/:messageId/status', updateMessageStatus);
 router.get('/admindashboard/members', showMemberList);
 router.post('/admindashboard/members/:playerId/role', updateAccountRole);
 router.post('/admindashboard/members/:playerId/moderation', updateMemberModeration);
+router.post('/admindashboard/members/:playerId/table-booking-permission', updateTableBookingPermission);
 router.post('/admindashboard/members/:playerId/delete', deleteMemberAccount);
 
 router.get('/admindashboard/memberships', showMembershipList);
