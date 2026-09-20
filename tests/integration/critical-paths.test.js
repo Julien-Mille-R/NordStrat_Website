@@ -168,6 +168,36 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
     assert.equal(await models.Event.count({ where: { title: 'Soirée invalide' } }), 0);
   });
 
+  test('un administrateur attribue manuellement le droit de réserver', async () => {
+    const unauthorizedAgent = request.agent(app);
+    await login(unauthorizedAgent, firstUser.email);
+    const bookingPage = await unauthorizedAgent.get('/booking').expect(200);
+    await unauthorizedAgent.post('/tables/create')
+      .type('form')
+      .send({
+        _csrf: csrfToken(bookingPage),
+        eventId: event.id,
+        tableNumber: 1,
+        gameId: game.id,
+        maxPlayers: 4,
+      })
+      .expect(302)
+      .expect('Location', '/booking?error=table-booking-not-authorized');
+
+    const adminAgent = request.agent(app);
+    await login(adminAgent, admin.email);
+    const memberList = await adminAgent.get('/admindashboard/members').expect(200);
+    await adminAgent
+      .post(`/admindashboard/members/${firstUser.id}/table-booking-permission`)
+      .type('form')
+      .send({ _csrf: csrfToken(memberList), canBookTables: 'on' })
+      .expect(302)
+      .expect('Location', '/admindashboard/members');
+
+    await firstUser.reload();
+    assert.equal(firstUser.canBookTables, true);
+  });
+
   test('une réservation peut être créée puis discutée par un autre membre', async () => {
     const hostAgent = request.agent(app);
     await login(hostAgent, firstUser.email);
@@ -224,5 +254,18 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
     const archiveContents = JSON.parse(await fs.readFile(result.archive.getFilePath(), 'utf8'));
     assert.equal(archiveContents.event.id, event.id);
     assert.equal(await models.GameTable.count({ where: { eventId: event.id } }), 0);
+  });
+
+  test('le rapport mensuel agrège les archives sans exposer les membres', async () => {
+    const { buildMonthlyReport } = await import('../../services/monthly-report.service.js');
+    const reportDate = new Date(event.date);
+    reportDate.setMonth(reportDate.getMonth() + 1, 1);
+    reportDate.setHours(12, 0, 0, 0);
+    const report = await buildMonthlyReport(reportDate);
+    assert.equal(report.evenings.held, 1);
+    assert.equal(report.evenings.tables, 1);
+    assert.equal(report.evenings.registrations, 1);
+    assert.deepEqual(report.games, [{ name: 'Frostgrave', tables: 1 }]);
+    assert.equal('players' in report, false);
   });
 });

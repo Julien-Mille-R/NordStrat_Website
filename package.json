@@ -11,6 +11,7 @@
     "admin:create": "node scripts/create-first-admin.js",
     "migrate": "node scripts/run-migrations.js",
     "seed:games": "node scripts/seed-games.js",
+    "report:test": "bash scripts/send-monthly-report-test.sh",
     "docker:up": "docker compose --env-file .env.docker up -d --build",
     "docker:down": "docker compose --env-file .env.docker down",
     "docker:logs": "docker compose --env-file .env.docker logs -f nginx app db",
@@ -39,7 +40,7 @@
     "express-rate-limit": "^8.6.0",
     "express-session": "^1.19.0",
     "helmet": "^8.3.0",
-    "multer": "^2.2.0",
+    "multer": "^2.4.0",
     "nodemailer": "^10.0.10",
     "pg": "^8.16.3",
     "sequelize": "^6.37.8"

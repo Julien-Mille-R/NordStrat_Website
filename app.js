@@ -110,7 +110,7 @@ export function createApp() {
       ...(process.env.DB_SCHEMA ? { schemaName: process.env.DB_SCHEMA } : {}),
       createTableIfMissing: true,
     }),
-    name: 'nordstrat.sid',
+    name: process.env.SESSION_COOKIE_NAME || 'nordstrat.sid',
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
