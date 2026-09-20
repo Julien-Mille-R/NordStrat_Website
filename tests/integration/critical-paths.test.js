@@ -225,4 +225,17 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
     assert.equal(archiveContents.event.id, event.id);
     assert.equal(await models.GameTable.count({ where: { eventId: event.id } }), 0);
   });
+  test('le rapport mensuel agrège les archives sans exposer les membres', async () => {
+    const { buildMonthlyReport } = await import('../../services/monthly-report.service.js');
+    const reportDate = new Date(event.date);
+    reportDate.setMonth(reportDate.getMonth() + 1, 1);
+    reportDate.setHours(12, 0, 0, 0);
+    const report = await buildMonthlyReport(reportDate);
+
+    assert.equal(report.evenings.held, 1);
+    assert.equal(report.evenings.tables, 1);
+    assert.equal(report.evenings.registrations, 1);
+    assert.deepEqual(report.games, [{ name: 'Frostgrave', tables: 1 }]);
+    assert.equal('players' in report, false);
+    });
 });
