@@ -1,6 +1,11 @@
 ALTER TABLE player
 ADD COLUMN email_verified_at TIMESTAMPTZ NULL;
 
+UPDATE player
+SET email_verified_at = NOW()
+WHERE email_verified_at IS NULL
+  AND moderation_status <> 'deleted';
+
 ALTER TABLE player
 ADD COLUMN pending_email VARCHAR(255) NULL;
 
