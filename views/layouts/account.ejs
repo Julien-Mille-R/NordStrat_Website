@@ -130,7 +130,31 @@
           <label class="block">Prénom<input name="firstname" required maxlength="100" value="<%= player.firstname %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
           <label class="block">Nom<input name="lastname" required maxlength="100" value="<%= player.lastname %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
           <label class="block">Pseudonyme<input name="nickname" maxlength="50" value="<%= player.nickname || '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
-          <label class="block">Adresse e-mail actuelle<input disabled value="<%= player.email %>" class="mt-1 w-full p-3 bg-fantasy-darkest border border-fantasy-gold/20 rounded-lg text-fantasy-gold-light/60 truncate"></label>
+          <div>
+            <label class="block">
+              Adresse e-mail actuelle
+              <input
+                disabled
+                value="<%= player.email %>"
+                class="mt-1 w-full p-3 bg-fantasy-darkest border border-fantasy-gold/20 rounded-lg text-fantasy-gold-light/60 truncate"
+              >
+            </label>
+
+            <% if (player.pendingEmail) { %>
+              <div class="mt-3 p-3 rounded-lg border border-fantasy-orange/40 bg-fantasy-orange/5 text-sm">
+                <p class="font-bold text-fantasy-orange">
+                  Nouvelle adresse en attente de validation
+                </p>
+                <p class="mt-1 break-all text-fantasy-gold-light">
+                  <%= player.pendingEmail %>
+                </p>
+                <p class="mt-2 text-xs text-fantasy-gold-light/65">
+                  Un e-mail de validation a été envoyé à cette adresse.
+                  Votre adresse actuelle reste utilisée tant que la nouvelle n’est pas validée.
+                </p>
+              </div>
+            <% } %>
+          </div>
           <div class="md:col-span-2"><button class="w-full sm:w-auto px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg">Enregistrer mes informations</button></div>
         </form>
       </article>
