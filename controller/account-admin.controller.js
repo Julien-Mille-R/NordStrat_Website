@@ -90,6 +90,56 @@ export async function updateAccountRole(req, res, next) {
   }
 }
 
+export async function updateTableBookingPermission(req, res, next) {
+  const playerId = Number(req.params.playerId);
+  const canBookTables = req.body.canBookTables === 'on';
+
+  try {
+    const player = await Player.findByPk(playerId, {
+      include: [{ association: 'role' }],
+    });
+
+    if (!player) {
+      return res.status(404).send('Compte introuvable.');
+    }
+
+    if (player.moderationStatus === 'deleted') {
+      setFlash(req, 'error', 'Un compte anonymisé ne peut plus être modifié.');
+      return res.redirect(memberRedirect());
+    }
+
+    await sequelize.transaction(async (transaction) => {
+      await player.update(
+        { canBookTables },
+        { transaction },
+      );
+
+      await recordAdminAction({
+        admin: req.currentUser,
+        category: 'members',
+        action: 'table_booking_permission_updated',
+        targetType: 'member',
+        targetId: player.id,
+        targetLabel: targetDisplayName(player),
+        description: `Droit de réservation/participation aux tables ${canBookTables ? 'accordé' : 'retiré'}.`,
+        transaction,
+      });
+    });
+
+    setFlash(
+      req,
+      'success',
+      canBookTables
+        ? 'Le droit de réserver et participer aux tables a été accordé.'
+        : 'Le droit de réserver et participer aux tables a été retiré.',
+    );
+
+    return res.redirect(memberRedirect());
+  } catch (error) {
+    return next(error);
+  }
+}
+
 export async function updateMemberModeration(req, res, next) {
   const playerId = Number(req.params.playerId);
   const action = req.body.action;
