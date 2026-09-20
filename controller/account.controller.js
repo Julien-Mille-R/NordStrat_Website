@@ -80,6 +80,7 @@ export async function register(req, res, next) {
       email,
       password: await bcrypt.hash(password, 12),
       roleId: userRole.id,
+      canBookTables: false,
       acceptedTermsAt: new Date(),
       acceptedTermsVersion: '2026-07',
     });
