@@ -2,7 +2,11 @@ import bcrypt from 'bcrypt';
 import { Player, sequelize } from '../models/index.js';
 import { reactivateExpiredSuspension, setFlash } from './access.controller.js';
 import { regenerateSession, invalidatePlayerSessions } from '../services/session-security.service.js';
-import { createPasswordResetToken } from '../services/password-reset.service.js';
+import {
+  consumePasswordResetToken,
+  createPasswordResetToken,
+  findValidPasswordResetToken,
+} from '../services/password-reset.service.js';
 import { sendEmail } from '../services/mail.service.js';
 
 export async function login(req, res, next) {
