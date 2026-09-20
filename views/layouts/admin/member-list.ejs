@@ -89,6 +89,56 @@
             </form>
           </section>
 
+          <section class="mt-6 p-4 border border-fantasy-gold/30 rounded-lg">
+            <h3 class="text-xl text-fantasy-gold mb-3">Droit de réservation des tables</h3>
+          
+            <p class="text-sm text-fantasy-gold-light/80">
+              Par défaut, un utilisateur ne peut pas créer ou rejoindre une table.
+              Ce droit doit être accordé par un administrateur après présentation sur le Discord.
+            </p>
+          
+            <% if (player.role.name === 'Admin') { %>
+          
+              <p class="mt-3 text-fantasy-emerald">
+                Les administrateurs disposent automatiquement de ce droit.
+              </p>
+          
+            <% } else { %>
+          
+              <form
+                method="POST"
+                action="/admindashboard/members/<%= player.id %>/table-booking-permission"
+                class="mt-4"
+              >
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="canBookTables"
+                    <%= player.canBookTables ? 'checked' : '' %>
+                    class="mt-1 w-5 h-5"
+                  >
+          
+                  <span>
+                    <strong>Autoriser à réserver et participer aux tables</strong>
+          
+                    <span class="block text-sm text-fantasy-gold-light/60 mt-1">
+                      Ce droit permet de créer une table et de rejoindre une table existante.
+                    </span>
+                  </span>
+                </label>
+          
+                <button
+                  class="mt-4 px-4 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded"
+                >
+                  Enregistrer le droit
+                </button>
+              </form>
+          
+            <% } %>
+          </section>
+
           <section class="mt-6 p-4 border border-fantasy-red/40 rounded-lg">
             <h3 class="text-xl text-fantasy-gold">Modération du compte</h3>
             <% if (player.id === currentUser.id) { %>
