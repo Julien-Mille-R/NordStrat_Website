@@ -83,6 +83,7 @@
         <% const isMyTable = currentReservation && currentReservation.gameTableId === gameTable?.id; %>
         <% const isHost = currentUser && gameTable && currentUser.id === gameTable.hostPlayerId; %>
         <% const isAdmin = currentUser?.role?.name === 'Admin'; %>
+        <% const canBookTables = isAdmin || currentUser?.canBookTables === true; %>
         <% const discussion = gameTable ? discussionByTableId.get(gameTable.id) : null; %>
 
         <article id="table-<%= gameTable?.id || `slot-${slot.number}` %>" class="bg-fantasy-dark border-2 border-fantasy-gold/40 rounded-xl p-4 sm:p-5 shadow-fantasy flex flex-col">
@@ -192,10 +193,17 @@
                 </details>
               <% } %>
             <% } else if (!currentReservation && gameTable.status === 'open' && !isFull) { %>
-              <form method="POST" action="/tables/<%= gameTable.id %>/join">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <button class="w-full px-4 py-2 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange">Rejoindre</button>
-              </form>
+            <% } else if (!currentReservation && gameTable.status === 'open' && !isFull) { %>
+              <% if (canBookTables) { %>
+                <form method="POST" action="/tables/<%= gameTable.id %>/join">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button class="w-full px-4 py-2 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange">Rejoindre</button>
+                </form>
+              <% else { %>
+                <p class="text-sm text-fantasy-gold-light/70 text-center leading-relaxed">
+                  Merci de passer sur le Discord vous présenter pour avoir le droit de réserver/participer à une table.
+                </p>
+              <% } %>
             <% } else if (currentReservation) { %>
               <p class="text-sm text-fantasy-gold-light/60 text-center">Vous êtes déjà inscrit à une autre table.</p>
             <% } %>
@@ -210,21 +218,32 @@
             <% if (!currentUser) { %>
               <button type="button" data-open-auth="login" class="w-full px-4 py-2 border border-fantasy-gold text-fantasy-gold rounded-lg">Se connecter pour réserver</button>
             <% } else if (!currentReservation) { %>
-              <form method="POST" action="/tables/create" class="space-y-3">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <input type="hidden" name="eventId" value="<%= event.id %>">
-                <input type="hidden" name="tableNumber" value="<%= slot.number %>">
-                <label class="block text-sm text-fantasy-gold-light">Jeu
-                  <select name="gameId" required data-game-select aria-controls="gamePreview-<%= slot.number %>" class="mt-1 w-full bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light">
-                    <option value="">Choisir un jeu</option>
-                    <% games.forEach((game) => { %><option value="<%= game.id %>" data-image-url="<%= game.displayImageUrl || '' %>"><%= game.name %></option><% }) %>
-                  </select>
-                </label>
-                <label class="block text-sm text-fantasy-gold-light">Nombre maximal de joueurs
-                  <input type="number" name="maxPlayers" min="1" max="10" required class="mt-1 w-full bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light">
-                </label>
-                <button class="w-full px-4 py-2 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange">Réserver</button>
-              </form>
+              <% if (canBookTables) { %>
+                <form method="POST" action="/tables/create" class="space-y-3">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="hidden" name="eventId" value="<%= event.id %>">
+                  <input type="hidden" name="tableNumber" value="<%= slot.number %>">
+            
+                  <label class="block text-sm text-fantasy-gold-light">Jeu
+                    <select name="gameId" required data-game-select aria-controls="gamePreview-<%= slot.number %>" class="mt-1 w-full bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light">
+                      <option value="">Choisir un jeu</option>
+                      <% games.forEach((game) => { %>
+                        <option value="<%= game.id %>" data-image-url="<%= game.displayImageUrl || '' %>"><%= game.name %></option>
+                      <% }) %>
+                    </select>
+                  </label>
+            
+                  <label class="block text-sm text-fantasy-gold-light">Nombre maximal de joueurs
+                    <input type="number" name="maxPlayers" min="1" max="10" required class="mt-1 w-full bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light">
+                  </label>
+            
+                  <button class="w-full px-4 py-2 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange">Réserver</button>
+                </form>
+              <% } else { %>
+                <p class="text-sm text-fantasy-gold-light/70 text-center leading-relaxed">
+                  Merci de passer sur le Discord vous présenter pour avoir le droit de réserver/participer à une table.
+                </p>
+              <% } %>
             <% } else { %>
               <p class="text-sm text-fantasy-gold-light/60 text-center">Vous êtes déjà inscrit à une table.</p>
             <% } %>
