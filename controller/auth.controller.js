@@ -108,12 +108,101 @@ export async function login(req, res, next) {
       return res.redirect('/?auth=login');
     }
 
+    if (!player.emailVerifiedAt) {
+      setFlash(
+        req,
+        'error',
+        'Votre adresse e-mail n’est pas encore validée. Consultez votre messagerie ou demandez un nouvel e-mail de validation.',
+      );
+      return res.redirect('/?auth=login');
+    }
+
     const rememberMe = req.body.rememberMe === 'on';
     await regenerateSession(req);
     req.session.userId = player.id;
     req.session.cookie.maxAge = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 8 * 60 * 60 * 1000;
     setFlash(req, 'success', `Bienvenue ${player.nickname || player.firstname}.`);
     return res.redirect('/');
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export async function resendEmailVerification(req, res, next) {
+  const email = req.body.email?.trim().toLowerCase();
+
+  try {
+    if (email) {
+      const player = await Player.unscoped().findOne({
+        where: {
+          email,
+          isActive: true,
+          moderationStatus: 'active',
+        },
+      });
+
+      if (player && !player.emailVerifiedAt) {
+        const verificationToken = await createEmailVerificationToken(
+          player.id,
+          player.email,
+        );
+
+        const verificationUrl = `${process.env.SITE_URL}/verify-email?token=${encodeURIComponent(verificationToken)}`;
+
+        await sendEmail({
+          to: player.email,
+          subject: 'Validez votre adresse e-mail - Nord Stratégie',
+          text: [
+            'Bonjour,',
+            '',
+            'Vous avez demandé un nouvel e-mail de validation pour votre compte Nord Stratégie.',
+            '',
+            `Pour valider votre adresse e-mail, utilisez ce lien : ${verificationUrl}`,
+            '',
+            'Ce lien est valable pendant 1 heure et ne peut être utilisé qu’une seule fois.',
+            '',
+            'Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-mail.',
+            '',
+            'Nord Stratégie',
+          ].join('\n'),
+          html: `
+            <p>Bonjour,</p>
+
+            <p>
+              Vous avez demandé un nouvel e-mail de validation
+              pour votre compte <strong>Nord Stratégie</strong>.
+            </p>
+
+            <p>
+              <a href="${verificationUrl}">
+                Valider mon adresse e-mail
+              </a>
+            </p>
+
+            <p>
+              Ce lien est valable pendant 1 heure et ne peut être utilisé
+              qu’une seule fois.
+            </p>
+
+            <p>
+              Si vous n’êtes pas à l’origine de cette demande,
+              vous pouvez ignorer cet e-mail.
+            </p>
+
+            <p>Nord Stratégie</p>
+          `,
+        });
+      }
+    }
+
+    // Réponse identique que le compte existe ou non.
+    setFlash(
+      req,
+      'success',
+      'Si cette adresse correspond à un compte non validé, un nouvel e-mail de validation vous a été envoyé.',
+    );
+
+    return res.redirect('/?auth=login');
   } catch (error) {
     return next(error);
   }

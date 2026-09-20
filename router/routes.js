@@ -14,6 +14,7 @@ import {
   showForgotPassword,
   showResetPassword,
   verifyEmail,
+  resendEmailVerification,
 } from '../controller/auth.controller.js';
 import {
   changeEmail,
@@ -182,6 +183,7 @@ router.post('/auth/forgot-password', requireGuest, authLimiter, requestPasswordR
 router.get('/reset-password', requireGuest, showResetPassword);
 router.post('/reset-password', requireGuest, authLimiter, resetPassword);
 router.post('/auth/login', requireGuest, authLimiter, login);
+router.post('/auth/resend-verification', requireGuest, authLimiter, resendEmailVerification);
 router.post('/auth/logout', requireUser, logout);
 router.post('/account/register', requireGuest, authLimiter, register);
 router.get('/account', requireUser, showAccount);
