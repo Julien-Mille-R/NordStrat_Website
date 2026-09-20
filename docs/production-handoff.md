@@ -17,12 +17,6 @@ La création du premier administrateur sera documentée séparément.
 
 - Les secrets de production ne doivent pas être repris depuis le poste de
   développement et doivent être transmis par un canal séparé du dépôt Git.
-- Si le rapport mensuel est activé, renseigner les identifiants SMTP Brevo,
-  une adresse d'expédition validée, `MONTHLY_REPORT_ENABLED=true` et
-  `MONTHLY_REPORT_RECIPIENT=nord.strategie@gmail.com`.
-- Envoyer un rapport de test avant l'ouverture avec
-  `npm run report:test -- --docker`. Cette commande ne marque pas le mois comme
-  déjà envoyé.
 
 ## 2. Domaine et Nginx conteneurisé
 
