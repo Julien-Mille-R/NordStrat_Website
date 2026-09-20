@@ -27,6 +27,19 @@ export default function definePlayer(sequelize) {
         this.setDataValue('email', value?.trim().toLowerCase());
       },
     },
+    emailVerifiedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'email_verified_at',
+    },
+    pendingEmail: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      field: 'pending_email',
+      validate: {
+        isEmail: true,
+      },
+    },
     password: { type: DataTypes.STRING(255), allowNull: false },
     roleId: { type: DataTypes.INTEGER, allowNull: false, field: 'role_id' },
     canBookTables: {

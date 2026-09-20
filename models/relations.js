@@ -17,6 +17,7 @@ import defineRole from './role.js';
 import defineTableComment from './table-comment.js';
 import defineTableDiscussionRead from './table-discussion-read.js';
 import definePasswordResetToken from './password-reset-token.js';
+import defineEmailVerificationToken from './email-verification-token.js';
 
 const initializedModels = new WeakMap();
 
@@ -27,6 +28,7 @@ export function initModels(sequelize) {
 
   const Role = defineRole(sequelize);
   const Player = definePlayer(sequelize);
+  const EmailVerificationToken = defineEmailVerificationToken(sequelize);
   const PasswordResetToken = definePasswordResetToken(sequelize);
   const AuditLog = defineAuditLog(sequelize);
   const PlayerGame = definePlayerGame(sequelize);
@@ -58,6 +60,18 @@ export function initModels(sequelize) {
 
   Player.hasMany(PasswordResetToken, {
     as: 'passwordResetTokens',
+    foreignKey: 'playerId',
+    onDelete: 'CASCADE',
+  });
+
+  Player.hasMany(EmailVerificationToken, {
+    as: 'emailVerificationTokens',
+    foreignKey: 'playerId',
+    onDelete: 'CASCADE',
+  });
+
+  EmailVerificationToken.belongsTo(Player, {
+    as: 'player',
     foreignKey: 'playerId',
     onDelete: 'CASCADE',
   });
@@ -431,6 +445,7 @@ export function initModels(sequelize) {
     PasswordResetToken,
     AuditLog,
     PlayerGame,
+    EmailVerificationToken,
     Event,
     Game,
     Membership,

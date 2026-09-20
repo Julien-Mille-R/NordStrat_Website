@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 
-export default function definePasswordResetToken(sequelize) {
-  return sequelize.define('PasswordResetToken', {
+export default function defineEmailVerificationToken(sequelize) {
+  return sequelize.define('EmailVerificationToken', {
     id: {
       type: DataTypes.BIGINT,
       primaryKey: true,
@@ -11,6 +11,10 @@ export default function definePasswordResetToken(sequelize) {
       type: DataTypes.INTEGER,
       allowNull: false,
       field: 'player_id',
+    },
+    email: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
     },
     tokenHash: {
       type: DataTypes.CHAR(64),
@@ -35,7 +39,7 @@ export default function definePasswordResetToken(sequelize) {
       defaultValue: DataTypes.NOW,
     },
   }, {
-    tableName: 'password_reset_token',
+    tableName: 'email_verification_token',
     underscored: true,
     timestamps: false,
     indexes: [

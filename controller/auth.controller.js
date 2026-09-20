@@ -1,7 +1,139 @@
 import bcrypt from 'bcrypt';
-import { Player } from '../models/index.js';
+import {
+  col,
+  fn,
+  where,
+} from 'sequelize';
+import { Player, sequelize } from '../models/index.js';
 import { reactivateExpiredSuspension, setFlash } from './access.controller.js';
-import { regenerateSession } from '../services/session-security.service.js';
+import { regenerateSession, invalidatePlayerSessions } from '../services/session-security.service.js';
+import {
+  consumePasswordResetToken,
+  createPasswordResetToken,
+  findValidPasswordResetToken,
+} from '../services/password-reset.service.js';
+import {
+  consumeEmailVerificationToken,
+  createEmailVerificationToken,
+} from '../services/email-verification.service.js';
+import { sendEmail } from '../services/mail.service.js';
+
+
+export async function verifyEmail(req, res, next) {
+  const token = req.query.token;
+
+  if (!token) {
+    setFlash(req, 'error', 'Le lien de validation est invalide ou a expiré.');
+    return res.redirect('/?auth=login');
+  }
+
+  try {
+    let verificationType = 'account';
+
+    await sequelize.transaction(async (transaction) => {
+      const verificationToken = await consumeEmailVerificationToken(
+        token,
+        transaction,
+      );
+
+      if (!verificationToken) {
+        const error = new Error('Invalid or expired email verification token.');
+        error.code = 'EMAIL_VERIFICATION_TOKEN_INVALID';
+        throw error;
+      }
+
+      const player = await Player.unscoped().findByPk(
+        verificationToken.playerId,
+        {
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        },
+      );
+
+      if (
+        !player
+        || player.moderationStatus === 'deleted'
+        || !player.isActive
+      ) {
+        const error = new Error('Email verification account invalid.');
+        error.code = 'EMAIL_VERIFICATION_ACCOUNT_INVALID';
+        throw error;
+      }
+
+      const tokenEmail = verificationToken.email.toLowerCase();
+
+      // Validation initiale du compte.
+      if (player.email.toLowerCase() === tokenEmail) {
+        await player.update({
+          emailVerifiedAt: new Date(),
+        }, { transaction });
+
+        return;
+      }
+
+      // Changement d'adresse e-mail.
+      if (!player.pendingEmail || player.pendingEmail.toLowerCase() !== tokenEmail) {
+        const error = new Error('Email verification address mismatch.');
+        error.code = 'EMAIL_VERIFICATION_ADDRESS_MISMATCH';
+        throw error;
+      }
+
+      const existingPlayer = await Player.unscoped().findOne({
+        where: where(fn('LOWER', col('email')), tokenEmail),
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+
+      if (existingPlayer && existingPlayer.id !== player.id) {
+        const error = new Error('Email verification address already used.');
+        error.code = 'EMAIL_VERIFICATION_ADDRESS_USED';
+        throw error;
+      }
+
+      await player.update({
+        email: player.pendingEmail,
+        pendingEmail: null,
+        emailVerifiedAt: new Date(),
+      }, { transaction });
+
+      verificationType = 'email_change';
+    });
+
+    if (verificationType === 'email_change') {
+      setFlash(
+        req,
+        'success',
+        'Votre nouvelle adresse e-mail a été validée et associée à votre compte.',
+      );
+
+      return res.redirect('/account');
+    }
+
+    setFlash(
+      req,
+      'success',
+      'Votre adresse e-mail a été validée. Vous pouvez maintenant vous connecter.',
+    );
+
+    return res.redirect('/?auth=login');
+  } catch (error) {
+    if (
+      error.code === 'EMAIL_VERIFICATION_TOKEN_INVALID'
+      || error.code === 'EMAIL_VERIFICATION_ACCOUNT_INVALID'
+      || error.code === 'EMAIL_VERIFICATION_ADDRESS_MISMATCH'
+      || error.code === 'EMAIL_VERIFICATION_ADDRESS_USED'
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Le lien de validation est invalide ou a expiré.',
+      );
+      return res.redirect('/?auth=login');
+    }
+
+    return next(error);
+  }
+}
 
 export async function login(req, res, next) {
   const email = req.body.email?.trim().toLowerCase();
@@ -24,6 +156,15 @@ export async function login(req, res, next) {
       return res.redirect('/?auth=login');
     }
 
+    if (!player.emailVerifiedAt) {
+      setFlash(
+        req,
+        'error',
+        'Votre adresse e-mail n’est pas encore validée. Consultez votre messagerie ou demandez un nouvel e-mail de validation.',
+      );
+      return res.redirect('/?auth=login');
+    }
+
     const rememberMe = req.body.rememberMe === 'on';
     await regenerateSession(req);
     req.session.userId = player.id;
@@ -33,6 +174,263 @@ export async function login(req, res, next) {
   } catch (error) {
     return next(error);
   }
+}
+
+export async function resendEmailVerification(req, res, next) {
+  const email = req.body.email?.trim().toLowerCase();
+
+  try {
+    if (email) {
+      const player = await Player.unscoped().findOne({
+        where: {
+          email,
+          isActive: true,
+          moderationStatus: 'active',
+        },
+      });
+
+      if (player && !player.emailVerifiedAt) {
+        const verificationToken = await createEmailVerificationToken(
+          player.id,
+          player.email,
+        );
+
+        const verificationUrl = `${process.env.SITE_URL}/verify-email?token=${encodeURIComponent(verificationToken)}`;
+
+        await sendEmail({
+          to: player.email,
+          subject: 'Validez votre adresse e-mail - Nord Stratégie',
+          text: [
+            'Bonjour,',
+            '',
+            'Vous avez demandé un nouvel e-mail de validation pour votre compte Nord Stratégie.',
+            '',
+            `Pour valider votre adresse e-mail, utilisez ce lien : ${verificationUrl}`,
+            '',
+            'Ce lien est valable pendant 1 heure et ne peut être utilisé qu’une seule fois.',
+            '',
+            'Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-mail.',
+            '',
+            'Nord Stratégie',
+          ].join('\n'),
+          html: `
+            <p>Bonjour,</p>
+
+            <p>
+              Vous avez demandé un nouvel e-mail de validation
+              pour votre compte <strong>Nord Stratégie</strong>.
+            </p>
+
+            <p>
+              <a href="${verificationUrl}">
+                Valider mon adresse e-mail
+              </a>
+            </p>
+
+            <p>
+              Ce lien est valable pendant 1 heure et ne peut être utilisé
+              qu’une seule fois.
+            </p>
+
+            <p>
+              Si vous n’êtes pas à l’origine de cette demande,
+              vous pouvez ignorer cet e-mail.
+            </p>
+
+            <p>Nord Stratégie</p>
+          `,
+        });
+      }
+    }
+
+    // Réponse identique que le compte existe ou non.
+    setFlash(
+      req,
+      'success',
+      'Si cette adresse correspond à un compte non validé, un nouvel e-mail de validation vous a été envoyé.',
+    );
+
+    return res.redirect('/?auth=login');
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export function showForgotPassword(req, res) {
+  return res.render('layouts/forgot-password');
+}
+
+export async function requestPasswordReset(req, res, next) {
+  const email = req.body.email?.trim().toLowerCase();
+
+  try {
+    if (email) {
+      const player = await Player.unscoped().findOne({
+        where: {
+          email,
+          isActive: true,
+          moderationStatus: 'active',
+        },
+      });
+
+      if (player) {
+        const token = await createPasswordResetToken(player.id);
+        const resetUrl = `${process.env.SITE_URL}/reset-password?token=${encodeURIComponent(token)}`;
+
+        await sendEmail({
+          to: player.email,
+          subject: 'Réinitialisation de votre mot de passe - Nord Stratégie',
+          text: [
+            'Bonjour,',
+            '',
+            'Une demande de réinitialisation du mot de passe de votre compte Nord Stratégie a été effectuée.',
+            '',
+            `Pour choisir un nouveau mot de passe, utilisez ce lien : ${resetUrl}`,
+            '',
+            'Ce lien est valable pendant 1 heure et ne peut être utilisé qu’une seule fois.',
+            '',
+            'Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-mail.',
+            '',
+            'Nord Stratégie',
+          ].join('\n'),
+          html: `
+            <p>Bonjour,</p>
+
+            <p>
+              Une demande de réinitialisation du mot de passe de votre compte
+              <strong>Nord Stratégie</strong> a été effectuée.
+            </p>
+
+            <p>
+              <a href="${resetUrl}">
+                Réinitialiser mon mot de passe
+              </a>
+            </p>
+
+            <p>
+              Ce lien est valable pendant 1 heure et ne peut être utilisé
+              qu’une seule fois.
+            </p>
+
+            <p>
+              Si vous n’êtes pas à l’origine de cette demande,
+              vous pouvez ignorer cet e-mail.
+            </p>
+
+            <p>Nord Stratégie</p>
+          `,
+        });
+      }
+    }
+
+    // Réponse volontairement identique que l'adresse existe ou non.
+    setFlash(
+      req,
+      'success',
+      'Si cette adresse correspond à un compte actif, un e-mail de réinitialisation vous a été envoyé.',
+    );
+
+    return res.redirect('/?auth=login');
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export async function showResetPassword(req, res, next) {
+  const token = req.query.token;
+
+  try {
+    const resetToken = await findValidPasswordResetToken(token);
+
+    if (!resetToken) {
+      setFlash(
+        req,
+        'error',
+        'Ce lien de réinitialisation est invalide ou a expiré.',
+      );
+      return res.redirect('/forgot-password');
+    }
+
+    return res.render('layouts/reset-password', { token });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export async function resetPassword(req, res, next) {
+  const token = req.body.token;
+  const newPassword = req.body.newPassword || '';
+  const passwordConfirmation = req.body.passwordConfirmation || '';
+
+  if (
+    newPassword.length < 10
+    || newPassword.length > 128
+    || newPassword !== passwordConfirmation
+  ) {
+    setFlash(
+      req,
+      'error',
+      'Le mot de passe doit contenir entre 10 et 128 caractères et les deux saisies doivent être identiques.',
+    );
+    return res.redirect(`/reset-password?token=${encodeURIComponent(token || '')}`);
+  }
+
+  let playerId;
+
+  try {
+    await sequelize.transaction(async (transaction) => {
+      const resetToken = await consumePasswordResetToken(token, transaction);
+
+      if (!resetToken) {
+        const error = new Error('Invalid or expired password reset token.');
+        error.code = 'PASSWORD_RESET_TOKEN_INVALID';
+        throw error;
+      }
+
+      playerId = resetToken.playerId;
+
+      const player = await Player.unscoped().findByPk(
+        playerId,
+        { transaction },
+      );
+
+      if (!player || !player.isActive || player.moderationStatus !== 'active') {
+        const error = new Error('Password reset account is not active.');
+        error.code = 'PASSWORD_RESET_ACCOUNT_INVALID';
+        throw error;
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+      await player.update({
+        password: hashedPassword,
+      }, { transaction });
+    });
+
+    await invalidatePlayerSessions(playerId);
+  } catch (error) {
+    if (
+      error.code === 'PASSWORD_RESET_TOKEN_INVALID'
+      || error.code === 'PASSWORD_RESET_ACCOUNT_INVALID'
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Ce lien de réinitialisation est invalide ou a expiré.',
+      );
+      return res.redirect('/forgot-password');
+    }
+
+    return next(error);
+  }
+
+  setFlash(
+    req,
+    'success',
+    'Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter.',
+  );
+
+  return res.redirect('/?auth=login');
 }
 
 export function logout(req, res, next) {

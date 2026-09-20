@@ -23,22 +23,40 @@ export async function createPasswordResetToken(playerId) {
   return token;
 }
 
-export async function consumePasswordResetToken(token) {
+export async function findValidPasswordResetToken(token, options = {}) {
   if (!token) return null;
 
   const tokenHash = hashToken(token);
 
   const resetToken = await PasswordResetToken.findOne({
     where: { tokenHash },
+    ...options,
   });
 
   if (!resetToken || resetToken.usedAt || resetToken.expiresAt <= new Date()) {
     return null;
   }
 
+  return resetToken;
+}
+
+export async function consumePasswordResetToken(token, transaction) {
+  if (!transaction) {
+    throw new Error('Une transaction est requise pour consommer un token de réinitialisation.');
+  }
+
+  const resetToken = await findValidPasswordResetToken(token, {
+    transaction,
+    lock: transaction.LOCK.UPDATE,
+  });
+
+  if (!resetToken) {
+    return null;
+  }
+
   await resetToken.update({
     usedAt: new Date(),
-  });
+  }, { transaction });
 
   return resetToken;
 }
