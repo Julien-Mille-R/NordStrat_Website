@@ -145,6 +145,7 @@ public/           CSS, JavaScript navigateur, images et icônes
 router/           déclaration des routes
 scripts/          migrations, seed, administration et exploitation
 services/         services métier partagés
+templates/        templates des e-mails transactionnels
 tests/            tests unitaires, smoke tests et intégration
 views/            vues EJS et partials
 ```
@@ -280,6 +281,13 @@ Stockage :
 
 - `UPLOAD_ROOT` ;
 - `ARCHIVE_DIRECTORY`.
+
+E-mails et rapport mensuel :
+
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` : accès SMTP Brevo ;
+- `MAIL_FROM_NAME`, `MAIL_FROM_ADDRESS` : identité d'expédition validée ;
+- `MONTHLY_REPORT_ENABLED` : active l'automatisation avec la valeur `true` ;
+- `MONTHLY_REPORT_RECIPIENT` : boîte qui reçoit le rapport.
 
 Docker et Nginx :
 
@@ -1344,6 +1352,58 @@ Le site contient aussi un manifeste et des icônes.
 Les pages 404 et 500 utilisent des vues dédiées, cohérentes avec le thème de
 l'association.
 
+### 8.18 Rapport mensuel par e-mail
+
+#### Objectif
+
+Envoyer le premier de chaque mois un bilan de l'activité du mois précédent à
+la boîte de l'association. Le rapport reste agrégé et ne contient ni adresse
+e-mail de membre ni autre donnée nominative.
+
+#### Contenu
+
+Le rapport regroupe les comptes actifs, les nouvelles inscriptions, les droits
+de réservation, les cotisations, les soirées archivées ou annulées, les tables,
+les inscriptions, les jeux joués et les actualités publiées.
+
+#### Automatisation
+
+`server.js` démarre `monthly-report.scheduler.js`. Le service vérifie chaque
+heure si la date de Paris est le premier du mois. Après un envoi réussi, il
+écrit le mois traité dans
+`ARCHIVE_DIRECTORY/system/monthly-report-state.json`.
+
+Ce fichier est placé dans le volume persistant des archives. Il évite un second
+envoi après un redémarrage du conteneur. En cas d'échec SMTP, la tentative est
+rejouée au contrôle suivant.
+
+#### Template et envoi
+
+`templates/email/monthly-report.template.js` produit une version HTML
+compatible avec les clients de messagerie et une version texte. Les styles
+importants sont intégrés au document, car le CSS Tailwind du site n'est pas
+chargé par les clients mail.
+
+`services/monthly-report.service.js` collecte les statistiques et utilise
+`services/mail.service.js`. Le service SMTP créé pour Brevo n'est pas dupliqué.
+
+#### Test manuel
+
+```bash
+npm run report:test
+npm run report:test -- --docker
+```
+
+La commande demande confirmation, envoie un vrai mail et ne modifie pas le
+marqueur mensuel. `--yes` permet de confirmer explicitement sans interaction.
+Le guide complet se trouve dans `docs/rapport-mensuel.md`.
+
+#### Sécurité
+
+Les identifiants SMTP restent exclusivement dans le fichier `.env` réel. La
+validation de production refuse l'activation du rapport si une variable SMTP
+obligatoire manque.
+
 ## 9. Modèles et relations principales
 
 ### 9.1 Comptes
@@ -1502,6 +1562,7 @@ Les tests couvrent notamment :
 - contrôles d'accès ;
 - détection du contenu réel des images ;
 - protection contre la sortie des dossiers d'uploads.
+- génération du template et agrégation du rapport mensuel.
 
 ### 11.5 Recette manuelle
 
@@ -1674,6 +1735,10 @@ Ces fichiers doivent exister dans `public/images` avant la construction Nginx.
 Le formulaire de contact stocke les messages en base. Il ne transmet pas encore
 de notification vers `nord.strategie@gmail.com`.
 
+Le rapport mensuel utilise Brevo indépendamment du formulaire de contact. Il
+reste désactivé tant que les variables SMTP et `MONTHLY_REPORT_ENABLED=true`
+ne sont pas présentes dans l'environnement réellement déployé.
+
 ### 14.5 CI/CD
 
 La construction Docker est prête, mais le pipeline GitHub de test, publication
@@ -1689,6 +1754,7 @@ externe, des alertes et le suivi de l'espace disque.
 - `docs/docker.md` : commandes Docker détaillées ;
 - `docs/production-handoff.md` : remise à l'hébergeur ;
 - `docs/recette-mvp.md` : recette fonctionnelle ;
+- `docs/rapport-mensuel.md` : configuration et test du rapport par e-mail ;
 - `.env.example` : environnement local ;
 - `.env.production.example` : environnement de production ;
 - `database/init_db.sql` : schéma initial ;

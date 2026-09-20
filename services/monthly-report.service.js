@@ -182,7 +182,7 @@ function assertMailConfiguration() {
   if (missing.length) throw new Error(`Configuration du rapport mensuel incomplète : ${missing.join(', ')}`);
 }
 
-export async function sendMonthlyReport(now = new Date()) {
+export async function sendMonthlyReportTest(now = new Date()) {
   assertMailConfiguration();
   const report = await buildMonthlyReport(now);
   const email = renderMonthlyReportEmail(report);
@@ -192,6 +192,11 @@ export async function sendMonthlyReport(now = new Date()) {
     text: email.text,
     html: email.html,
   });
+  return report;
+}
+
+export async function sendMonthlyReport(now = new Date()) {
+  const report = await sendMonthlyReportTest(now);
   await saveState(report.period.key, now.toISOString());
   return report;
 }
