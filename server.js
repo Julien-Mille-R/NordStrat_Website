@@ -2,7 +2,6 @@ import 'dotenv/config';
 import app from './app.js';
 import { BookingArchive, sequelize } from './models/index.js';
 import { cleanupExpiredRateLimits } from './services/postgres-rate-limit-store.js';
-import { startMonthlyReportScheduler } from './services/monthly-report.scheduler.js';
 
 const PORT = Number(process.env.PORT || 3000);
 const ARCHIVE_CHECK_INTERVAL = 60 * 1000;
@@ -37,7 +36,6 @@ const server = app.listen(PORT, (error) => {
   setInterval(() => {
     cleanupExpiredRateLimits().catch((error) => console.error('Échec du nettoyage des compteurs.', error));
   }, RATE_LIMIT_CLEANUP_INTERVAL).unref();
-  startMonthlyReportScheduler();
 });
 
 async function shutdown(signal) {
