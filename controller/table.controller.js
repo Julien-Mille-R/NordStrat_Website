@@ -109,7 +109,7 @@ export async function closeEventTableSlotByAdmin(req, res, next) {
   try {
     if (!Number.isInteger(eventId) || eventId < 1
       || !Number.isInteger(tableNumber) || tableNumber < 1 || tableNumber > 8) {
-      return res.status(400).send('Soirée ou table invalide.');
+      return res.status(400).send('Rencontre ou table invalide.');
     }
 
     await sequelize.transaction(async (transaction) => {
@@ -183,7 +183,7 @@ export async function reopenEventTableSlotByAdmin(req, res, next) {
   try {
     if (!Number.isInteger(eventId) || eventId < 1
       || !Number.isInteger(tableNumber) || tableNumber < 1 || tableNumber > 8) {
-      return res.status(400).send('Soirée ou table invalide.');
+      return res.status(400).send('Rencontre ou table invalide.');
     }
 
     await sequelize.transaction(async (transaction) => {

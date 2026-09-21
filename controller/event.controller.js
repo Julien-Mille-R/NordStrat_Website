@@ -17,7 +17,7 @@ function nextWeeklyDate(date) {
 }
 
 function eventLabel(event) {
-  return event.title || `Soirée #${event.id}`;
+  return event.title || `Rencontre #${event.id}`;
 }
 
 function renderCreateEventError(res, message, formValues) {
@@ -56,10 +56,10 @@ export async function createEvent(req, res, next) {
       return renderCreateEventError(res, 'Le titre est obligatoire et ne doit pas dépasser 255 caractères.', formValues);
     }
     if (Number.isNaN(date.getTime()) || Number.isNaN(registrationDeadline.getTime())) {
-      return renderCreateEventError(res, 'Renseignez une date de soirée et une fin des inscriptions valides.', formValues);
+      return renderCreateEventError(res, 'Renseignez une date de rencontre et une fin des inscriptions valides.', formValues);
     }
     if (registrationDeadline >= date) {
-      return renderCreateEventError(res, 'La fin des inscriptions doit être antérieure à la date de la soirée.', formValues);
+      return renderCreateEventError(res, 'La fin des inscriptions doit être antérieure à la date de la rencontre.', formValues);
     }
     if (!Number.isInteger(maxTable) || maxTable < 1 || maxTable > 8) {
       return renderCreateEventError(res, 'Le nombre de tables doit être compris entre 1 et 8.', formValues);
@@ -81,7 +81,7 @@ export async function createEvent(req, res, next) {
         targetType: 'event',
         targetId: event.id,
         targetLabel: eventLabel(event),
-        description: 'Soirée créée.',
+        description: 'Rencontre créée.',
         transaction,
       });
     });
@@ -95,7 +95,7 @@ export async function showEditEventForm(req, res, next) {
   try {
     const event = await Event.findByPk(Number(req.params.eventId));
     if (!event) return res.status(404).send('Événement introuvable.');
-    if (event.status === 'cancelled') return res.status(409).send('Une soirée annulée ne peut plus être modifiée.');
+    if (event.status === 'cancelled') return res.status(409).send('Une rencontre annulée ne peut plus être modifiée.');
     return res.render('layouts/admin/event-form', { event, formValues: {} });
   } catch (error) {
     return next(error);
@@ -106,7 +106,7 @@ export async function updateEvent(req, res, next) {
   try {
     const event = await Event.findByPk(Number(req.params.eventId));
     if (!event) return res.status(404).send('Événement introuvable.');
-    if (event.status === 'cancelled') return res.status(409).send('Une soirée annulée ne peut plus être modifiée.');
+    if (event.status === 'cancelled') return res.status(409).send('Une rencontre annulée ne peut plus être modifiée.');
     if (!ALLOWED_EDIT_STATUSES.has(req.body.status)) return res.status(400).send('Statut invalide.');
     await sequelize.transaction(async (transaction) => {
       await event.update({
@@ -124,7 +124,7 @@ export async function updateEvent(req, res, next) {
         targetType: 'event',
         targetId: event.id,
         targetLabel: eventLabel(event),
-        description: `Soirée modifiée : ${event.maxTable} tables disponibles, inscriptions ${event.reservable ? 'ouvertes' : 'fermées'}.`,
+        description: `Rencontre modifiée : ${event.maxTable} tables disponibles, inscriptions ${event.reservable ? 'ouvertes' : 'fermées'}.`,
         transaction,
       });
     });
@@ -174,7 +174,7 @@ export async function cancelEvent(req, res, next) {
         targetType: 'event',
         targetId: event.id,
         targetLabel: eventLabel(event),
-        description: 'Soirée annulée ; ses tables et inscriptions ont été supprimées.',
+        description: 'Rencontre annulée ; ses tables et inscriptions ont été supprimées.',
         transaction,
       });
 
@@ -188,7 +188,7 @@ export async function cancelEvent(req, res, next) {
         }).format(nextDate);
 
         await Event.create({
-          title: `Soirée jeux du ${formattedDate}`,
+          title: `Rencontre jeux du ${formattedDate}`,
           date: nextDate,
           status: 'upcoming',
           maxTable: event.maxTable,
@@ -202,15 +202,15 @@ export async function cancelEvent(req, res, next) {
     });
 
     if (!eventFound) return res.status(404).send('Événement introuvable.');
-    setFlash(req, 'success', 'La soirée a été annulée. Ses tables et inscriptions ont été supprimées ; elle pourra être relancée avec des tables vierges.');
+    setFlash(req, 'success', 'La rencontre a été annulée. Ses tables et inscriptions ont été supprimées ; elle pourra être relancée avec des tables vierges.');
     return res.redirect('/admindashboard/events');
   } catch (error) {
     if (error.message === 'EVENT_ALREADY_CANCELLED') {
-      setFlash(req, 'error', 'Cette soirée est déjà annulée.');
+      setFlash(req, 'error', 'Cette rencontre est déjà annulée.');
       return res.redirect('/admindashboard/events');
     }
     if (error.message === 'EVENT_ALREADY_COMPLETED') {
-      setFlash(req, 'error', 'Une soirée déjà clôturée ne peut pas être annulée.');
+      setFlash(req, 'error', 'Une rencontre déjà clôturée ne peut pas être annulée.');
       return res.redirect('/admindashboard/events');
     }
     return next(error);
@@ -256,24 +256,24 @@ export async function reopenEvent(req, res, next) {
         targetType: 'event',
         targetId: event.id,
         targetLabel: eventLabel(event),
-        description: 'Soirée rouverte aux réservations avec des tables vierges.',
+        description: 'Rencontre rouverte aux réservations avec des tables vierges.',
         transaction,
       });
     });
 
     if (!eventFound) return res.status(404).send('Événement introuvable.');
     const message = registrationExtended
-      ? 'La soirée est de nouveau ouverte avec des tables vierges. La date limite d’inscription a été prolongée jusqu’au début de la soirée.'
-      : 'La soirée est de nouveau ouverte aux réservations avec des tables vierges.';
+      ? 'La rencontre est de nouveau ouverte avec des tables vierges. La date limite d’inscription a été prolongée jusqu’au début de la rencontre.'
+      : 'La rencontre est de nouveau ouverte aux réservations avec des tables vierges.';
     setFlash(req, 'success', message);
     return res.redirect('/admindashboard/events');
   } catch (error) {
     if (error.message === 'EVENT_NOT_CANCELLED') {
-      setFlash(req, 'error', 'Seule une soirée annulée peut être relancée.');
+      setFlash(req, 'error', 'Seule une rencontre annulée peut être relancée.');
       return res.redirect('/admindashboard/events');
     }
     if (error.message === 'EVENT_ALREADY_STARTED') {
-      setFlash(req, 'error', 'Une soirée déjà commencée ou passée ne peut pas être relancée.');
+      setFlash(req, 'error', 'Une rencontre déjà commencée ou passée ne peut pas être relancée.');
       return res.redirect('/admindashboard/events');
     }
     return next(error);

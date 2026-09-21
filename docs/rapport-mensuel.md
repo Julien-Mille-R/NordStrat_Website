@@ -4,7 +4,7 @@
 
 Le premier de chaque mois, le site prépare un résumé du mois précédent et
 l'envoie à la boîte de l'association. Il présente les membres, cotisations,
-soirées, tables, jeux et actualités sous forme de statistiques agrégées.
+rencontres, tables, jeux et actualités sous forme de statistiques agrégées.
 
 Le rapport ne contient pas les noms, pseudonymes ou adresses des membres.
 

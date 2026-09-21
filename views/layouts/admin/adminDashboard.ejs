@@ -19,13 +19,13 @@
           <span class="w-11 h-11 rounded-xl bg-fantasy-brown flex items-center justify-center text-2xl" aria-hidden="true">📅</span>
           <% if (dashboardStats.nextEvent) { %><span class="px-3 py-1 text-xs border border-fantasy-emerald/50 text-fantasy-emerald rounded-full">Planifiée</span><% } %>
         </div>
-        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Soirées</h2>
+        <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Rencontres</h2>
         <% if (dashboardStats.nextEvent) { %>
           <p class="text-fantasy-gold-light mt-1">Prochaine : <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(dashboardStats.nextEvent.date) %></p>
         <% } else { %>
-          <p class="text-fantasy-orange mt-1">Aucune soirée ouverte actuellement.</p>
+          <p class="text-fantasy-orange mt-1">Aucune rencontre ouverte actuellement.</p>
         <% } %>
-        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Gérer les soirées →</span>
+        <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Gérer les rencontres →</span>
       </a>
 
       <a href="/admindashboard/members" class="group min-h-44 p-5 bg-fantasy-dark border-2 border-fantasy-gold/25 rounded-2xl hover:border-fantasy-orange hover:-translate-y-1 transition flex flex-col">
@@ -78,7 +78,7 @@
           <span class="text-3xl font-bold text-fantasy-gold"><%= dashboardStats.archiveCount %></span>
         </div>
         <h2 class="text-2xl font-fantasy text-fantasy-gold mt-4">Archives</h2>
-        <p class="text-fantasy-gold-light mt-1"><%= dashboardStats.archiveCount %> soirée<%= dashboardStats.archiveCount > 1 ? 's' : '' %> archivée<%= dashboardStats.archiveCount > 1 ? 's' : '' %>.</p>
+        <p class="text-fantasy-gold-light mt-1"><%= dashboardStats.archiveCount %> rencontre<%= dashboardStats.archiveCount > 1 ? 's' : '' %> archivée<%= dashboardStats.archiveCount > 1 ? 's' : '' %>.</p>
         <span class="mt-auto pt-4 text-fantasy-orange font-bold group-hover:translate-x-1 transition-transform">Consulter les archives →</span>
       </a>
 

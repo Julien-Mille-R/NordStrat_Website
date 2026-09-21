@@ -30,7 +30,7 @@ Il fournit aussi des outils pratiques :
 - gestion des membres ;
 - messages de contact ;
 - inscriptions à l'Assaut de Bruay ;
-- archivage et statistiques des soirées ;
+- archivage et statistiques des rencontres ;
 - journal des actions administratives.
 
 ### 2.2 Types d'utilisateurs
@@ -126,7 +126,7 @@ Trois volumes conservent les données :
 
 - `postgres_data` : données PostgreSQL ;
 - `uploads_data` : avatars et images envoyées ;
-- `archives_data` : exports JSON des soirées.
+- `archives_data` : exports JSON des rencontres.
 
 Un redémarrage ou un `docker compose down` conserve ces volumes.
 
@@ -773,7 +773,7 @@ Accès administrateur. Logo limité à 2 Mo et contenu vérifié.
 Les tests contrôlent la priorité du logo importé et la résolution des logos
 statiques.
 
-### 8.5 Soirées hebdomadaires
+### 8.5 Rencontres hebdomadaires
 
 #### Objectif
 
@@ -790,14 +790,14 @@ Créer le cadre temporel des réservations du vendredi.
 
 #### Parcours
 
-La première soirée doit être créée manuellement.
+La première rencontre doit être créée manuellement.
 
-Sa date limite d'inscription doit précéder la soirée.
+Sa date limite d'inscription doit précéder la rencontre.
 
-À 23 h 59 le vendredi, l'automatisation archive la soirée. Elle crée ensuite
-la soirée située sept jours plus tard avec le même décalage de clôture.
+À 23 h 59 le vendredi, l'automatisation archive la rencontre. Elle crée ensuite
+la rencontre située sept jours plus tard avec le même décalage de clôture.
 
-La nouvelle soirée devient réservable dès sa création. En pratique, cela
+La nouvelle rencontre devient réservable dès sa création. En pratique, cela
 correspond au début du samedi suivant l'archivage.
 
 Une annulation supprime les tables et inscriptions. Une réouverture repart avec
@@ -820,17 +820,17 @@ Les opérations importantes sont transactionnelles et journalisées.
 #### Tests
 
 Un test vérifie qu'une date limite incohérente renvoie une erreur utile sans
-créer de soirée.
+créer de rencontre.
 
 #### Limite actuelle
 
-Sans première soirée, aucune table n'est disponible et le cycle ne démarre pas.
+Sans première rencontre, aucune table n'est disponible et le cycle ne démarre pas.
 
 ### 8.6 Réservation des tables
 
 #### Objectif
 
-Permettre à un membre de créer ou rejoindre une table pour la prochaine soirée.
+Permettre à un membre de créer ou rejoindre une table pour la prochaine rencontre.
 
 #### Routes
 
@@ -848,7 +848,7 @@ La page présente huit emplacements.
 
 Une table est disponible si :
 
-- une soirée future existe ;
+- une rencontre future existe ;
 - son statut est `upcoming` ;
 - `reservable` est vrai ;
 - sa date limite n'est pas dépassée ;
@@ -858,7 +858,7 @@ Une table est disponible si :
 Le créateur choisit le jeu et le nombre maximal de joueurs. Il devient hôte et
 premier inscrit.
 
-Un membre ne peut avoir qu'une réservation confirmée par soirée.
+Un membre ne peut avoir qu'une réservation confirmée par rencontre.
 
 Les autres membres peuvent rejoindre jusqu'à la capacité maximale.
 
@@ -968,7 +968,7 @@ Contrôleur : `attendance.controller.js`.
 
 Les informations utiles au jeu et à la table sont copiées pour l'archive.
 
-### 8.9 Archivage et statistiques des soirées
+### 8.9 Archivage et statistiques des rencontres
 
 #### Objectif
 
@@ -983,13 +983,13 @@ Vider les tables chaque semaine tout en conservant les statistiques finales.
 
 #### Parcours automatique
 
-`server.js` vérifie chaque minute les soirées à archiver.
+`server.js` vérifie chaque minute les rencontres à archiver.
 
-Une soirée du vendredi devient archivable à 23 h 59, heure de Paris.
+Une rencontre du vendredi devient archivable à 23 h 59, heure de Paris.
 
 L'archive contient :
 
-- la soirée ;
+- la rencontre ;
 - les tables ;
 - les jeux ;
 - les participants ;
@@ -998,10 +998,10 @@ L'archive contient :
 
 L'instantané est stocké en JSONB dans PostgreSQL et exporté en fichier JSON.
 
-Après l'archive, les tables, fermetures et présences sont supprimées. La soirée
+Après l'archive, les tables, fermetures et présences sont supprimées. La rencontre
 devient `completed`.
 
-La soirée suivante est créée automatiquement.
+La rencontre suivante est créée automatiquement.
 
 #### Données
 
@@ -1013,7 +1013,7 @@ Dossier : `ARCHIVE_DIRECTORY`.
 
 #### Fiabilité
 
-Une archive est unique par soirée. Les fichiers manquants sont recréés depuis
+Une archive est unique par rencontre. Les fichiers manquants sont recréés depuis
 PostgreSQL au démarrage.
 
 ### 8.10 Actualités
@@ -1252,7 +1252,7 @@ Centraliser les outils et afficher les indicateurs principaux.
 
 Le tableau affiche notamment :
 
-- prochaine soirée réservable ;
+- prochaine rencontre réservable ;
 - membres actifs ;
 - cotisations à jour ou manquantes ;
 - messages non lus ;
@@ -1432,7 +1432,7 @@ Ils gèrent notamment :
 - discussions ;
 - aperçu des jeux ;
 - tableaux administratifs ;
-- validation du formulaire de soirée.
+- validation du formulaire de rencontre.
 
 La logique métier importante reste validée côté serveur.
 
@@ -1494,7 +1494,7 @@ Les tests couvrent notamment :
 
 - connexion refusée avec un mauvais mot de passe ;
 - interdiction des routes admin à un membre ;
-- validation d'une soirée ;
+- validation d'une rencontre ;
 - création et discussion d'une table ;
 - upload multipart protégé par CSRF ;
 - archivage JSON ;
@@ -1592,14 +1592,14 @@ Les mots de passe `POSTGRES_PASSWORD` et `DB_PASSWORD` doivent correspondre.
 
 ### 13.3 Les tables de réservation sont indisponibles
 
-Vérifier qu'une soirée future existe avec :
+Vérifier qu'une rencontre future existe avec :
 
 - statut `upcoming` ;
 - `reservable=true` ;
 - date limite future ;
 - au moins une table autorisée.
 
-Une base neuve demande la création manuelle de la première soirée.
+Une base neuve demande la création manuelle de la première rencontre.
 
 ### 13.4 Erreur d'origine ou CSRF
 
@@ -1646,9 +1646,9 @@ La commande refuse également de fonctionner si un admin existe déjà.
 
 ## 14. Points de vigilance actuels
 
-### 14.1 Première soirée
+### 14.1 Première rencontre
 
-Le cycle automatique dépend d'une première soirée créée manuellement.
+Le cycle automatique dépend d'une première rencontre créée manuellement.
 
 ### 14.2 Permissions des nouveaux uploads avec Nginx séparé
 

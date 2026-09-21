@@ -109,7 +109,7 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
     game = await models.Game.create({ name: 'Frostgrave', minPlayers: 1, maxPlayers: 10 });
     const eventDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     event = await models.Event.create({
-      title: 'Soirée de test',
+      title: 'Rencontre de test',
       date: eventDate,
       registrationDeadline: new Date(eventDate.getTime() - 24 * 60 * 60 * 1000),
       createdBy: admin.id,
@@ -149,7 +149,7 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
     await agent.get('/admindashboard').expect(403);
   });
 
-  test('la création d’une soirée affiche une erreur utile si la clôture est trop tardive', async () => {
+  test('la création d’une rencontre affiche une erreur utile si la clôture est trop tardive', async () => {
     const agent = request.agent(app);
     await login(agent, admin.email);
     const form = await agent.get('/admindashboard/events/create').expect(200);
@@ -157,7 +157,7 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
       .type('form')
       .send({
         _csrf: csrfToken(form),
-        title: 'Soirée invalide',
+        title: 'Rencontre invalide',
         date: '2030-09-06T20:30',
         registrationDeadline: '2030-09-06T21:00',
         maxTable: '8',
@@ -165,7 +165,7 @@ describe('parcours HTTP critiques', { skip: !testDatabaseUrl }, () => {
       })
       .expect(422);
     assert.match(response.text, /La fin des inscriptions doit être antérieure/);
-    assert.equal(await models.Event.count({ where: { title: 'Soirée invalide' } }), 0);
+    assert.equal(await models.Event.count({ where: { title: 'Rencontre invalide' } }), 0);
   });
 
   test('une réservation peut être créée puis discutée par un autre membre', async () => {

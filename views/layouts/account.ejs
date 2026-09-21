@@ -160,7 +160,7 @@
       </article>
 
       <article id="accountPanelTables" role="tabpanel" aria-labelledby="accountTab-tables" data-account-panel="tables" hidden class="p-5 sm:p-6 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl text-fantasy-gold-light">
-        <h2 class="text-2xl text-fantasy-gold">Ma prochaine soirée</h2>
+        <h2 class="text-2xl text-fantasy-gold">Ma prochaine rencontre</h2>
         <% if (player.reservations.length) { const reservation = player.reservations[0]; %>
           <p class="mt-4 text-xl font-bold text-fantasy-orange">Table <%= reservation.gameTable.tableNumber %></p>
           <p class="mt-1"><%= reservation.gameTable.game.name %></p>

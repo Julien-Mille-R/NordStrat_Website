@@ -23,8 +23,8 @@
           </div>
           <% if (['upcoming', 'ongoing'].includes(event.status)) { %>
             <details class="mt-4 pt-4 border-t border-fantasy-red/20">
-              <summary class="cursor-pointer text-fantasy-red">Annuler cette soirée</summary>
-              <form method="POST" action="/admindashboard/events/<%= event.id %>/cancel" class="mt-3 space-y-3" data-confirm="Confirmer l’annulation définitive de cette soirée ?">
+              <summary class="cursor-pointer text-fantasy-red">Annuler cette rencontre</summary>
+              <form method="POST" action="/admindashboard/events/<%= event.id %>/cancel" class="mt-3 space-y-3" data-confirm="Confirmer l’annulation définitive de cette rencontre ?">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <label class="block">Motif communiqué aux joueurs
                   <textarea name="cancellationReason" required minlength="5" maxlength="500" rows="2" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-red/40 rounded-lg"></textarea>
@@ -37,12 +37,12 @@
             <div class="mt-4 pt-4 border-t border-fantasy-gold/15">
               <p class="text-sm"><span class="font-bold text-fantasy-gold">Motif :</span> <%= event.cancellationReason %></p>
               <% if (event.date > new Date()) { %>
-                <form method="POST" action="/admindashboard/events/<%= event.id %>/reopen" class="mt-4" data-confirm="Relancer cette soirée avec des tables vierges et rouvrir les inscriptions ?">
+                <form method="POST" action="/admindashboard/events/<%= event.id %>/reopen" class="mt-4" data-confirm="Relancer cette rencontre avec des tables vierges et rouvrir les inscriptions ?">
                   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <button class="px-4 py-2 bg-fantasy-emerald-dark text-white font-bold rounded-lg hover:bg-fantasy-emerald transition-colors">Relancer les inscriptions</button>
                 </form>
               <% } else { %>
-                <p class="mt-3 text-sm text-fantasy-gold-light/50">Cette soirée est passée et ne peut plus être relancée.</p>
+                <p class="mt-3 text-sm text-fantasy-gold-light/50">Cette rencontre est passée et ne peut plus être relancée.</p>
               <% } %>
             </div>
           <% } %>

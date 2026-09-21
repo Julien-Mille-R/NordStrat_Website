@@ -1,7 +1,7 @@
 import { NewsPost } from '../models/index.js';
 
 const SITE_NAME = 'Nord Stratégie';
-const DEFAULT_DESCRIPTION = 'Nord Stratégie rassemble les passionnés de jeux de figurines à Bruay-sur-l’Escaut : soirées jeux, découvertes, événements et vie associative.';
+const DEFAULT_DESCRIPTION = 'Nord Stratégie rassemble les passionnés de jeux de figurines à Bruay-sur-l’Escaut : rencontres jeux, découvertes, événements et vie associative.';
 const PRIVATE_PATH_PREFIXES = [
   '/account',
   '/admindashboard',
@@ -26,7 +26,7 @@ const STATIC_PAGE_SEO = {
   },
   '/contact': {
     title: 'Contacter Nord Stratégie | Bruay-sur-l’Escaut',
-    description: 'Contactez l’association Nord Stratégie pour découvrir les soirées jeux, poser une question ou préparer votre première visite.',
+    description: 'Contactez l’association Nord Stratégie pour découvrir les rencontres jeux, poser une question ou préparer votre première visite.',
   },
   '/accessibility': {
     title: 'Accessibilité | Nord Stratégie',

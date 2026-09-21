@@ -40,13 +40,13 @@
           </div>
         <% } %>
         <p class="text-fantasy-gold-light text-lg">
-          Soirée du <%= bookingDateFormatter.format(event.date) %> - Ouverture à 20h30
+          Rencontre du <%= bookingDateFormatter.format(event.date) %> - Ouverture à 20h30
         </p>
         <% if (event.status === 'cancelled') { %>
           <div class="max-w-3xl mx-auto mt-5 p-5 border-2 border-fantasy-red bg-fantasy-red/10 rounded-xl text-left" role="alert">
-            <p class="text-xl font-bold text-fantasy-red">Soirée annulée</p>
+            <p class="text-xl font-bold text-fantasy-red">Rencontre annulée</p>
             <p class="mt-2 text-fantasy-gold-light"><span class="font-bold">Motif :</span> <%= event.cancellationReason %></p>
-            <p class="mt-2 text-sm text-fantasy-gold-light/70">Les tables et inscriptions de cette soirée ont été supprimées. En cas de réouverture, les réservations repartiront de zéro.</p>
+            <p class="mt-2 text-sm text-fantasy-gold-light/70">Les tables et inscriptions de cette rencontre ont été supprimées. En cas de réouverture, les réservations repartiront de zéro.</p>
           </div>
         <% } else { %>
           <p class="text-fantasy-gold-light/70 text-sm mt-2">
@@ -54,7 +54,7 @@
           </p>
         <% } %>
       <% } else { %>
-        <p class="text-fantasy-gold-light">Aucune soirée n’est actuellement ouverte aux réservations.</p>
+        <p class="text-fantasy-gold-light">Aucune rencontre n’est actuellement ouverte aux réservations.</p>
       <% } %>
     </div>
 
@@ -74,7 +74,7 @@
       'login-required': 'Vous devez être connecté pour effectuer cette action.',
       'table-booking-not-authorized': 'Merci de passer sur le Discord vous présenter pour avoir le droit de réserver/participer à une table.',
       'event_not_reservable': 'Les réservations ne sont plus ouvertes.',
-      'player_already_registered': 'Vous êtes déjà inscrit à une table pour cette soirée.',
+      'player_already_registered': 'Vous êtes déjà inscrit à une table pour cette rencontre.',
       'invalid_game_capacity': 'La capacité choisie n’est pas compatible avec ce jeu.',
       'no_table_available': 'Aucune table n’est disponible.',
       'table_unavailable': 'Cette table n’est pas disponible.',
@@ -83,7 +83,7 @@
       'table_already_closed': 'Les inscriptions à cette table sont déjà fermées.',
       'table_already_open': 'Cette table est déjà ouverte aux réservations.',
       'reservation_not_found': 'Votre réservation est introuvable.',
-      'event_not_available': 'Cette soirée ne permet plus de modifier votre présence.',
+      'event_not_available': 'Cette rencontre ne permet plus de modifier votre présence.',
       'not_table_host': 'Seul l’organisateur peut modifier cette table.'
     }; %>
 
@@ -285,7 +285,7 @@
               </div>
             <% } %>
           <% } else { %>
-            <div class="flex-grow flex items-center justify-center text-fantasy-gold-light/40"><%= slot.isClosed ? 'Table fermée par l’administration' : 'Non disponible pour cette soirée' %></div>
+            <div class="flex-grow flex items-center justify-center text-fantasy-gold-light/40"><%= slot.isClosed ? 'Table fermée par l’administration' : 'Non disponible pour cette rencontre' %></div>
             <% if (isAdmin && slot.isClosed && event) { %>
               <div class="mt-4 p-3 border border-fantasy-orange/50 bg-fantasy-orange/10 rounded-lg">
                 <p class="text-xs uppercase tracking-wider font-bold text-fantasy-orange">Modération</p>

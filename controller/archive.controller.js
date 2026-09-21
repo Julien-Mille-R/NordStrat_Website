@@ -11,7 +11,7 @@ export async function archiveEvent(req, res, next) {
       targetType: 'event',
       targetId: archive.eventId,
       targetLabel: archive.snapshot.event.title,
-      description: 'Soirée clôturée et archivée manuellement.',
+      description: 'Rencontre clôturée et archivée manuellement.',
     });
     return res.redirect('/admindashboard/archives');
   } catch (error) {

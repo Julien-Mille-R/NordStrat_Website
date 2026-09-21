@@ -18,7 +18,7 @@ const ACTION_FILTERS = {
 };
 
 export const AUDIT_CATEGORY_LABELS = {
-  game_tables: 'Soirées et tables',
+  game_tables: 'Rencontres et tables',
   members: 'Membres',
   memberships: 'Cotisations',
   news: 'Actualités',
@@ -33,11 +33,11 @@ export const AUDIT_ACTION_FILTER_LABELS = {
 };
 
 const AUDIT_ACTION_LABELS = {
-  event_archived_manually: 'Soirée archivée manuellement',
-  event_cancelled: 'Soirée annulée',
-  event_created: 'Soirée créée',
-  event_reopened: 'Soirée rouverte',
-  event_updated: 'Soirée modifiée',
+  event_archived_manually: 'Rencontre archivée manuellement',
+  event_cancelled: 'Rencontre annulée',
+  event_created: 'Rencontre créée',
+  event_reopened: 'Rencontre rouverte',
+  event_updated: 'Rencontre modifiée',
   member_reactivated: 'Compte réactivé',
   member_suspended_permanently: 'Compte suspendu définitivement',
   member_suspended_temporarily: 'Compte suspendu temporairement',
@@ -60,7 +60,7 @@ const AUDIT_ACTION_LABELS = {
 };
 
 const AUDIT_TARGET_LABELS = {
-  event: 'Soirée concernée',
+  event: 'Rencontre concernée',
   event_table_slot: 'Table concernée',
   game_table: 'Table concernée',
   member: 'Membre concerné',

@@ -14,9 +14,9 @@ Cette checklist complète les tests automatisés. Elle doit être rejouée sur o
 
 - création, modification, fermeture, réouverture et annulation d’une table ;
 - inscription et désinscription d’un second joueur ;
-- refus d’une seconde réservation pour la même soirée ;
+- refus d’une seconde réservation pour la même rencontre ;
 - discussion accessible à un membre non inscrit et modération par un admin ;
-- archivage de la soirée et contrôle du fichier JSON produit.
+- archivage de la rencontre et contrôle du fichier JSON produit.
 
 ## Formulaires et fichiers
 

@@ -43,7 +43,7 @@ export function renderMonthlyReportEmail(report) {
 <html lang="fr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
 <body style="margin:0;background:#f3f3f3;color:#1d1d1f;font-family:Arial,sans-serif;">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Membres, soirées, jeux et actualités : le résumé du mois.</div>
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Membres, rencontres, jeux et actualités : le résumé du mois.</div>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f3f3;padding:24px 12px;">
     <tr><td align="center">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #dedede;">
@@ -60,13 +60,13 @@ export function renderMonthlyReportEmail(report) {
           <p style="margin:0 0 7px;"><strong>${number(members.membershipsUpToDate)}</strong> adhésions à jour</p>
           <p style="margin:0 0 24px;"><strong>${number(members.membershipsPending)}</strong> cotisations en attente</p>
 
-          <h2 style="margin:0 0 14px;color:#a31515;font-size:20px;">Les soirées jeux</h2>
-          <p style="margin:0 0 7px;"><strong>${number(evenings.held)}</strong> soirées organisées</p>
-          <p style="margin:0 0 7px;"><strong>${number(evenings.cancelled)}</strong> soirées annulées</p>
+          <h2 style="margin:0 0 14px;color:#a31515;font-size:20px;">Les rencontres jeux</h2>
+          <p style="margin:0 0 7px;"><strong>${number(evenings.held)}</strong> rencontres organisées</p>
+          <p style="margin:0 0 7px;"><strong>${number(evenings.cancelled)}</strong> rencontres annulées</p>
           <p style="margin:0 0 7px;"><strong>${number(evenings.tables)}</strong> tables réservées</p>
           <p style="margin:0 0 7px;"><strong>${number(evenings.registrations)}</strong> inscriptions aux tables</p>
           <p style="margin:0 0 7px;"><strong>${number(evenings.uniquePlayers)}</strong> joueurs différents</p>
-          <p style="margin:0 0 24px;">Moyenne de <strong>${escapeHtml(evenings.averagePlayers)}</strong> joueur(s) par soirée</p>
+          <p style="margin:0 0 24px;">Moyenne de <strong>${escapeHtml(evenings.averagePlayers)}</strong> joueur(s) par rencontre</p>
 
           <h2 style="margin:0 0 14px;color:#a31515;font-size:20px;">Les jeux du mois</h2>
           <p style="margin:0 0 12px;"><strong>${number(games.length)}</strong> jeux différents ont été joués.</p>
@@ -101,13 +101,13 @@ LES MEMBRES
 - ${number(members.membershipsUpToDate)} adhésions à jour
 - ${number(members.membershipsPending)} cotisations en attente
 
-LES SOIRÉES JEUX
-- ${number(evenings.held)} soirées organisées
-- ${number(evenings.cancelled)} soirées annulées
+LES RENCONTRES JEUX
+- ${number(evenings.held)} rencontres organisées
+- ${number(evenings.cancelled)} rencontres annulées
 - ${number(evenings.tables)} tables réservées
 - ${number(evenings.registrations)} inscriptions aux tables
 - ${number(evenings.uniquePlayers)} joueurs différents
-- Moyenne : ${evenings.averagePlayers} joueur(s) par soirée
+- Moyenne : ${evenings.averagePlayers} joueur(s) par rencontre
 
 LES JEUX DU MOIS
 ${textList(games, 'Aucun jeu archivé ce mois-ci.', (game, index) => `${index + 1}. ${game.name} — ${number(game.tables)} table(s)`)}
