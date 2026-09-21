@@ -319,6 +319,11 @@
   </div>
 </section>
 
+<script>
+  document.getElementById('bookingEvent')?.addEventListener('change', (event) => {
+    window.location.href = event.target.value;
+  });
+</script>
 <script src="/js/booking-discussions.js" defer></script>
 <script src="/js/booking-game-preview.js" defer></script>
 <%- include('../partials/footer') %>
