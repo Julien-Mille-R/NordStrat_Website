@@ -57,3 +57,9 @@ mobileDiscussionLayout.addEventListener('change', () => {
 
 const autoOpenPanel = discussionPanels.find((panel) => panel.hasAttribute('data-auto-open'));
 if (autoOpenPanel) openDiscussion(autoOpenPanel);
+
+const bookingEventSelector = document.getElementById('bookingEvent');
+
+bookingEventSelector?.addEventListener('change', (event) => {
+  window.location.href = event.target.value;
+});
