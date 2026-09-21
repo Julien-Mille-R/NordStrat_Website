@@ -27,7 +27,6 @@
             <select
               id="bookingEvent"
               class="w-full min-h-11 bg-fantasy-brown border border-fantasy-gold/40 rounded-lg px-3 py-2 text-fantasy-gold-light"
-              onchange="window.location.href = this.value;"
             >
               <% availableEvents.forEach((availableEvent) => { %>
                 <option
@@ -320,6 +319,11 @@
   </div>
 </section>
 
+<script>
+  document.getElementById('bookingEvent')?.addEventListener('change', (event) => {
+    window.location.href = event.target.value;
+  });
+</script>
 <script src="/js/booking-discussions.js" defer></script>
 <script src="/js/booking-game-preview.js" defer></script>
 <%- include('../partials/footer') %>
