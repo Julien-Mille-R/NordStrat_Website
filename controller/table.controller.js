@@ -94,7 +94,7 @@ export async function createTable(req, res, next) {
       }
     });
 
-    return res.redirect('/booking?message=table-created');
+    return res.redirect(`/booking?event=${eventId}&message=table-created`);
   } catch (error) {
     const knownErrors = ['EVENT_NOT_RESERVABLE', 'PLAYER_ALREADY_REGISTERED', 'INVALID_GAME_CAPACITY', 'TABLE_UNAVAILABLE'];
     if (knownErrors.includes(error.message)) return redirectWithError(res, error.message.toLowerCase());
@@ -239,6 +239,7 @@ export async function updateTable(req, res, next) {
   const tableId = Number(req.params.tableId);
   const gameId = Number(req.body.gameId);
   const maxPlayers = Number(req.body.maxPlayers);
+  let eventId;
 
   try {
     await sequelize.transaction(async (transaction) => {
@@ -247,6 +248,7 @@ export async function updateTable(req, res, next) {
         lock: transaction.LOCK.UPDATE,
       });
       if (!gameTable) throw new Error('TABLE_NOT_FOUND');
+      eventId = gameTable.eventId;
       if (gameTable.hostPlayerId !== req.currentUser.id && !isAdmin(req)) throw new Error('NOT_TABLE_HOST');
 
       const event = await Event.findByPk(gameTable.eventId, {
@@ -279,7 +281,7 @@ export async function updateTable(req, res, next) {
       await gameTable.update({ gameId: game.id, maxPlayers }, { transaction });
     });
 
-    return res.redirect('/booking?message=table-updated');
+    return res.redirect(`/booking?event=${eventId}&message=table-updated`);
   } catch (error) {
     if (['TABLE_NOT_FOUND', 'NOT_TABLE_HOST', 'INVALID_GAME_CAPACITY', 'EVENT_NOT_RESERVABLE'].includes(error.message)) {
       return redirectWithError(res, error.message.toLowerCase());
@@ -290,6 +292,7 @@ export async function updateTable(req, res, next) {
 
 export async function closeTable(req, res, next) {
   const tableId = Number(req.params.tableId);
+  let eventId;
 
   try {
     if (!Number.isInteger(tableId) || tableId < 1) {
@@ -301,7 +304,7 @@ export async function closeTable(req, res, next) {
         transaction,
         lock: transaction.LOCK.UPDATE,
       });
-      const eventId = gameTable.eventId;
+      eventId = gameTable.eventId;
       if (!gameTable) throw new Error('TABLE_NOT_FOUND');
       if (gameTable.hostPlayerId !== req.currentUser.id && !isAdmin(req)) throw new Error('NOT_TABLE_HOST');
       if (gameTable.status === 'closed') throw new Error('TABLE_ALREADY_CLOSED');
@@ -339,6 +342,7 @@ export async function closeTable(req, res, next) {
 }
 
 export async function cancelTable(req, res, next) {
+  let eventId;
   try {
     await sequelize.transaction(async (transaction) => {
       const gameTable = await GameTable.findByPk(Number(req.params.tableId), {

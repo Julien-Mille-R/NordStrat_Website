@@ -17,6 +17,7 @@ function redirectWithError(res, code) {
 export async function joinTable(req, res, next) {
   const tableId = Number(req.params.tableId);
   const playerId = req.currentUser.id;
+  let eventId;
 
   try {
     await sequelize.transaction(async (transaction) => {
@@ -64,6 +65,7 @@ export async function joinTable(req, res, next) {
 export async function leaveTable(req, res, next) {
   const tableId = Number(req.params.tableId);
   const playerId = req.currentUser.id;
+  let eventId;
 
   try {
     await sequelize.transaction(async (transaction) => {
