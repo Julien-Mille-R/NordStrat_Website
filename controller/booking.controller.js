@@ -9,45 +9,57 @@ import { attachGameImageUrl } from '../services/game-image.service.js';
 
 export async function showBookingPage(req, res, next) {
   try {
-    const event = await Event.findOne({
+    const availableEvents = await Event.findAll({
       where: {
         status: { [Op.in]: ['upcoming', 'ongoing', 'cancelled'] },
         date: { [Op.gte]: new Date() },
       },
-      include: [{
-        association: 'gameTables',
-        required: false,
-        where: { status: { [Op.ne]: 'cancelled' } },
-        include: [
-          { association: 'game' },
-          { association: 'host' },
-          {
-            association: 'reservations',
-            required: false,
-            where: { status: 'confirmed' },
-            include: [{ association: 'player' }],
-          },
-          {
-            association: 'comments',
-            required: false,
-            include: [{
-              association: 'author',
-              attributes: ['id', 'nickname', 'firstname', 'avatarUrl'],
-            }],
-          },
-          ...(req.currentUser ? [{
-            association: 'discussionReads',
-            required: false,
-            where: { playerId: req.currentUser.id },
-            attributes: ['gameTableId', 'playerId', 'lastReadAt'],
-          }] : []),
-        ],
-      }, {
-        association: 'tableClosures',
-        required: false,
-      }],
+      attributes: ['id', 'title', 'date', 'status', 'registrationDeadline'],
       order: [['date', 'ASC']],
     });
+
+    const requestedEventId = Number(req.query.event);
+    const selectedEventId = Number.isInteger(requestedEventId)
+      && availableEvents.some((availableEvent) => availableEvent.id === requestedEventId)
+      ? requestedEventId
+      : availableEvents[0]?.id || null;
+
+    const event = selectedEventId
+      ? await Event.findByPk(selectedEventId, {
+        include: [{
+          association: 'gameTables',
+          required: false,
+          where: { status: { [Op.ne]: 'cancelled' } },
+          include: [
+            { association: 'game' },
+            { association: 'host' },
+            {
+              association: 'reservations',
+              required: false,
+              where: { status: 'confirmed' },
+              include: [{ association: 'player' }],
+            },
+            {
+              association: 'comments',
+              required: false,
+              include: [{
+                association: 'author',
+                attributes: ['id', 'nickname', 'firstname', 'avatarUrl'],
+              }],
+            },
+            ...(req.currentUser ? [{
+              association: 'discussionReads',
+              required: false,
+              where: { playerId: req.currentUser.id },
+              attributes: ['gameTableId', 'playerId', 'lastReadAt'],
+            }] : []),
+          ],
+        }, {
+          association: 'tableClosures',
+          required: false,
+        }],
+      })
+      : null;
 
     const games = await Game.findAll({
       where: { isAvailable: true },
@@ -117,6 +129,7 @@ export async function showBookingPage(req, res, next) {
       : null;
 
     return res.render('layouts/booking', {
+      availableEvents,
       event,
       games,
       tableSlots,

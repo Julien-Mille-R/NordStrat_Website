@@ -11,6 +11,35 @@
           year: 'numeric',
           timeZone: 'Europe/Paris'
         }); %>
+        <% if (availableEvents.length > 1) { %>
+          <% const eventDateFormatter = new Intl.DateTimeFormat('fr-FR', {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            timeZone: 'Europe/Paris'
+          }); %>
+
+          <div class="max-w-xl mx-auto mb-5 text-left">
+            <label for="bookingEvent" class="block text-sm font-bold text-fantasy-gold-light mb-2">
+              Choisir une rencontre
+            </label>
+            <select
+              id="bookingEvent"
+              class="w-full min-h-11 bg-fantasy-brown border border-fantasy-gold/40 rounded-lg px-3 py-2 text-fantasy-gold-light"
+              onchange="window.location.href = this.value;"
+            >
+              <% availableEvents.forEach((availableEvent) => { %>
+                <option
+                  value="/booking?event=<%= availableEvent.id %>"
+                  <%= availableEvent.id === event.id ? 'selected' : '' %>
+                >
+                  <%= eventDateFormatter.format(availableEvent.date) %> — <%= availableEvent.title %><%= availableEvent.status === 'cancelled' ? ' — annulée' : '' %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+        <% } %>
         <p class="text-fantasy-gold-light text-lg">
           Soirée du <%= bookingDateFormatter.format(event.date) %> - Ouverture à 20h30
         </p>
