@@ -31,6 +31,8 @@ export async function joinTable(req, res, next) {
         throw new Error('EVENT_NOT_RESERVABLE');
       }
 
+      eventId = event.id;
+
       const existingReservation = await Reservation.findOne({
         where: { playerId, eventId: event.id, status: 'confirmed' },
         transaction,
@@ -51,7 +53,7 @@ export async function joinTable(req, res, next) {
       }, { transaction });
     });
 
-    return res.redirect('/booking?message=table-joined');
+    return res.redirect(`/booking?event=${eventId}&message=table-joined`);
   } catch (error) {
     const knownErrors = ['TABLE_UNAVAILABLE', 'EVENT_NOT_RESERVABLE', 'PLAYER_ALREADY_REGISTERED', 'TABLE_FULL'];
     if (knownErrors.includes(error.message)) return redirectWithError(res, error.message.toLowerCase());
@@ -70,6 +72,8 @@ export async function leaveTable(req, res, next) {
         lock: transaction.LOCK.UPDATE,
       });
       if (!gameTable) throw new Error('TABLE_NOT_FOUND');
+
+      eventId = gameTable.eventId;
 
       const reservation = await Reservation.findOne({
         where: { gameTableId: tableId, playerId, status: 'confirmed' },
@@ -98,7 +102,7 @@ export async function leaveTable(req, res, next) {
       }
     });
 
-    return res.redirect('/booking?message=table-left');
+    return res.redirect(`/booking?event=${eventId}&message=table-left`);
   } catch (error) {
     if (['TABLE_NOT_FOUND', 'RESERVATION_NOT_FOUND'].includes(error.message)) {
       return redirectWithError(res, error.message.toLowerCase());

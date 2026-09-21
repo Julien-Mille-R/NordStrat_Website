@@ -164,7 +164,7 @@ export async function closeEventTableSlotByAdmin(req, res, next) {
       });
     });
 
-    return res.redirect('/booking?message=table-closed');
+    return res.redirect(`/booking?event=${eventId}&message=table-closed`);
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError') {
       return redirectWithError(res, 'table_already_closed');
@@ -226,7 +226,7 @@ export async function reopenEventTableSlotByAdmin(req, res, next) {
       });
     });
 
-    return res.redirect('/booking?message=table-reopened');
+    return res.redirect(`/booking?event=${eventId}&message=table-reopened`);
   } catch (error) {
     if (['EVENT_NOT_RESERVABLE', 'TABLE_NOT_FOUND', 'TABLE_ALREADY_OPEN'].includes(error.message)) {
       return redirectWithError(res, error.message.toLowerCase());
@@ -301,6 +301,7 @@ export async function closeTable(req, res, next) {
         transaction,
         lock: transaction.LOCK.UPDATE,
       });
+      const eventId = gameTable.eventId;
       if (!gameTable) throw new Error('TABLE_NOT_FOUND');
       if (gameTable.hostPlayerId !== req.currentUser.id && !isAdmin(req)) throw new Error('NOT_TABLE_HOST');
       if (gameTable.status === 'closed') throw new Error('TABLE_ALREADY_CLOSED');
@@ -328,7 +329,7 @@ export async function closeTable(req, res, next) {
         });
       }
     });
-    return res.redirect('/booking?message=table-closed');
+    return res.redirect(`/booking?event=${eventId}&message=table-closed`);
   } catch (error) {
     if (['TABLE_NOT_FOUND', 'NOT_TABLE_HOST', 'TABLE_ALREADY_CLOSED', 'EVENT_NOT_AVAILABLE'].includes(error.message)) {
       return redirectWithError(res, error.message.toLowerCase());
@@ -345,6 +346,7 @@ export async function cancelTable(req, res, next) {
         lock: transaction.LOCK.UPDATE,
       });
       if (!gameTable) throw new Error('TABLE_NOT_FOUND');
+      eventId = gameTable.eventId;
       if (gameTable.hostPlayerId !== req.currentUser.id && !isAdmin(req)) throw new Error('NOT_TABLE_HOST');
       if (isAdmin(req)) {
         await recordAdminAction({
@@ -361,7 +363,7 @@ export async function cancelTable(req, res, next) {
       await gameTable.destroy({ transaction });
     });
 
-    return res.redirect('/booking?message=table-cancelled');
+    return res.redirect(`/booking?event=${eventId}&message=table-cancelled`);
   } catch (error) {
     if (['TABLE_NOT_FOUND', 'NOT_TABLE_HOST'].includes(error.message)) {
       return redirectWithError(res, error.message.toLowerCase());
