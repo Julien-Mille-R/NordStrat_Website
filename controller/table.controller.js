@@ -304,8 +304,8 @@ export async function closeTable(req, res, next) {
         transaction,
         lock: transaction.LOCK.UPDATE,
       });
-      eventId = gameTable.eventId;
       if (!gameTable) throw new Error('TABLE_NOT_FOUND');
+      eventId = gameTable.eventId;
       if (gameTable.hostPlayerId !== req.currentUser.id && !isAdmin(req)) throw new Error('NOT_TABLE_HOST');
       if (gameTable.status === 'closed') throw new Error('TABLE_ALREADY_CLOSED');
       if (gameTable.status !== 'open') throw new Error('TABLE_NOT_FOUND');
