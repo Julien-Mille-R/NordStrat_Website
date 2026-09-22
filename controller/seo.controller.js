@@ -95,7 +95,7 @@ function organizationSchema(baseUrl) {
     },
     sameAs: [
       'https://www.facebook.com/nordstrategie/?locale=fr_FR',
-      'https://discord.gg/ws3YHhukB8',
+      'https://discord.gg/BB7f4yCt6G',
     ],
   };
 }
