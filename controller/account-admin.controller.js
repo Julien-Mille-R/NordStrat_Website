@@ -10,6 +10,7 @@ import { reactivateExpiredSuspension, setFlash } from './access.controller.js';
 import { recordAdminAction, targetDisplayName } from '../services/audit-log.service.js';
 import { invalidatePlayerSessions } from '../services/session-security.service.js';
 import { deleteUploadedImage } from '../services/upload-storage.service.js';
+import { currentMembershipSeason } from './membership.controller.js';
 
 
 function memberRedirect() {
@@ -18,6 +19,8 @@ function memberRedirect() {
 
 export async function showMemberList(req, res, next) {
   try {
+    const currentSeason = currentMembershipSeason();
+
     const players = await Player.findAll({
       where: {
         moderationStatus: {
@@ -35,6 +38,11 @@ export async function showMemberList(req, res, next) {
           association: 'reservations',
           required: false,
           where: { status: 'confirmed' },
+        },
+        {
+          association: 'memberships',
+          required: false,
+          where: { seasonStart: currentSeason.start },
         },
       ],
       order: [['createdAt', 'DESC']],

@@ -150,8 +150,44 @@
               <h3 class="text-fantasy-gold font-bold">Informations</h3>
               <p class="mt-2">Inscription : <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(player.createdAt) %></p>
               <p class="mt-1">Réservation active : <%= player.reservations.length ? 'oui' : 'non' %></p>
-              <p class="mt-1">Cotisation :
-                <%= player.membershipExpiresAt ? `échéance au ${new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeZone: 'Europe/Paris' }).format(player.membershipExpiresAt)}` : 'non renseignée' %>
+              <% const membership = player.memberships?.[0] || null; %>
+              <p class="mt-1">
+                Cotisation :
+                <% if (membership?.status === 'paid') { %>
+                  <span class="text-fantasy-emerald font-bold">
+                    réglée
+                  </span>
+                  <span class="text-fantasy-gold-light/70">
+                    — valable jusqu'au
+                    <%= new Intl.DateTimeFormat('fr-FR', {
+                      dateStyle: 'long',
+                      timeZone: 'Europe/Paris'
+                    }).format(new Date(membership.seasonEnd)) %>
+                  </span>
+                <% } else if (membership?.status === 'exempted') { %>
+                  <span class="text-fantasy-gold font-bold">
+                    exonérée
+                  </span>
+                  <span class="text-fantasy-gold-light/70">
+                    — valable jusqu'au
+                    <%= new Intl.DateTimeFormat('fr-FR', {
+                      dateStyle: 'long',
+                      timeZone: 'Europe/Paris'
+                    }).format(new Date(membership.seasonEnd)) %>
+                  </span>
+                <% } else if (membership?.status === 'unpaid') { %>
+                  <span class="text-fantasy-orange font-bold">
+                    non réglée
+                  </span>
+                <% } else if (membership?.status === 'cancelled') { %>
+                  <span class="text-fantasy-red font-bold">
+                    annulée
+                  </span>
+                <% } else { %>
+                  <span class="text-fantasy-gold-light/50">
+                    non renseignée
+                  </span>
+                <% } %>
               </p>
             </div>
           </div>
