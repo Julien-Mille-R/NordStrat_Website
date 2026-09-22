@@ -44,6 +44,23 @@
                       <%= player.role.name %>
                     </span>
 
+                    <% const membership = player.memberships?.[0] || null; %>
+
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold
+                      <%= membership?.status === 'paid' || membership?.status === 'exempted'
+                        ? 'bg-fantasy-emerald/15 text-fantasy-emerald border border-fantasy-emerald/40'
+                        : membership?.status === 'unpaid'
+                          ? 'bg-fantasy-orange/15 text-fantasy-orange border border-fantasy-orange/40'
+                          : 'bg-fantasy-brown text-fantasy-gold-light/60 border border-fantasy-gold/10' %>">
+                      <%= membership?.status === 'paid'
+                        ? '✓ Membre'
+                        : membership?.status === 'exempted'
+                          ? '✓ Exonéré'
+                          : membership?.status === 'unpaid'
+                            ? '⚠ Cotisation'
+                            : '✕ Non membre' %>
+                    </span>
+
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold
                       <%= player.canBookTables || isAdmin
                         ? 'bg-fantasy-emerald/15 text-fantasy-emerald border border-fantasy-emerald/40'
