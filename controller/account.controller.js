@@ -43,39 +43,66 @@ async function removeLocalAvatar(avatarUrl) {
 export async function register(req, res, next) {
   const firstname = normalizedText(req.body.firstname);
   const lastname = normalizedText(req.body.lastname);
-  const nickname = normalizedText(req.body.nickname) || null;
+  const nickname = normalizedText(req.body.nickname);
   const email = normalizedText(req.body.email)?.toLowerCase();
   const password = req.body.password || '';
   const passwordConfirmation = req.body.passwordConfirmation || '';
 
   try {
-    if (!firstname || !lastname || !email || firstname.length > 100 || lastname.length > 100 || (nickname && nickname.length > 50)) {
-      setFlash(req, 'error', 'Les informations du compte sont incomplètes ou trop longues.');
+    if (
+      !firstname
+      || !lastname
+      || !nickname
+      || !email
+      || firstname.length > 100
+      || lastname.length > 100
+      || nickname.length > 50
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Le prénom, le nom et le pseudonyme sont obligatoires et doivent respecter les longueurs autorisées.',
+      );
       return res.redirect('/?auth=register');
     }
+
     if (password.length < 10 || password.length > 128) {
-      setFlash(req, 'error', 'Le mot de passe doit contenir entre 10 et 128 caractères.');
+      setFlash(
+        req,
+        'error',
+        'Le mot de passe doit contenir entre 10 et 128 caractères.',
+      );
       return res.redirect('/?auth=register');
     }
+
     if (password !== passwordConfirmation) {
       setFlash(req, 'error', 'Les mots de passe ne correspondent pas.');
       return res.redirect('/?auth=register');
     }
+
     if (req.body.acceptTerms !== 'on') {
-      setFlash(req, 'error', "Vous devez accepter les conditions générales d'utilisation.");
+      setFlash(
+        req,
+        'error',
+        "Vous devez accepter les conditions générales d'utilisation.",
+      );
       return res.redirect('/?auth=register');
     }
 
     const existingPlayer = await Player.unscoped().findOne({
       where: where(fn('LOWER', col('email')), email),
     });
+
     if (existingPlayer) {
       setFlash(req, 'error', 'Cette adresse email est déjà utilisée.');
       return res.redirect('/?auth=register');
     }
 
     const userRole = await Role.findOne({ where: { name: 'User' } });
-    if (!userRole) throw new Error('Le rôle User est absent de la base.');
+
+    if (!userRole) {
+      throw new Error('Le rôle User est absent de la base.');
+    }
 
     const player = await Player.create({
       firstname,
@@ -137,12 +164,21 @@ export async function register(req, res, next) {
       'success',
       'Votre compte a été créé. Un e-mail de validation vient de vous être envoyé.',
     );
+
     return res.redirect('/?auth=login');
   } catch (error) {
-    if (error.name === 'SequelizeUniqueConstraintError' || error.name === 'SequelizeValidationError') {
-      setFlash(req, 'error', 'Impossible de créer ce compte. Vérifiez les informations saisies.');
+    if (
+      error.name === 'SequelizeUniqueConstraintError'
+      || error.name === 'SequelizeValidationError'
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Impossible de créer ce compte. Vérifiez les informations saisies.',
+      );
       return res.redirect('/?auth=register');
     }
+
     return next(error);
   }
 }
@@ -167,11 +203,16 @@ export async function showAccount(req, res, next) {
         },
       ],
     });
-    player.favoriteGames.sort((first, second) => first.PlayerGame.position - second.PlayerGame.position);
+
+    player.favoriteGames.sort(
+      (first, second) => first.PlayerGame.position - second.PlayerGame.position,
+    );
+
     const games = await Game.findAll({
       where: { isAvailable: true },
       order: [['name', 'ASC']],
     });
+
     return res.render('layouts/account', {
       player,
       games,
@@ -186,15 +227,51 @@ export async function updateProfile(req, res, next) {
   try {
     const firstname = normalizedText(req.body.firstname);
     const lastname = normalizedText(req.body.lastname);
-    const nickname = normalizedText(req.body.nickname) || null;
-    if (!firstname || !lastname || firstname.length > 100 || lastname.length > 100 || (nickname && nickname.length > 50)) {
-      setFlash(req, 'error', 'Les informations du profil sont invalides.');
+    const nickname = normalizedText(req.body.nickname);
+
+    if (
+      !firstname
+      || !lastname
+      || !nickname
+      || firstname.length > 100
+      || lastname.length > 100
+      || nickname.length > 50
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Le prénom, le nom et le pseudonyme sont obligatoires et doivent respecter les longueurs autorisées.',
+      );
       return res.redirect('/account');
     }
-    await req.currentUser.update({ firstname, lastname, nickname });
+
+    await req.currentUser.update({
+      firstname,
+      lastname,
+      nickname,
+    });
+
     setFlash(req, 'success', 'Votre profil a été mis à jour.');
     return res.redirect('/account');
   } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      setFlash(
+        req,
+        'error',
+        'Ce pseudonyme est déjà utilisé par un autre membre.',
+      );
+      return res.redirect('/account');
+    }
+
+    if (error.name === 'SequelizeValidationError') {
+      setFlash(
+        req,
+        'error',
+        'Les informations du profil sont invalides.',
+      );
+      return res.redirect('/account');
+    }
+
     return next(error);
   }
 }
@@ -210,13 +287,26 @@ export async function changePassword(req, res, next) {
       setFlash(req, 'error', 'Le mot de passe actuel est incorrect.');
       return res.redirect('/account');
     }
-    if (newPassword.length < 10 || newPassword.length > 128 || newPassword !== confirmation) {
-      setFlash(req, 'error', 'Le nouveau mot de passe est invalide ou sa confirmation ne correspond pas.');
+
+    if (
+      newPassword.length < 10
+      || newPassword.length > 128
+      || newPassword !== confirmation
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Le nouveau mot de passe est invalide ou sa confirmation ne correspond pas.',
+      );
       return res.redirect('/account');
     }
 
-    await player.update({ password: await bcrypt.hash(newPassword, 12) });
+    await player.update({
+      password: await bcrypt.hash(newPassword, 12),
+    });
+
     await renewAuthenticatedSession(req, player.id);
+
     setFlash(req, 'success', 'Votre mot de passe a été modifié.');
     return res.redirect('/account');
   } catch (error) {
@@ -371,11 +461,16 @@ export async function deleteAccount(req, res, next) {
 
   try {
     if (confirmation !== 'SUPPRIMER') {
-      setFlash(req, 'error', 'Saisissez SUPPRIMER pour confirmer l’anonymisation de votre compte.');
+      setFlash(
+        req,
+        'error',
+        'Saisissez SUPPRIMER pour confirmer l’anonymisation de votre compte.',
+      );
       return res.redirect('/account');
     }
 
     const playerWithPassword = await Player.scope('withPassword').findByPk(playerId);
+
     if (!await bcrypt.compare(password, playerWithPassword.password)) {
       setFlash(req, 'error', 'Le mot de passe est incorrect.');
       return res.redirect('/account');
@@ -383,16 +478,28 @@ export async function deleteAccount(req, res, next) {
 
     if (req.currentUser.role.name === 'Admin') {
       const activeAdminCount = await Player.count({
-        where: { roleId: req.currentUser.roleId, isActive: true },
+        where: {
+          roleId: req.currentUser.roleId,
+          isActive: true,
+        },
       });
+
       if (activeAdminCount <= 1) {
-        setFlash(req, 'error', 'Vous êtes le dernier administrateur actif. Attribuez d’abord ce rôle à un autre compte.');
+        setFlash(
+          req,
+          'error',
+          'Vous êtes le dernier administrateur actif. Attribuez d’abord ce rôle à un autre compte.',
+        );
         return res.redirect('/account');
       }
     }
 
-    const deletedEmail = `deleted-${playerId}-${crypto.randomUUID()}@anonymized.invalid`;
-    const deletedPassword = await bcrypt.hash(crypto.randomBytes(48).toString('hex'), 12);
+    const deletedEmail =
+      `deleted-${playerId}-${crypto.randomUUID()}@anonymized.invalid`;
+
+    const deletedPassword =
+      await bcrypt.hash(crypto.randomBytes(48).toString('hex'), 12);
+
     const anonymizedAt = new Date();
 
     await sequelize.transaction(async (transaction) => {
@@ -400,13 +507,17 @@ export async function deleteAccount(req, res, next) {
         transaction,
         lock: transaction.LOCK.UPDATE,
       });
-      if (!player || player.moderationStatus === 'deleted') throw new Error('ACCOUNT_NOT_AVAILABLE');
+
+      if (!player || player.moderationStatus === 'deleted') {
+        throw new Error('ACCOUNT_NOT_AVAILABLE');
+      }
 
       const hostedTables = await GameTable.findAll({
         where: { hostPlayerId: playerId },
         transaction,
         lock: transaction.LOCK.UPDATE,
       });
+
       for (const gameTable of hostedTables) {
         const nextReservation = await Reservation.findOne({
           where: {
@@ -418,22 +529,43 @@ export async function deleteAccount(req, res, next) {
           transaction,
           lock: transaction.LOCK.UPDATE,
         });
+
         if (nextReservation) {
-          await gameTable.update({ hostPlayerId: nextReservation.playerId }, { transaction });
+          await gameTable.update(
+            { hostPlayerId: nextReservation.playerId },
+            { transaction },
+          );
         } else {
           await gameTable.destroy({ transaction });
         }
       }
 
-      await Reservation.destroy({ where: { playerId }, transaction });
-      await EventAttendance.destroy({ where: { playerId }, transaction });
-      await PlayerGame.destroy({ where: { playerId }, transaction });
-      await ContactMessage.destroy({ where: { playerId }, transaction });
+      await Reservation.destroy({
+        where: { playerId },
+        transaction,
+      });
+
+      await EventAttendance.destroy({
+        where: { playerId },
+        transaction,
+      });
+
+      await PlayerGame.destroy({
+        where: { playerId },
+        transaction,
+      });
+
+      await ContactMessage.destroy({
+        where: { playerId },
+        transaction,
+      });
 
       const archives = await BookingArchive.findAll({ transaction });
+
       for (const archive of archives) {
         const snapshot = structuredClone(archive.snapshot);
         let changed = false;
+
         for (const table of snapshot.tables || []) {
           for (const participant of table.participants || []) {
             if (participant.playerId === playerId) {
@@ -443,6 +575,7 @@ export async function deleteAccount(req, res, next) {
             }
           }
         }
+
         if (changed) {
           await archive.update({ snapshot }, { transaction });
           changedArchives.push(archive);
@@ -473,16 +606,22 @@ export async function deleteAccount(req, res, next) {
       }, { transaction });
     });
 
-    await Promise.all(changedArchives.map((archive) => archive.exportToFile()));
+    await Promise.all(
+      changedArchives.map((archive) => archive.exportToFile()),
+    );
+
     await destroySession(req);
     await invalidatePlayerSessions(playerId);
     await removeLocalAvatar(avatarUrl);
+
     res.clearCookie('nordstrat.sid');
+
     return res.redirect('/');
   } catch (error) {
     if (error.message === 'ACCOUNT_NOT_AVAILABLE') {
       return res.redirect('/');
     }
+
     return next(error);
   }
 }

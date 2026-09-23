@@ -5,7 +5,7 @@ export default function definePlayer(sequelize) {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     firstname: { type: DataTypes.STRING(100), allowNull: false },
     lastname: { type: DataTypes.STRING(100), allowNull: false },
-    nickname: { type: DataTypes.STRING(50), allowNull: true },
+    nickname: { type: DataTypes.STRING(50), allowNull: false, validate: { notEmpty: true, len: [1, 50], }, },
     avatarUrl: { type: DataTypes.TEXT, allowNull: true, field: 'avatar_url' },
     biography: {
       type: DataTypes.TEXT,
@@ -75,7 +75,18 @@ export default function definePlayer(sequelize) {
     timestamps: true,
     defaultScope: { attributes: { exclude: ['password'] } },
     scopes: { withPassword: { attributes: { include: ['password'] } } },
-    indexes: [{ name: 'unique_player_email_lower', unique: true, fields: [sequelize.fn('LOWER', sequelize.col('email'))] }],
+    indexes: [
+      {
+        name: 'unique_player_email_lower',
+        unique: true,
+        fields: [sequelize.fn('LOWER', sequelize.col('email'))],
+      },
+      {
+        name: 'unique_player_nickname_lower',
+        unique: true,
+        fields: [sequelize.fn('LOWER', sequelize.col('nickname'))],
+      },
+    ],
     validate: {
       moderationIsCoherent() {
         if (this.moderationStatus === 'active' && (!this.isActive || this.suspendedUntil)) {

@@ -93,8 +93,20 @@
         </label>
 
         <label class="block text-fantasy-gold font-semibold text-sm">
-          Pseudonyme <span class="font-normal text-fantasy-gold-light/60">(facultatif)</span>
-          <input type="text" id="registerNickname" name="nickname" maxlength="50" autocomplete="nickname" class="mt-1 w-full min-h-11 md:min-h-10 px-3 py-2 md:py-1.5 rounded-lg bg-fantasy-brown border-2 border-fantasy-gold/30 text-fantasy-gold-light focus:border-fantasy-gold focus:outline-none">
+          Pseudonyme
+          <input
+            type="text"
+            id="registerNickname"
+            name="nickname"
+            required
+            minlength="1"
+            maxlength="50"
+            autocomplete="nickname"
+            class="mt-1 w-full min-h-11 md:min-h-10 px-3 py-2 md:py-1.5 rounded-lg bg-fantasy-brown border-2 border-fantasy-gold/30 text-fantasy-gold-light focus:border-fantasy-gold focus:outline-none"
+          >
+          <span class="mt-1 block text-xs text-fantasy-gold-light/60">
+            Votre pseudonyme sera visible par les autres membres.
+          </span>
         </label>
 
         <label class="block text-fantasy-gold font-semibold text-sm">

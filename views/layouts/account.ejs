@@ -129,7 +129,17 @@
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <label class="block">Prénom<input name="firstname" required maxlength="100" value="<%= player.firstname %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
           <label class="block">Nom<input name="lastname" required maxlength="100" value="<%= player.lastname %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
-          <label class="block">Pseudonyme<input name="nickname" maxlength="50" value="<%= player.nickname || '' %>" class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"></label>
+          <label class="block">
+            Pseudonyme
+            <input
+              name="nickname"
+              required
+              minlength="1"
+              maxlength="50"
+              value="<%= player.nickname || '' %>"
+              class="mt-1 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"
+            >
+          </label>
           <div>
             <label class="block">
               Adresse e-mail actuelle
