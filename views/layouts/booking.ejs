@@ -11,6 +11,11 @@
           year: 'numeric',
           timeZone: 'Europe/Paris'
         }); %>
+        <% const bookingTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'Europe/Paris'
+        }); %>
         <% if (availableEvents.length > 1) { %>
           <% const eventDateFormatter = new Intl.DateTimeFormat('fr-FR', {
             weekday: 'long',
@@ -40,7 +45,7 @@
           </div>
         <% } %>
         <p class="text-fantasy-gold-light text-lg">
-          Rencontre du <%= bookingDateFormatter.format(event.date) %> - Ouverture à 20h30
+          Rencontre du <%= bookingDateFormatter.format(event.date) %> - Ouverture à <%= bookingTimeFormatter.format(event.date) %>
         </p>
         <% if (event.status === 'cancelled') { %>
           <div class="max-w-3xl mx-auto mt-5 p-5 border-2 border-fantasy-red bg-fantasy-red/10 rounded-xl text-left" role="alert">
@@ -50,7 +55,7 @@
           </div>
         <% } else { %>
           <p class="text-fantasy-gold-light/70 text-sm mt-2">
-            Inscriptions jusqu’au <%= bookingDateFormatter.format(event.registrationDeadline) %> - 20h30
+            Inscriptions jusqu’au <%= bookingDateFormatter.format(event.registrationDeadline) %> - <%= bookingTimeFormatter.format(event.registrationDeadline) %>
           </p>
         <% } %>
       <% } else { %>
