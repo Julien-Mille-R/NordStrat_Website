@@ -12,8 +12,8 @@ import { recordAdminAction } from '../services/audit-log.service.js';
 
 const BOOKING_PATH = '/booking';
 
-function discussionPath(tableId, suffix = '') {
-  return `${BOOKING_PATH}?discussion=${tableId}${suffix}#table-${tableId}`;
+function discussionPath(tableId, eventId, suffix = '') {
+  return `${BOOKING_PATH}?event=${eventId}&discussion=${tableId}${suffix}#table-${tableId}`;
 }
 
 export async function openTableDiscussion(req, res, next) {
@@ -37,18 +37,19 @@ export async function openTableDiscussion(req, res, next) {
       setFlash(req, 'error', 'Cette discussion n’existe plus.');
       return res.redirect(BOOKING_PATH);
     }
-
+    
     const newestComment = await TableComment.findOne({
       where: { gameTableId: tableId },
       order: [['createdAt', 'DESC']],
     });
+    
     await TableDiscussionRead.upsert({
       gameTableId: tableId,
       playerId: req.currentUser.id,
       lastReadAt: newestComment?.createdAt || new Date(),
     });
-
-    return res.redirect(discussionPath(tableId));
+    
+    return res.redirect(discussionPath(tableId, gameTable.event.id));  
   } catch (error) {
     return next(error);
   }
@@ -63,7 +64,9 @@ export async function createTableComment(req, res, next) {
       setFlash(req, 'error', 'Le message doit contenir entre 1 et 500 caractères.');
       return res.redirect(Number.isInteger(tableId) ? discussionPath(tableId) : BOOKING_PATH);
     }
-
+    
+    let eventId;
+    
     await sequelize.transaction(async (transaction) => {
       const gameTable = await GameTable.findByPk(tableId, {
         transaction,
@@ -79,6 +82,8 @@ export async function createTableComment(req, res, next) {
         transaction,
       });
       if (!event) throw new Error('TABLE_NOT_FOUND');
+      
+      eventId = event.id;
 
       const comment = await TableComment.create({
         gameTableId: tableId,
@@ -93,7 +98,7 @@ export async function createTableComment(req, res, next) {
     });
 
     setFlash(req, 'success', 'Votre message a été publié.');
-    return res.redirect(discussionPath(tableId));
+    return res.redirect(discussionPath(tableId, eventId));
   } catch (error) {
     if (error.message === 'TABLE_NOT_FOUND') {
       setFlash(req, 'error', 'Cette table n’existe plus.');
@@ -101,7 +106,7 @@ export async function createTableComment(req, res, next) {
     }
     if (error.name === 'SequelizeValidationError') {
       setFlash(req, 'error', 'Le message doit contenir entre 1 et 500 caractères.');
-      return res.redirect(discussionPath(tableId));
+      return res.redirect(discussionPath(tableId, eventId));
     }
     return next(error);
   }
@@ -116,6 +121,9 @@ export async function deleteTableComment(req, res, next) {
     if (!Number.isInteger(tableId) || !Number.isInteger(commentId)) {
       return res.status(400).send('Message invalide.');
     }
+
+    let eventId;
+    
     if (!reason || reason.length < 5 || reason.length > 500) {
       setFlash(req, 'error', 'Le motif de modération doit contenir entre 5 et 500 caractères.');
       return res.redirect(discussionPath(tableId));
@@ -130,6 +138,20 @@ export async function deleteTableComment(req, res, next) {
         lock: transaction.LOCK.UPDATE,
       });
       if (!comment) throw new Error('COMMENT_NOT_FOUND');
+
+      const event = await Event.findOne({
+        where: {
+          id: gameTable.eventId,
+          status: { [Op.in]: ['upcoming', 'ongoing'] },
+          date: { [Op.gte]: new Date() },
+        },
+        transaction,
+      });
+      
+      if (!event) throw new Error('TABLE_NOT_FOUND');
+      
+      eventId = event.id;
+      
       const author = await Player.findByPk(comment.playerId, {
         attributes: ['id', 'nickname', 'firstname', 'lastname'],
         transaction,
@@ -152,11 +174,11 @@ export async function deleteTableComment(req, res, next) {
     });
 
     setFlash(req, 'success', 'Le message a été supprimé.');
-    return res.redirect(discussionPath(tableId));
+    return res.redirect(discussionPath(tableId, eventId));
   } catch (error) {
     if (error.message === 'COMMENT_NOT_FOUND') {
       setFlash(req, 'error', 'Ce message n’existe plus.');
-      return res.redirect(discussionPath(tableId));
+      return res.redirect(discussionPath(tableId, eventId));
     }
     return next(error);
   }
