@@ -2,6 +2,7 @@ import { Op } from 'sequelize';
 import {
   Event,
   Game,
+  GameTable,
   Membership,
 } from '../models/index.js';
 import { currentMembershipSeason } from './membership.controller.js';
@@ -19,10 +20,27 @@ export async function showBookingPage(req, res, next) {
     });
 
     const requestedEventId = Number(req.query.event);
+    const requestedDiscussionId = Number(req.query.discussion);
+    
+    let requestedDiscussionEventId = null;
+    
+    if (Number.isInteger(requestedDiscussionId) && requestedDiscussionId > 0) {
+      const discussionTable = await GameTable.findByPk(requestedDiscussionId, {
+        attributes: ['id', 'eventId'],
+      });
+    
+      requestedDiscussionEventId = discussionTable?.eventId || null;
+    }
+    
+    const requestedEventId = Number(req.query.event);
+    
     const selectedEventId = Number.isInteger(requestedEventId)
       && availableEvents.some((availableEvent) => availableEvent.id === requestedEventId)
       ? requestedEventId
-      : availableEvents[0]?.id || null;
+      : Number.isInteger(requestedDiscussionEventId)
+        && availableEvents.some((availableEvent) => availableEvent.id === requestedDiscussionEventId)
+        ? requestedDiscussionEventId
+        : availableEvents[0]?.id || null;
 
     const event = selectedEventId
       ? await Event.findByPk(selectedEventId, {
