@@ -137,7 +137,6 @@ export async function showBookingPage(req, res, next) {
         canPost: Boolean(currentUser),
       }];
     }));
-    const requestedDiscussionId = Number(req.query.discussion);
     const openDiscussionId = Number.isInteger(requestedDiscussionId)
       && discussionByTableId.has(requestedDiscussionId)
       && currentUser
