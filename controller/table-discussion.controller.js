@@ -20,9 +20,15 @@ export async function openTableDiscussion(req, res, next) {
   const tableId = Number(req.params.tableId);
 
   try {
-    if (!Number.isInteger(tableId)) return res.status(400).send('Table invalide.');
+    if (!Number.isInteger(tableId)) {
+      return res.status(400).send('Table invalide.');
+    }
+
     const gameTable = await GameTable.findOne({
-      where: { id: tableId, status: { [Op.ne]: 'cancelled' } },
+      where: {
+        id: tableId,
+        status: { [Op.ne]: 'cancelled' },
+      },
       include: [{
         association: 'event',
         required: true,
@@ -33,23 +39,26 @@ export async function openTableDiscussion(req, res, next) {
         attributes: ['id'],
       }],
     });
+
     if (!gameTable) {
       setFlash(req, 'error', 'Cette discussion n’existe plus.');
       return res.redirect(BOOKING_PATH);
     }
-    
+
     const newestComment = await TableComment.findOne({
       where: { gameTableId: tableId },
       order: [['createdAt', 'DESC']],
     });
-    
+
     await TableDiscussionRead.upsert({
       gameTableId: tableId,
       playerId: req.currentUser.id,
       lastReadAt: newestComment?.createdAt || new Date(),
     });
-    
-    return res.redirect(discussionPath(tableId, gameTable.event.id));  
+
+    return res.redirect(
+      discussionPath(tableId, gameTable.event.id),
+    );
   } catch (error) {
     return next(error);
   }
@@ -60,19 +69,32 @@ export async function createTableComment(req, res, next) {
   const content = String(req.body.content || '').trim();
 
   try {
-    if (!Number.isInteger(tableId) || content.length < 1 || content.length > 500) {
-      setFlash(req, 'error', 'Le message doit contenir entre 1 et 500 caractères.');
-      return res.redirect(Number.isInteger(tableId) ? discussionPath(tableId) : BOOKING_PATH);
+    if (!Number.isInteger(tableId)) {
+      setFlash(req, 'error', 'Table invalide.');
+      return res.redirect(BOOKING_PATH);
     }
-    
+
+    if (content.length < 1 || content.length > 500) {
+      setFlash(
+        req,
+        'error',
+        'Le message doit contenir entre 1 et 500 caractères.',
+      );
+      return res.redirect(BOOKING_PATH);
+    }
+
     let eventId;
-    
+
     await sequelize.transaction(async (transaction) => {
       const gameTable = await GameTable.findByPk(tableId, {
         transaction,
         lock: transaction.LOCK.SHARE,
       });
-      if (!gameTable || gameTable.status === 'cancelled') throw new Error('TABLE_NOT_FOUND');
+
+      if (!gameTable || gameTable.status === 'cancelled') {
+        throw new Error('TABLE_NOT_FOUND');
+      }
+
       const event = await Event.findOne({
         where: {
           id: gameTable.eventId,
@@ -81,8 +103,11 @@ export async function createTableComment(req, res, next) {
         },
         transaction,
       });
-      if (!event) throw new Error('TABLE_NOT_FOUND');
-      
+
+      if (!event) {
+        throw new Error('TABLE_NOT_FOUND');
+      }
+
       eventId = event.id;
 
       const comment = await TableComment.create({
@@ -90,6 +115,7 @@ export async function createTableComment(req, res, next) {
         playerId: req.currentUser.id,
         content,
       }, { transaction });
+
       await TableDiscussionRead.upsert({
         gameTableId: tableId,
         playerId: req.currentUser.id,
@@ -98,16 +124,25 @@ export async function createTableComment(req, res, next) {
     });
 
     setFlash(req, 'success', 'Votre message a été publié.');
-    return res.redirect(discussionPath(tableId, eventId));
+
+    return res.redirect(
+      discussionPath(tableId, eventId),
+    );
   } catch (error) {
     if (error.message === 'TABLE_NOT_FOUND') {
       setFlash(req, 'error', 'Cette table n’existe plus.');
       return res.redirect(BOOKING_PATH);
     }
+
     if (error.name === 'SequelizeValidationError') {
-      setFlash(req, 'error', 'Le message doit contenir entre 1 et 500 caractères.');
-      return res.redirect(discussionPath(tableId, eventId));
+      setFlash(
+        req,
+        'error',
+        'Le message doit contenir entre 1 et 500 caractères.',
+      );
+      return res.redirect(BOOKING_PATH);
     }
+
     return next(error);
   }
 }
@@ -122,22 +157,38 @@ export async function deleteTableComment(req, res, next) {
       return res.status(400).send('Message invalide.');
     }
 
-    let eventId;
-    
     if (!reason || reason.length < 5 || reason.length > 500) {
-      setFlash(req, 'error', 'Le motif de modération doit contenir entre 5 et 500 caractères.');
-      return res.redirect(discussionPath(tableId));
+      setFlash(
+        req,
+        'error',
+        'Le motif de modération doit contenir entre 5 et 500 caractères.',
+      );
+      return res.redirect(BOOKING_PATH);
     }
 
+    let eventId;
+
     await sequelize.transaction(async (transaction) => {
-      const gameTable = await GameTable.findByPk(tableId, { transaction });
-      if (!gameTable) throw new Error('COMMENT_NOT_FOUND');
+      const gameTable = await GameTable.findByPk(tableId, {
+        transaction,
+      });
+
+      if (!gameTable) {
+        throw new Error('COMMENT_NOT_FOUND');
+      }
+
       const comment = await TableComment.findOne({
-        where: { id: commentId, gameTableId: tableId },
+        where: {
+          id: commentId,
+          gameTableId: tableId,
+        },
         transaction,
         lock: transaction.LOCK.UPDATE,
       });
-      if (!comment) throw new Error('COMMENT_NOT_FOUND');
+
+      if (!comment) {
+        throw new Error('COMMENT_NOT_FOUND');
+      }
 
       const event = await Event.findOne({
         where: {
@@ -147,19 +198,27 @@ export async function deleteTableComment(req, res, next) {
         },
         transaction,
       });
-      
-      if (!event) throw new Error('TABLE_NOT_FOUND');
-      
+
+      if (!event) {
+        throw new Error('TABLE_NOT_FOUND');
+      }
+
       eventId = event.id;
-      
+
       const author = await Player.findByPk(comment.playerId, {
         attributes: ['id', 'nickname', 'firstname', 'lastname'],
         transaction,
       });
-      const authorLabel = author?.nickname || `${author?.firstname || ''} ${author?.lastname || ''}`.trim() || `Membre #${comment.playerId}`;
+
+      const authorLabel =
+        author?.nickname
+        || `${author?.firstname || ''} ${author?.lastname || ''}`.trim()
+        || `Membre #${comment.playerId}`;
+
       const excerpt = comment.content.length > 200
         ? `${comment.content.slice(0, 197).trimEnd()}...`
         : comment.content;
+
       await recordAdminAction({
         admin: req.currentUser,
         category: 'game_tables',
@@ -170,16 +229,28 @@ export async function deleteTableComment(req, res, next) {
         description: `Message #${comment.id} de ${authorLabel} supprimé. Motif : ${reason}. Message concerné : « ${excerpt} »`,
         transaction,
       });
+
       await comment.destroy({ transaction });
     });
 
     setFlash(req, 'success', 'Le message a été supprimé.');
-    return res.redirect(discussionPath(tableId, eventId));
+
+    return res.redirect(
+      discussionPath(tableId, eventId),
+    );
   } catch (error) {
     if (error.message === 'COMMENT_NOT_FOUND') {
       setFlash(req, 'error', 'Ce message n’existe plus.');
-      return res.redirect(discussionPath(tableId, eventId));
+
+      return res.redirect(BOOKING_PATH);
     }
+
+    if (error.message === 'TABLE_NOT_FOUND') {
+      setFlash(req, 'error', 'Cette table n’existe plus.');
+
+      return res.redirect(BOOKING_PATH);
+    }
+
     return next(error);
   }
 }
