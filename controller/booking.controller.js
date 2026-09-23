@@ -32,8 +32,6 @@ export async function showBookingPage(req, res, next) {
       requestedDiscussionEventId = discussionTable?.eventId || null;
     }
     
-    const requestedEventId = Number(req.query.event);
-    
     const selectedEventId = Number.isInteger(requestedEventId)
       && availableEvents.some((availableEvent) => availableEvent.id === requestedEventId)
       ? requestedEventId
