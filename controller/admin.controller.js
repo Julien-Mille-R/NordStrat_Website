@@ -16,7 +16,20 @@ import { currentMembershipSeason } from './membership.controller.js';
 
 export async function showDashboard(req, res, next) {
   try {
+    const isNewsManager = req.currentUser.role.name === 'NewsManager';
+
+    if (isNewsManager) {
+      const newsPostCount = await NewsPost.count();
+
+      return res.render('layouts/admin/adminDashboard', {
+        dashboardStats: {
+          newsPostCount,
+        },
+      });
+    }
+
     const currentSeason = currentMembershipSeason();
+
     const [
       nextEvent,
       activeMemberCount,
@@ -56,7 +69,10 @@ export async function showDashboard(req, res, next) {
         nextEvent,
         activeMemberCount,
         membershipUpToDateCount,
-        membershipMissingCount: Math.max(activeMemberCount - membershipUpToDateCount, 0),
+        membershipMissingCount: Math.max(
+          activeMemberCount - membershipUpToDateCount,
+          0,
+        ),
         membershipSeason: currentSeason.label,
         unreadMessageCount,
         availableGameCount,

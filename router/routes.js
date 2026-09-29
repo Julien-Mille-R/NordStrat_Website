@@ -2,7 +2,9 @@ import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import {
   requireAdmin,
+  requireAdminOrNewsManager,
   requireGuest,
+  requireNewsManager,
   requireTableBooking,
   requireUser,
 } from '../controller/access.controller.js';
@@ -220,9 +222,42 @@ router.post('/tables/:tableId/comments/:commentId/delete', requireAdmin, deleteT
 
 router.get('/admin', (req, res) => res.status(404).send('Page introuvable.'));
 
-router.use('/admindashboard', requireAdmin);
+router.get('/admindashboard', requireAdminOrNewsManager, showDashboard);
 
-router.get('/admindashboard', showDashboard);
+// Les actualités sont accessibles aux Admin et aux NewsManager.
+router.get('/admindashboard/news', requireNewsManager, showNewsAdminList);
+router.get('/admindashboard/news/create', requireNewsManager, showCreateNewsForm);
+
+router.post(
+  '/admindashboard/news/create',
+  requireNewsManager,
+  uploadLimiter,
+  parseNewsImageUpload,
+  createNewsPost,
+);
+
+router.get(
+  '/admindashboard/news/:postId/edit',
+  requireNewsManager,
+  showEditNewsForm,
+);
+
+router.post(
+  '/admindashboard/news/:postId/update',
+  requireNewsManager,
+  uploadLimiter,
+  parseNewsImageUpload,
+  updateNewsPost,
+);
+
+router.post(
+  '/admindashboard/news/:postId/delete',
+  requireNewsManager,
+  deleteNewsPost,
+);
+
+// Tout le reste de l'administration reste réservé aux Admin.
+router.use('/admindashboard', requireAdmin);
 router.get('/admindashboard/statistics', (req, res) => {
   res.render('layouts/admin/adminStatistics');
 });
@@ -240,23 +275,6 @@ router.post(
 router.get('/admindashboard/assaut-de-bruay/applications', showPublicEventApplications);
 router.get('/admindashboard/assaut-de-bruay/applications/:applicationId', showPublicEventApplicationDetails);
 router.post('/admindashboard/assaut-de-bruay/applications/:applicationId/status', updatePublicEventApplication);
-
-router.get('/admindashboard/news', showNewsAdminList);
-router.get('/admindashboard/news/create', showCreateNewsForm);
-router.post(
-  '/admindashboard/news/create',
-  uploadLimiter,
-  parseNewsImageUpload,
-  createNewsPost,
-);
-router.get('/admindashboard/news/:postId/edit', showEditNewsForm);
-router.post(
-  '/admindashboard/news/:postId/update',
-  uploadLimiter,
-  parseNewsImageUpload,
-  updateNewsPost,
-);
-router.post('/admindashboard/news/:postId/delete', deleteNewsPost);
 
 router.get('/admindashboard/inbox', showMessageList);
 router.post('/admindashboard/inbox/:messageId/status', updateMessageStatus);

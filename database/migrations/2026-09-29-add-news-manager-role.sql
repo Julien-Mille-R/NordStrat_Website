@@ -1,0 +1,7 @@
+BEGIN;
+
+INSERT INTO role (name)
+VALUES ('NewsManager')
+ON CONFLICT (name) DO NOTHING;
+
+COMMIT;

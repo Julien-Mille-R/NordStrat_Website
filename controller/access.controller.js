@@ -143,6 +143,32 @@ export function requireGuest(req, res, next) {
   return next();
 }
 
+export function requireNewsManager(req, res, next) {
+  if (!req.currentUser) {
+    setFlash(req, 'error', 'Vous devez être connecté.');
+    return res.redirect('/?auth=login');
+  }
+
+  if (!['Admin', 'NewsManager'].includes(req.currentUser.role.name)) {
+    return res.status(403).send('Accès interdit.');
+  }
+
+  return next();
+}
+
+export function requireAdminOrNewsManager(req, res, next) {
+  if (!req.currentUser) {
+    setFlash(req, 'error', 'Vous devez être connecté.');
+    return res.redirect('/?auth=login');
+  }
+
+  if (!['Admin', 'NewsManager'].includes(req.currentUser.role.name)) {
+    return res.status(403).send('Accès interdit.');
+  }
+
+  return next();
+}
+
 export function requireAdmin(req, res, next) {
   if (!req.currentUser) {
     setFlash(req, 'error', 'Vous devez être connecté.');
