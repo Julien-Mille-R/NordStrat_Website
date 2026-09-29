@@ -192,68 +192,38 @@
         return;
     }
 
-    const blocks = getSelectedBlocks();
+    const selection = window.getSelection();
 
-    if (blocks.length === 0) {
+    if (!selection || selection.rangeCount === 0) {
+        return;
+    }
+
+    const range = selection.getRangeAt(0);
+
+    if (!isRangeInsideEditor(range)) {
+        return;
+    }
+
+    if (range.collapsed) {
         window.alert(
-        'Placez le curseur dans un paragraphe ou sélectionnez les lignes à mettre en liste.',
+        'Placez le curseur dans une ligne ou sélectionnez les lignes à mettre en liste.',
         );
         return;
     }
 
-    // On mémorise l'emplacement AVANT de supprimer les blocs.
-    const firstBlock = blocks[0];
-    const parent = firstBlock.parentNode;
-    const referenceNode = firstBlock;
+    const command = listType === 'ol'
+        ? 'insertOrderedList'
+        : 'insertUnorderedList';
 
-    if (!parent) {
+    const success = document.execCommand(command, false, null);
+
+    if (!success) {
+        console.warn(`La commande ${command} n'a pas pu être exécutée.`);
         return;
     }
 
-    // Évite de traiter plusieurs fois des blocs déjà contenus
-    // dans le même élément de liste.
-    const uniqueBlocks = blocks.filter((block, index) => {
-        const parentLi = block.closest('li');
-
-        if (!parentLi) {
-        return true;
-        }
-
-        return !blocks
-        .slice(0, index)
-        .some((previousBlock) => previousBlock === parentLi);
-    });
-
-    const list = document.createElement(listType);
-
-    uniqueBlocks.forEach((block) => {
-        const item = document.createElement('li');
-
-        while (block.firstChild) {
-        item.appendChild(block.firstChild);
-        }
-
-        list.appendChild(item);
-        block.remove();
-    });
-
-    // On replace la liste exactement à l'emplacement
-    // du premier bloc sélectionné.
-    parent.insertBefore(list, referenceNode);
-
-    // Replace le curseur à la fin de la liste.
-    const newRange = document.createRange();
-    newRange.selectNodeContents(list);
-    newRange.collapse(false);
-
-    const selection = window.getSelection();
-
-    selection.removeAllRanges();
-    selection.addRange(newRange);
-
-    savedRange = newRange.cloneRange();
-
     updateInput();
+    saveSelection();
   };
 
   const createLink = () => {
