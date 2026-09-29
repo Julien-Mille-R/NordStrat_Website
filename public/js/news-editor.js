@@ -100,10 +100,21 @@
         return;
       }
 
-      document.execCommand(command, false, value);
+    if (
+    command === 'insertUnorderedList'
+    || command === 'insertOrderedList'
+    ) {
+    document.execCommand('styleWithCSS', false, false);
+    }
 
-      updateInput();
-      saveSelection();
+    const success = document.execCommand(command, false, value);
+
+    if (!success) {
+    console.warn(`La commande ${command} n'a pas pu être exécutée.`);
+    }
+
+    updateInput();
+    saveSelection();
     });
   });
 
