@@ -49,8 +49,6 @@
                 <div class="overflow-hidden">
                     <div id="carousel" class="flex transition-transform duration-700 ease-out" aria-live="off">
                         <% latestNews.forEach((newsPost, index) => { %>
-                            <% const plainContent = newsPost.content.replace(/\s+/g, ' ').trim(); %>
-                            <% const excerpt = plainContent.length > 260 ? `${plainContent.slice(0, 257).trimEnd()}...` : plainContent; %>
                             <article class="min-w-full grid grid-cols-1 md:grid-cols-[45%_55%] bg-fantasy-darker" aria-label="Actualité <%= index + 1 %> sur <%= latestNews.length %>">
                                 <div class="h-60 sm:h-72 md:h-[28rem] bg-gradient-to-br from-fantasy-brown via-fantasy-dark to-fantasy-darkest overflow-hidden">
                                     <% if (newsPost.imageUrl) { %>
@@ -59,12 +57,25 @@
                                         <div class="w-full h-full flex items-center justify-center text-7xl text-fantasy-gold/30" aria-hidden="true">⚔️</div>
                                     <% } %>
                                 </div>
+
                                 <div class="p-6 sm:p-8 lg:p-12 flex flex-col justify-center items-start">
                                     <time datetime="<%= newsPost.publishedAt.toISOString() %>" class="text-sm uppercase tracking-wider text-fantasy-orange"><%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(newsPost.publishedAt) %></time>
-                                    <h3 class="mt-3 text-2xl sm:text-3xl lg:text-4xl font-fantasy font-bold text-fantasy-gold break-words"><%= newsPost.title %></h3>
-                                    <p class="mt-4 text-fantasy-gold-light font-body text-base sm:text-lg leading-relaxed"><%= excerpt %></p>
-                                    <div class="mt-4"><%- include('../partials/news-author', { author: newsPost.author }) %></div>
-                                    <a href="/news/<%= newsPost.id %>" class="mt-7 px-6 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange transition-colors">Lire l’article</a>
+
+                                    <h3 class="mt-3 text-2xl sm:text-3xl lg:text-4xl font-fantasy font-bold text-fantasy-gold break-words">
+                                        <%= newsPost.title %>
+                                    </h3>
+
+                                    <p class="mt-4 text-fantasy-gold-light font-body text-base sm:text-lg leading-relaxed">
+                                        <%= newsPost.excerpt %>
+                                    </p>
+
+                                    <div class="mt-4">
+                                        <%- include('../partials/news-author', { author: newsPost.author }) %>
+                                    </div>
+
+                                    <a href="/news/<%= newsPost.id %>" class="mt-7 px-6 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange transition-colors">
+                                        Lire l’article
+                                    </a>
                                 </div>
                             </article>
                         <% }) %>
@@ -74,19 +85,31 @@
                 <% if (latestNews.length > 1) { %>
                     <div class="min-h-16 px-4 sm:px-6 flex items-center justify-between gap-4 border-t border-fantasy-gold/20 bg-fantasy-dark">
                         <button id="prev" type="button" aria-label="Actualité précédente" class="w-10 h-10 rounded-full border border-fantasy-gold/50 text-fantasy-gold text-2xl font-bold hover:bg-fantasy-gold hover:text-fantasy-darkest transition-colors">‹</button>
+
                         <div class="flex items-center gap-4">
                             <div class="flex items-center gap-2" aria-label="Choisir une actualité">
                                 <% latestNews.forEach((newsPost, index) => { %>
-                                    <button type="button" data-carousel-index="<%= index %>" aria-label="Afficher l’actualité <%= index + 1 %>" aria-current="<%= index === 0 ? 'true' : 'false' %>" class="news-carousel-dot group flex h-6 w-6 items-center justify-center rounded-full">
+                                    <button
+                                        type="button"
+                                        data-carousel-index="<%= index %>"
+                                        aria-label="Afficher l’actualité <%= index + 1 %>"
+                                        aria-current="<%= index === 0 ? 'true' : 'false' %>"
+                                        class="news-carousel-dot group flex h-6 w-6 items-center justify-center rounded-full"
+                                    >
                                         <span class="block h-2.5 w-2.5 rounded-full bg-fantasy-gold/25 transition group-aria-[current=true]:scale-125 group-aria-[current=true]:bg-fantasy-orange"></span>
                                     </button>
                                 <% }) %>
                             </div>
-                            <span id="newsCarouselCounter" class="text-sm tabular-nums text-fantasy-gold-light/65">1 / <%= latestNews.length %></span>
+
+                            <span id="newsCarouselCounter" class="text-sm tabular-nums text-fantasy-gold-light/65">
+                                1 / <%= latestNews.length %>
+                            </span>
+
                             <button id="carouselAutoplay" type="button" aria-pressed="false" class="min-h-10 px-3 rounded-lg border border-fantasy-gold/40 text-sm font-bold text-fantasy-gold hover:bg-fantasy-brown">
-                              <span data-carousel-autoplay-label>Pause</span>
+                                <span data-carousel-autoplay-label>Pause</span>
                             </button>
                         </div>
+
                         <button id="next" type="button" aria-label="Actualité suivante" class="w-10 h-10 rounded-full border border-fantasy-gold/50 text-fantasy-gold text-2xl font-bold hover:bg-fantasy-gold hover:text-fantasy-darkest transition-colors">›</button>
                     </div>
                 <% } %>
@@ -137,6 +160,7 @@
                 <p class="text-fantasy-gold-light font-body text-lg leading-relaxed italic">
                     Que vous soyez débutant ou un vétéran du hobby, vous êtes les bienvenus !
                 </p>
+
                 <div class="mt-6 pt-6 border-t border-fantasy-gold/20 text-center">
                     <p class="text-fantasy-gold-light font-body text-lg leading-relaxed">
                         💬 <span class="text-fantasy-orange font-bold">Envie d'échanger avec nous ?</span><br>
@@ -161,38 +185,27 @@
             <!-- Galerie tactile sur mobile, grille sur tablette et ordinateur -->
             <div class="min-w-0">
                 <p class="mb-3 text-sm text-fantasy-gold-light/65 md:hidden">Faites glisser les photos pour découvrir l’association →</p>
+
                 <div class="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 md:grid md:grid-cols-2 md:overflow-visible md:pb-0" aria-label="Photos de l’association">
-                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
-                            hover:shadow-glow-gold transition-all duration-300">
-                    <img src="/images/asso1.jpg" alt="" loading="lazy"
-                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
-                                transition-all duration-300"></div>
-                </div>
-                
-                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
-                            hover:shadow-glow-gold transition-all duration-300">
-                    <img src="/images/asso2.jpg" alt="" loading="lazy"
-                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
-                                transition-all duration-300"></div>
-                </div>
-                
-                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
-                            hover:shadow-glow-gold transition-all duration-300">
-                    <img src="/images/asso3.jpg" alt="" loading="lazy"
-                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
-                                transition-all duration-300"></div>
-                </div>
-                
-                <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0
-                            hover:shadow-glow-gold transition-all duration-300">
-                    <img src="/images/asso4.jpg" alt="" loading="lazy"
-                         class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 
-                                transition-all duration-300"></div>
-                </div>
+                    <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0 hover:shadow-glow-gold transition-all duration-300">
+                        <img src="/images/asso1.jpg" alt="" loading="lazy" class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 transition-all duration-300"></div>
+                    </div>
+                    
+                    <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0 hover:shadow-glow-gold transition-all duration-300">
+                        <img src="/images/asso2.jpg" alt="" loading="lazy" class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 transition-all duration-300"></div>
+                    </div>
+                    
+                    <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-0 md:min-w-0 hover:shadow-glow-gold transition-all duration-300">
+                        <img src="/images/asso3.jpg" alt="" loading="lazy" class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 transition-all duration-300"></div>
+                    </div>
+                    
+                    <div class="relative group min-w-[88%] snap-center overflow-hidden rounded-lg border-3 border-fantasy-gold shadow-lg sm:min-w-[72%] md:min-w-0 hover:shadow-glow-gold transition-all duration-300">
+                        <img src="/images/asso4.jpg" alt="" loading="lazy" class="w-full h-48 sm:h-56 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-fantasy-darkest/0 group-hover:bg-fantasy-darkest/60 transition-all duration-300"></div>
+                    </div>
                 </div>
             </div>
 
@@ -211,11 +224,11 @@
         </h2>
 
         <p class="-mt-5 mb-4 text-sm text-fantasy-gold-light/65 md:hidden">Faites glisser pour parcourir nos activités →</p>
+
         <div class="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 xl:grid-cols-4 xl:gap-8">
 
             <!-- Carte Wargames -->
-            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
-                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
                 <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">⚔️📏</div>
                 <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Wargames</h3>
                 <p class="text-fantasy-gold-light font-body leading-relaxed">
@@ -224,8 +237,7 @@
             </article>
 
             <!-- Carte Plateau et Dungeon Crawler -->
-            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
-                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
                 <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">🗺️🎲</div>
                 <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Dungeon Crawlers et jeux de plateau</h3>
                 <p class="text-fantasy-gold-light font-body leading-relaxed">
@@ -234,8 +246,7 @@
             </article>
 
             <!-- Carte Modélisme -->
-            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
-                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
                 <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">🎨🪚</div>
                 <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Modélisme & DIY</h3>
                 <p class="text-fantasy-gold-light font-body leading-relaxed">
@@ -244,8 +255,7 @@
             </article>
 
             <!-- Carte Impression 3D -->
-            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy
-                        hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
+            <article class="min-w-[88%] snap-center bg-fantasy-brown border-3 border-fantasy-gold rounded-xl p-5 sm:min-w-[72%] sm:p-8 md:min-w-0 shadow-fantasy hover:shadow-glow-gold transition-all duration-300 hover:-translate-y-2 group">
                 <div class="text-6xl mb-4 text-fantasy-orange group-hover:animate-float">💻🛠</div>
                 <h3 class="text-2xl font-fantasy font-bold text-fantasy-gold mb-4">Impression 3D </h3>
                 <p class="text-fantasy-gold-light font-body leading-relaxed">
@@ -278,11 +288,11 @@
             L'inscription est ouverte à tous, petits et grands.
         </p>
 
-    <button type="button" data-open-auth="register"
-           class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-3 border-fantasy-gold text-fantasy-gold font-fantasy font-bold text-lg rounded-lg
-                      hover:bg-fantasy-gold hover:text-fantasy-darkest transition-all duration-300">
+        <button type="button" data-open-auth="register"
+               class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-3 border-fantasy-gold text-fantasy-gold font-fantasy font-bold text-lg rounded-lg
+                          hover:bg-fantasy-gold hover:text-fantasy-darkest transition-all duration-300">
             ⚔️ Je m'inscris maintenant !
-    </button>
+        </button>
         
         <p class="mt-8 text-fantasy-gold-light font-body text-sm">
             Ou venez nous rendre visite lors de nos rencontres du vendredi !
