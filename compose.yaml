@@ -118,6 +118,7 @@ services:
     volumes:
       - uploads_data:/app/data/uploads
       - archives_data:/app/data/archives
+      - /opt/nordstrat/stats:/app/data/stats:ro
     depends_on:
       db:
         condition: service_healthy

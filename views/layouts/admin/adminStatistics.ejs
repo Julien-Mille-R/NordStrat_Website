@@ -1,0 +1,63 @@
+<%- include('../../partials/header') %>
+
+<section class="pt-28 pb-12 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-7xl">
+
+    <header class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6">
+      <div>
+        <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">
+          Espace administrateur
+        </p>
+
+        <h1 class="text-4xl md:text-5xl font-fantasy text-fantasy-gold mt-1">
+          Statistiques
+        </h1>
+
+        <p class="text-fantasy-gold-light mt-2">
+          Analyse des visites et de l’utilisation du site.
+        </p>
+      </div>
+
+      <a
+        href="/admindashboard"
+        class="inline-flex items-center justify-center px-4 py-2 rounded-xl border border-fantasy-gold/25 bg-fantasy-dark text-fantasy-gold-light hover:border-fantasy-orange hover:text-fantasy-orange transition"
+      >
+        ← Retour au tableau de bord
+      </a>
+    </header>
+
+    <div class="bg-fantasy-dark border-2 border-fantasy-gold/25 rounded-2xl overflow-hidden shadow-xl">
+      <div class="px-5 py-4 border-b border-fantasy-gold/15 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <h2 class="text-xl font-fantasy text-fantasy-gold">
+            Statistiques de fréquentation
+          </h2>
+          <p class="text-sm text-fantasy-gold-light mt-1">
+            Rapport GoAccess — actualisation automatique toutes les 15 minutes.
+          </p>
+        </div>
+
+        <a
+          href="/admindashboard/statistics/report"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm text-fantasy-orange hover:underline"
+        >
+          Ouvrir le rapport seul ↗
+        </a>
+      </div>
+
+      <div class="bg-white">
+        <iframe
+          src="/admindashboard/statistics/report"
+          title="Statistiques GoAccess"
+          class="w-full border-0"
+          style="height: 80vh; min-height: 900px;"
+        ></iframe>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<%- include('../../partials/footer') %>
