@@ -2,7 +2,6 @@ import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import {
   requireAdmin,
-  requireAdminOrNewsManager,
   requireGuest,
   requireNewsManager,
   requireTableBooking,
@@ -222,7 +221,7 @@ router.post('/tables/:tableId/comments/:commentId/delete', requireAdmin, deleteT
 
 router.get('/admin', (req, res) => res.status(404).send('Page introuvable.'));
 
-router.get('/admindashboard', requireAdminOrNewsManager, showDashboard);
+router.get('/admindashboard', requireNewsManager, showDashboard);
 
 // Les actualités sont accessibles aux Admin et aux NewsManager.
 router.get('/admindashboard/news', requireNewsManager, showNewsAdminList);
