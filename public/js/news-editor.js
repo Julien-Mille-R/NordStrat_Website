@@ -50,26 +50,6 @@
     }
   };
 
-  const getSelectedTextLines = () => {
-    if (!savedRange) return [];
-
-    const fragment = savedRange.cloneContents();
-
-    const temporaryContainer = document.createElement('div');
-    temporaryContainer.appendChild(fragment);
-
-    const text = temporaryContainer.innerText
-      .replace(/\u00a0/g, ' ')
-      .trim();
-
-    if (!text) return [];
-
-    return text
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean);
-  };
-
   const replaceSelectionWithList = (listType) => {
     if (!restoreSelection()) {
       return;
@@ -87,49 +67,24 @@
       return;
     }
 
-    const selectedText = range.toString()
-      .replace(/\u00a0/g, ' ')
-      .trim();
-
-    if (!selectedText) {
+    if (range.collapsed) {
       window.alert('Sélectionnez au moins une ligne pour créer une liste.');
       return;
     }
 
-    const lines = selectedText
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean);
+    const command = listType === 'ol'
+      ? 'insertOrderedList'
+      : 'insertUnorderedList';
 
-    if (lines.length === 0) {
+    const success = document.execCommand(command, false, null);
+
+    if (!success) {
+      console.warn(`La commande ${command} n'a pas pu être exécutée.`);
       return;
     }
 
-    const list = document.createElement(listType);
-
-    lines.forEach((line) => {
-      const item = document.createElement('li');
-      item.textContent = line;
-      list.appendChild(item);
-    });
-
-    range.deleteContents();
-    range.insertNode(list);
-
-    /*
-     * Place le curseur après la liste afin de permettre
-     * de continuer à écrire normalement.
-     */
-    const newRange = document.createRange();
-    newRange.selectNodeContents(list);
-    newRange.collapse(false);
-
-    selection.removeAllRanges();
-    selection.addRange(newRange);
-
-    savedRange = newRange.cloneRange();
-
     updateInput();
+    saveSelection();
   };
 
   const createLink = () => {
@@ -180,8 +135,9 @@
       const value = button.dataset.editorValue || null;
 
       /*
-       * Les listes sont gérées nous-mêmes car execCommand()
-       * est peu fiable avec contenteditable.
+       * Les listes utilisent directement les commandes natives
+       * du navigateur, qui savent gérer correctement les blocs
+       * sélectionnés dans un contenteditable.
        */
       if (command === 'insertUnorderedList') {
         replaceSelectionWithList('ul');

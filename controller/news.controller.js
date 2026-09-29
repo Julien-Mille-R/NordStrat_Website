@@ -73,8 +73,10 @@ export function parseNewsImageUpload(req, res, next) {
     const formPath = req.params.postId
       ? `/admindashboard/news/${req.params.postId}/edit`
       : '/admindashboard/news/create';
+
     const invalidFile = error instanceof multer.MulterError
       || error.message === 'INVALID_NEWS_IMAGE_TYPE';
+
     setFlash(
       req,
       'error',
@@ -82,6 +84,7 @@ export function parseNewsImageUpload(req, res, next) {
         ? 'L’image doit être au format JPEG, PNG ou WebP et ne pas dépasser 5 Mo.'
         : 'Impossible de recevoir cette image.',
     );
+
     return res.redirect(formPath);
   });
 }
@@ -96,6 +99,7 @@ export async function showNewsAdminList(req, res, next) {
       include: [{ association: 'author' }],
       order: [['publishedAt', 'DESC']],
     });
+
     return res.render('layouts/admin/news-list', { newsPosts });
   } catch (error) {
     return next(error);
@@ -105,7 +109,11 @@ export async function showNewsAdminList(req, res, next) {
 export async function showEditNewsForm(req, res, next) {
   try {
     const newsPost = await NewsPost.findByPk(Number(req.params.postId));
-    if (!newsPost) return res.status(404).send('Actualité introuvable.');
+
+    if (!newsPost) {
+      return res.status(404).send('Actualité introuvable.');
+    }
+
     return res.render('layouts/admin/news-form', { newsPost });
   } catch (error) {
     return next(error);
@@ -130,6 +138,7 @@ export async function createNewsPost(req, res, next) {
         'error',
         'Le titre doit contenir 3 à 150 caractères et le contenu 20 à 50 000 caractères.',
       );
+
       return res.redirect('/admindashboard/news/create');
     }
 
@@ -143,6 +152,7 @@ export async function createNewsPost(req, res, next) {
         authorId: req.currentUser.id,
         publishedAt: new Date(),
       }, { transaction });
+
       await recordAdminAction({
         admin: req.currentUser,
         category: 'news',
@@ -153,21 +163,38 @@ export async function createNewsPost(req, res, next) {
         description: 'Actualité publiée.',
         transaction,
       });
+
       return createdPost;
     });
 
     setFlash(req, 'success', 'L’actualité a été publiée.');
+
     return res.redirect(`/news/${newsPost.id}`);
   } catch (error) {
-    if (uploadedImage) await deleteUploadedImage(uploadedImage.imageUrl, 'news');
+    if (uploadedImage) {
+      await deleteUploadedImage(uploadedImage.imageUrl, 'news');
+    }
+
     if (error.message === 'INVALID_NEWS_IMAGE_CONTENT') {
-      setFlash(req, 'error', 'Le contenu du fichier ne correspond pas à une image autorisée.');
+      setFlash(
+        req,
+        'error',
+        'Le contenu du fichier ne correspond pas à une image autorisée.',
+      );
+
       return res.redirect('/admindashboard/news/create');
     }
+
     if (error.name === 'SequelizeValidationError') {
-      setFlash(req, 'error', 'Impossible de publier cette actualité. Vérifiez son contenu.');
+      setFlash(
+        req,
+        'error',
+        'Impossible de publier cette actualité. Vérifiez son contenu.',
+      );
+
       return res.redirect('/admindashboard/news/create');
     }
+
     return next(error);
   }
 }
@@ -181,7 +208,11 @@ export async function updateNewsPost(req, res, next) {
 
   try {
     const newsPost = await NewsPost.findByPk(postId);
-    if (!newsPost) return res.status(404).send('Actualité introuvable.');
+
+    if (!newsPost) {
+      return res.status(404).send('Actualité introuvable.');
+    }
+
     if (
       title.length < 3
       || title.length > 150
@@ -193,16 +224,27 @@ export async function updateNewsPost(req, res, next) {
         'error',
         'Le titre doit contenir 3 à 150 caractères et le contenu 20 à 50 000 caractères.',
       );
+
       return res.redirect(`/admindashboard/news/${postId}/edit`);
     }
 
     uploadedImage = await saveUploadedNewsImage(req.file);
+
     const previousImageUrl = newsPost.imageUrl;
     const removeImage = req.body.removeImage === 'on';
-    const imageUrl = uploadedImage?.imageUrl || (removeImage ? null : previousImageUrl);
+    const imageUrl = uploadedImage?.imageUrl
+      || (removeImage ? null : previousImageUrl);
 
     await sequelize.transaction(async (transaction) => {
-      await newsPost.update({ title, content, imageUrl }, { transaction });
+      await newsPost.update(
+        {
+          title,
+          content,
+          imageUrl,
+        },
+        { transaction },
+      );
+
       await recordAdminAction({
         admin: req.currentUser,
         category: 'news',
@@ -214,18 +256,32 @@ export async function updateNewsPost(req, res, next) {
         transaction,
       });
     });
+
     if ((uploadedImage || removeImage) && previousImageUrl) {
       await deleteUploadedImage(previousImageUrl, 'news');
     }
 
     setFlash(req, 'success', 'L’actualité a été modifiée.');
+
     return res.redirect(`/news/${newsPost.id}`);
   } catch (error) {
-    if (uploadedImage) await deleteUploadedImage(uploadedImage.imageUrl, 'news');
-    if (error.message === 'INVALID_NEWS_IMAGE_CONTENT' || error.name === 'SequelizeValidationError') {
-      setFlash(req, 'error', 'Impossible de modifier cette actualité. Vérifiez son contenu et son image.');
+    if (uploadedImage) {
+      await deleteUploadedImage(uploadedImage.imageUrl, 'news');
+    }
+
+    if (
+      error.message === 'INVALID_NEWS_IMAGE_CONTENT'
+      || error.name === 'SequelizeValidationError'
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Impossible de modifier cette actualité. Vérifiez son contenu et son image.',
+      );
+
       return res.redirect(`/admindashboard/news/${postId}/edit`);
     }
+
     return next(error);
   }
 }
@@ -233,8 +289,13 @@ export async function updateNewsPost(req, res, next) {
 export async function deleteNewsPost(req, res, next) {
   try {
     const newsPost = await NewsPost.findByPk(Number(req.params.postId));
-    if (!newsPost) return res.status(404).send('Actualité introuvable.');
+
+    if (!newsPost) {
+      return res.status(404).send('Actualité introuvable.');
+    }
+
     const imageUrl = newsPost.imageUrl;
+
     await sequelize.transaction(async (transaction) => {
       await recordAdminAction({
         admin: req.currentUser,
@@ -246,10 +307,14 @@ export async function deleteNewsPost(req, res, next) {
         description: 'Actualité supprimée.',
         transaction,
       });
+
       await newsPost.destroy({ transaction });
     });
+
     await deleteUploadedImage(imageUrl, 'news');
+
     setFlash(req, 'success', 'L’actualité a été supprimée.');
+
     return res.redirect('/admindashboard/news');
   } catch (error) {
     return next(error);
@@ -262,6 +327,22 @@ export async function showNewsList(req, res, next) {
       include: [{ association: 'author' }],
       order: [['publishedAt', 'DESC']],
     });
+
+    for (const newsPost of newsPosts) {
+      const plainContent = sanitizeHtml(newsPost.content, {
+        allowedTags: [],
+        allowedAttributes: {},
+      })
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const excerpt = plainContent.length > 190
+        ? `${plainContent.slice(0, 187).trimEnd()}...`
+        : plainContent;
+
+      newsPost.setDataValue('excerpt', excerpt);
+    }
+
     return res.render('layouts/news-list', { newsPosts });
   } catch (error) {
     return next(error);
@@ -273,18 +354,28 @@ export async function showNewsDetails(req, res, next) {
     const newsPost = await NewsPost.findByPk(Number(req.params.postId), {
       include: [{ association: 'author' }],
     });
-    if (!newsPost) return res.status(404).send('Actualité introuvable.');
+
+    if (!newsPost) {
+      return res.status(404).send('Actualité introuvable.');
+    }
+
     const plainContent = sanitizeHtml(newsPost.content, {
       allowedTags: [],
       allowedAttributes: {},
-    }).replace(/\s+/g, ' ').trim();
+    })
+      .replace(/\s+/g, ' ')
+      .trim();
+
     const description = plainContent.length > 155
       ? `${plainContent.slice(0, 152).trimEnd()}...`
       : plainContent;
+
     const canonicalPath = `/news/${newsPost.id}`;
     const canonicalUrl = `${res.locals.seo.baseUrl}${canonicalPath}`;
+
     const authorName = newsPost.author.nickname
       || `${newsPost.author.firstname} ${newsPost.author.lastname}`;
+
     applySeo(res, {
       title: `${newsPost.title} | Nord Stratégie`,
       description,
@@ -301,7 +392,9 @@ export async function showNewsDetails(req, res, next) {
         datePublished: newsPost.publishedAt.toISOString(),
         dateModified: newsPost.updatedAt.toISOString(),
         mainEntityOfPage: canonicalUrl,
-        ...(newsPost.imageUrl ? { image: `${res.locals.seo.baseUrl}${newsPost.imageUrl}` } : {}),
+        ...(newsPost.imageUrl
+          ? { image: `${res.locals.seo.baseUrl}${newsPost.imageUrl}` }
+          : {}),
         author: {
           '@type': 'Person',
           name: authorName,
@@ -313,6 +406,7 @@ export async function showNewsDetails(req, res, next) {
         },
       }],
     });
+
     return res.render('layouts/news-details', { newsPost });
   } catch (error) {
     return next(error);
