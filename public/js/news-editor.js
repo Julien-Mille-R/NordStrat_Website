@@ -8,38 +8,84 @@
 
   if (!form || !editor || !input) return;
 
+  let savedRange = null;
+
+  const saveSelection = () => {
+    const selection = window.getSelection();
+
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+
+    if (editor.contains(range.commonAncestorContainer)) {
+      savedRange = range.cloneRange();
+    }
+  };
+
+  const restoreSelection = () => {
+    editor.focus();
+
+    if (!savedRange) return;
+
+    const selection = window.getSelection();
+
+    selection.removeAllRanges();
+    selection.addRange(savedRange);
+  };
+
   const updateInput = () => {
     input.value = editor.innerHTML.trim();
 
     const text = editor.innerText.replace(/\u00a0/g, ' ').trim();
 
     if (counter) {
-      counter.textContent = `${text.length.toLocaleString('fr-FR')} caractère${text.length > 1 ? 's' : ''}`;
+      counter.textContent =
+        `${text.length.toLocaleString('fr-FR')} caractère${text.length > 1 ? 's' : ''}`;
     }
   };
 
-  const restoreSelection = () => {
-    editor.focus();
-  };
-
   const createLink = () => {
+    restoreSelection();
+
     const url = window.prompt('Adresse du lien :');
 
     if (!url) return;
 
     const trimmedUrl = url.trim();
 
-    if (!/^https?:\/\//i.test(trimmedUrl) && !/^mailto:/i.test(trimmedUrl)) {
+    if (
+      !/^https?:\/\//i.test(trimmedUrl)
+      && !/^mailto:/i.test(trimmedUrl)
+    ) {
       window.alert('Le lien doit commencer par https:// ou mailto:');
       return;
     }
 
     document.execCommand('createLink', false, trimmedUrl);
+
     updateInput();
+    saveSelection();
   };
+
+  /*
+   * Sauvegarde la sélection avant que le bouton de toolbar
+   * ne fasse perdre le focus à l'éditeur.
+   */
+  editor.addEventListener('mouseup', saveSelection);
+  editor.addEventListener('keyup', saveSelection);
+  editor.addEventListener('input', () => {
+    saveSelection();
+    updateInput();
+  });
 
   document.querySelectorAll('[data-editor-command]').forEach((button) => {
     button.addEventListener('mousedown', (event) => {
+      /*
+       * Important :
+       * on sauvegarde la sélection AVANT d'empêcher le navigateur
+       * de déplacer le focus vers le bouton.
+       */
+      saveSelection();
       event.preventDefault();
     });
 
@@ -55,14 +101,17 @@
       }
 
       document.execCommand(command, false, value);
+
       updateInput();
+      saveSelection();
     });
   });
 
-  editor.addEventListener('input', updateInput);
-
   editor.addEventListener('paste', () => {
-    window.setTimeout(updateInput, 0);
+    window.setTimeout(() => {
+      updateInput();
+      saveSelection();
+    }, 0);
   });
 
   document.querySelector('[data-editor-action="preview"]')?.addEventListener('click', () => {
