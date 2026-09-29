@@ -1,4 +1,5 @@
 import multer from 'multer';
+import sanitizeHtml from 'sanitize-html';
 import { NewsPost, sequelize } from '../models/index.js';
 import { setFlash, validateMultipartCsrfToken } from './access.controller.js';
 import { recordAdminAction } from '../services/audit-log.service.js';
@@ -6,6 +7,50 @@ import { applySeo } from './seo.controller.js';
 import { deleteUploadedImage, saveUploadedImage } from '../services/upload-storage.service.js';
 
 const MAX_NEWS_IMAGE_SIZE = 5 * 1024 * 1024;
+
+const NEWS_CONTENT_MAX_LENGTH = 50000;
+
+const NEWS_HTML_SANITIZE_OPTIONS = {
+  allowedTags: [
+    'p',
+    'br',
+    'strong',
+    'b',
+    'em',
+    'i',
+    'u',
+    'h2',
+    'h3',
+    'ul',
+    'ol',
+    'li',
+    'a',
+    'blockquote',
+    'table',
+    'thead',
+    'tbody',
+    'tr',
+    'th',
+    'td',
+    'hr',
+    'img',
+  ],
+  allowedAttributes: {
+    a: ['href', 'target', 'rel'],
+    img: ['src', 'alt', 'width', 'height'],
+    th: ['colspan', 'rowspan'],
+    td: ['colspan', 'rowspan'],
+  },
+  allowedSchemes: ['http', 'https', 'mailto'],
+  allowedSchemesByTag: {
+    img: ['http', 'https'],
+  },
+  allowProtocolRelative: false,
+};
+
+function sanitizeNewsContent(content) {
+  return sanitizeHtml(content, NEWS_HTML_SANITIZE_OPTIONS).trim();
+}
 
 const newsImageUpload = multer({
   storage: multer.memoryStorage(),
@@ -69,12 +114,22 @@ export async function showEditNewsForm(req, res, next) {
 
 export async function createNewsPost(req, res, next) {
   const title = req.body.title?.trim() || '';
-  const content = req.body.content?.trim() || '';
+  const rawContent = req.body.content || '';
+  const content = sanitizeNewsContent(rawContent);
   let uploadedImage;
 
   try {
-    if (title.length < 3 || title.length > 150 || content.length < 20 || content.length > 10000) {
-      setFlash(req, 'error', 'Le titre doit contenir 3 à 150 caractères et le texte 20 à 10 000 caractères.');
+    if (
+      title.length < 3
+      || title.length > 150
+      || content.length < 20
+      || content.length > NEWS_CONTENT_MAX_LENGTH
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Le titre doit contenir 3 à 150 caractères et le contenu 20 à 50 000 caractères.',
+      );
       return res.redirect('/admindashboard/news/create');
     }
 
@@ -120,14 +175,24 @@ export async function createNewsPost(req, res, next) {
 export async function updateNewsPost(req, res, next) {
   const postId = Number(req.params.postId);
   const title = req.body.title?.trim() || '';
-  const content = req.body.content?.trim() || '';
+  const rawContent = req.body.content || '';
+  const content = sanitizeNewsContent(rawContent);
   let uploadedImage;
 
   try {
     const newsPost = await NewsPost.findByPk(postId);
     if (!newsPost) return res.status(404).send('Actualité introuvable.');
-    if (title.length < 3 || title.length > 150 || content.length < 20 || content.length > 10000) {
-      setFlash(req, 'error', 'Le titre doit contenir 3 à 150 caractères et le texte 20 à 10 000 caractères.');
+    if (
+      title.length < 3
+      || title.length > 150
+      || content.length < 20
+      || content.length > NEWS_CONTENT_MAX_LENGTH
+    ) {
+      setFlash(
+        req,
+        'error',
+        'Le titre doit contenir 3 à 150 caractères et le contenu 20 à 50 000 caractères.',
+      );
       return res.redirect(`/admindashboard/news/${postId}/edit`);
     }
 
@@ -209,7 +274,10 @@ export async function showNewsDetails(req, res, next) {
       include: [{ association: 'author' }],
     });
     if (!newsPost) return res.status(404).send('Actualité introuvable.');
-    const plainContent = newsPost.content.replace(/\s+/g, ' ').trim();
+    const plainContent = sanitizeHtml(newsPost.content, {
+      allowedTags: [],
+      allowedAttributes: {},
+    }).replace(/\s+/g, ' ').trim();
     const description = plainContent.length > 155
       ? `${plainContent.slice(0, 152).trimEnd()}...`
       : plainContent;

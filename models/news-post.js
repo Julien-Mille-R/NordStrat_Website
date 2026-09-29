@@ -11,10 +11,18 @@ export default function defineNewsPost(sequelize) {
     content: {
       type: DataTypes.TEXT,
       allowNull: false,
-      validate: { len: [20, 10000] },
+      validate: { len: [20, 50000] },
     },
-    imageUrl: { type: DataTypes.TEXT, allowNull: true, field: 'image_url' },
-    authorId: { type: DataTypes.INTEGER, allowNull: false, field: 'author_id' },
+    imageUrl: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      field: 'image_url',
+    },
+    authorId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'author_id',
+    },
     publishedAt: {
       type: DataTypes.DATE,
       allowNull: false,
