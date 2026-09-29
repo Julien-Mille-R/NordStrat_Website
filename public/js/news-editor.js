@@ -189,26 +189,37 @@
    */
   const formatSelectedList = (listType) => {
     if (!restoreSelection()) {
-      return;
+        return;
     }
 
     const blocks = getSelectedBlocks();
 
     if (blocks.length === 0) {
-      window.alert('Placez le curseur dans un paragraphe ou sélectionnez les lignes à mettre en liste.');
-      return;
+        window.alert(
+        'Placez le curseur dans un paragraphe ou sélectionnez les lignes à mettre en liste.',
+        );
+        return;
     }
 
-    /*
-     * Évite de traiter deux fois des éléments qui sont déjà
-     * à l'intérieur d'un même <li>.
-     */
+    // On mémorise l'emplacement AVANT de supprimer les blocs.
+    const firstBlock = blocks[0];
+    const parent = firstBlock.parentNode;
+    const referenceNode = firstBlock;
+
+    if (!parent) {
+        return;
+    }
+
+    // Évite de traiter plusieurs fois des blocs déjà contenus
+    // dans le même élément de liste.
     const uniqueBlocks = blocks.filter((block, index) => {
-      const parentLi = block.closest('li');
+        const parentLi = block.closest('li');
 
-      if (!parentLi) return true;
+        if (!parentLi) {
+        return true;
+        }
 
-      return !blocks
+        return !blocks
         .slice(0, index)
         .some((previousBlock) => previousBlock === parentLi);
     });
@@ -216,32 +227,22 @@
     const list = document.createElement(listType);
 
     uniqueBlocks.forEach((block) => {
-      const item = document.createElement('li');
+        const item = document.createElement('li');
 
-      while (block.firstChild) {
+        while (block.firstChild) {
         item.appendChild(block.firstChild);
-      }
+        }
 
-      list.appendChild(item);
-      block.remove();
+        list.appendChild(item);
+        block.remove();
     });
 
-    /*
-     * On insère la liste à l'endroit du premier bloc sélectionné.
-     */
-    const firstBlock = blocks[0];
+    // On replace la liste exactement à l'emplacement
+    // du premier bloc sélectionné.
+    parent.insertBefore(list, referenceNode);
 
-    if (firstBlock.parentNode) {
-      firstBlock.parentNode.insertBefore(list, firstBlock);
-    } else {
-      editor.appendChild(list);
-    }
-
-    /*
-     * Replace le curseur à la fin de la nouvelle liste.
-     */
+    // Replace le curseur à la fin de la liste.
     const newRange = document.createRange();
-
     newRange.selectNodeContents(list);
     newRange.collapse(false);
 
