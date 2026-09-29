@@ -1,4 +1,3 @@
-```ejs
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -90,5 +89,65 @@
                 </form>
               <% } else { %>
                 <button id="btnConnexion" type="button" class="w-full px-4 py-3 text-left rounded-lg text-fantasy-gold-light hover:bg-fantasy-brown hover:text-fantasy-gold">Connexion</button>
-                <button id="btnInscription
-```
+                <button id="btnInscription" type="button" class="w-full px-4 py-3 text-left rounded-lg text-fantasy-orange hover:bg-fantasy-brown">Créer un compte</button>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <div class="xl:hidden flex items-center gap-2 shrink-0">
+          <a href="/" aria-label="Retour à l’accueil" title="Accueil" <%= navigationPath === '/' ? 'aria-current="page"' : '' %> class="w-11 h-11 flex items-center justify-center rounded-lg border transition-colors <%= navigationPath === '/' ? 'bg-fantasy-brown border-fantasy-gold text-fantasy-gold' : 'border-fantasy-gold/50 text-fantasy-gold hover:bg-fantasy-brown' %>">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 11 9-8 9 8M5 10v10h14V10M9 20v-6h6v6"></path></svg>
+          </a>
+
+          <button id="mobileMenuToggle" type="button" aria-expanded="false" aria-controls="mobileNavigation" aria-label="Ouvrir le menu" class="w-11 h-11 flex items-center justify-center text-fantasy-gold border border-fantasy-gold/50 rounded-lg hover:bg-fantasy-brown transition-colors">
+            <svg data-menu-open-icon class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <svg data-menu-close-icon class="hidden w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="mobileNavigation" class="hidden xl:hidden mt-3 max-h-[calc(100vh-6rem)] overflow-y-auto p-3 bg-fantasy-darker border border-fantasy-gold/30 rounded-xl shadow-fantasy">
+        <div class="space-y-1">
+          <a href="/news" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath.startsWith('/news') ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">Actualités</a>
+
+          <% if (currentUser && typeof publicEventNavigationVisible !== 'undefined' && publicEventNavigationVisible) { %>
+            <a href="/events/assaut-de-bruay" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath.startsWith('/events/assaut-de-bruay') ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">Assaut de Bruay</a>
+          <% } %>
+
+          <a href="/about" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath === '/about' ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">À propos</a>
+
+          <% if (currentUser) { %>
+            <span class="block px-4 py-3 rounded-lg font-bold text-fantasy-gold-light/40" aria-disabled="true">Galerie <span class="text-xs font-normal">(bientôt disponible)</span></span>
+            <a href="/booking" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath.startsWith('/booking') ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">Réserver une table</a>
+          <% } %>
+
+          <a href="/contact" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath.startsWith('/contact') ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">Contact</a>
+        </div>
+
+        <div class="mt-3 pt-3 border-t border-fantasy-gold/20">
+          <p class="px-4 pb-2 text-xs uppercase tracking-wider text-fantasy-gold-light/50"><%= currentUser ? 'Mon espace' : 'Connexion / Inscription' %></p>
+
+          <% if (currentUser) { %>
+            <a href="/account" class="block px-4 py-3 rounded-lg text-fantasy-gold-light hover:bg-fantasy-brown">Mon compte</a>
+            <a href="/members/<%= currentUser.id %>" class="block px-4 py-3 rounded-lg text-fantasy-gold-light hover:bg-fantasy-brown">Mon profil public</a>
+
+            <% if (['Admin', 'NewsManager'].includes(currentUser.role.name)) { %>
+              <a href="/admindashboard" class="block px-4 py-3 rounded-lg text-fantasy-orange hover:bg-fantasy-brown">Administration</a>
+            <% } %>
+
+            <form method="POST" action="/auth/logout" class="mt-1">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="w-full px-4 py-3 text-left rounded-lg text-fantasy-gold-light hover:bg-fantasy-red/20 hover:text-white">Déconnexion</button>
+            </form>
+          <% } else { %>
+            <button id="btnConnexionMobile" type="button" class="w-full px-4 py-3 text-left rounded-lg text-fantasy-gold-light hover:bg-fantasy-brown">Connexion</button>
+            <button id="btnInscriptionMobile" type="button" class="w-full px-4 py-3 text-left rounded-lg text-fantasy-orange hover:bg-fantasy-brown">Créer un compte</button>
+          <% } %>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <%- include('./flash-message') %>
+  <main id="main-content" tabindex="-1" class="flex-grow">
