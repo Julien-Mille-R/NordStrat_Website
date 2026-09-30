@@ -1,12 +1,15 @@
 import 'dotenv/config';
 import { Sequelize } from 'sequelize';
 import initModels from './relations.js';
+import defineTableGuest from './table-guest.js';
 
 const commonOptions = {
   dialect: 'postgres',
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
   ...(process.env.DB_SCHEMA ? { define: { schema: process.env.DB_SCHEMA } } : {}),
 };
+
+const TableGuest = defineTableGuest(sequelize);
 
 export const sequelize = process.env.DATABASE_URL
   ? new Sequelize(process.env.DATABASE_URL, commonOptions)
@@ -44,6 +47,7 @@ export const {
   ContactMessage,
   TableComment,
   TableDiscussionRead,
+  TableGuest,
 } = models;
 
 export default models;

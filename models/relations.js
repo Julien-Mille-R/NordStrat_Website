@@ -320,6 +320,18 @@ export function initModels(sequelize) {
     onDelete: 'CASCADE',
   });
 
+  GameTable.hasMany(TableGuest, {
+    as: 'guests',
+    foreignKey: 'gameTableId',
+    onDelete: 'CASCADE',
+  });
+
+  TableGuest.belongsTo(GameTable, {
+    as: 'gameTable',
+    foreignKey: 'gameTableId',
+    onDelete: 'CASCADE',
+  });
+
   Event.hasMany(Reservation, {
     as: 'reservations',
     foreignKey: 'eventId',
