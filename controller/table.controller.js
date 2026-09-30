@@ -165,7 +165,7 @@ export async function closeEventTableSlotByAdmin(req, res, next) {
       });
     });
 
-    return res.redirect(`/booking?event=${eventId}&message=table-closed`);
+    return res.redirect( `/admindashboard/events/${eventId}/tables`, );
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError') {
       return redirectWithError(res, 'table_already_closed');
@@ -227,7 +227,7 @@ export async function reopenEventTableSlotByAdmin(req, res, next) {
       });
     });
 
-    return res.redirect(`/booking?event=${eventId}&message=table-reopened`);
+    return res.redirect( `/admindashboard/events/${eventId}/tables`, );
   } catch (error) {
     if (['EVENT_NOT_RESERVABLE', 'TABLE_NOT_FOUND', 'TABLE_ALREADY_OPEN'].includes(error.message)) {
       return redirectWithError(res, error.message.toLowerCase());
@@ -558,7 +558,8 @@ export async function cancelTable(req, res, next) {
       await gameTable.destroy({ transaction });
     });
 
-    return res.redirect(`/booking?event=${eventId}&message=table-cancelled`);
+    if (isAdmin(req)) { return res.redirect( `/admindashboard/events/${eventId}/tables`, ); }
+    return res.redirect( `/booking?event=${eventId}&message=table-cancelled`, );
   } catch (error) {
     if (['TABLE_NOT_FOUND', 'NOT_TABLE_HOST'].includes(error.message)) {
       return redirectWithError(res, error.message.toLowerCase());
