@@ -1,4 +1,3 @@
-```js
 import {
   Event,
   EventAttendance,
@@ -23,7 +22,7 @@ function escapeHtml(value) {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+    .replaceAll("'", '&#039;');
 }
 
 async function notifyTableHost({
@@ -35,6 +34,10 @@ async function notifyTableHost({
   host,
   player,
 }) {
+  // Pas d'email si :
+  // - le créateur n'a pas d'adresse email ;
+  // - le joueur n'existe pas ;
+  // - le joueur est lui-même le créateur de la table.
   if (!host?.email || !player?.id || host.id === player.id) {
     return;
   }
@@ -102,6 +105,8 @@ async function notifyTableHost({
       `,
     });
   } catch (error) {
+    // L'envoi d'un email ne doit jamais empêcher
+    // l'inscription ou la désinscription d'un joueur.
     console.error(
       `Échec de l'envoi de la notification de table (${action}).`,
       error,
@@ -176,6 +181,10 @@ export async function joinTable(req, res, next) {
         transaction,
       });
 
+      /*
+       * On prépare la notification pendant la transaction,
+       * mais l'email ne sera envoyé qu'après le COMMIT.
+       */
       const [host, player, game] = await Promise.all([
         Player.findByPk(gameTable.hostPlayerId, { transaction }),
         Player.findByPk(playerId, { transaction }),
@@ -249,6 +258,10 @@ export async function leaveTable(req, res, next) {
 
       eventId = gameTable.eventId;
 
+      /*
+       * On récupère ces informations avant de modifier la table,
+       * afin de pouvoir notifier correctement l'ancien créateur.
+       */
       const [event, game, host, player] = await Promise.all([
         Event.findByPk(gameTable.eventId, {
           transaction,
@@ -292,6 +305,10 @@ export async function leaveTable(req, res, next) {
         (item) => item.playerId !== playerId,
       );
 
+      /*
+       * Si le joueur était seul à la table, la table est supprimée.
+       * Il n'y a alors plus de créateur à notifier.
+       */
       if (!nextHostReservation) {
         await gameTable.destroy({ transaction });
         return;
@@ -312,6 +329,13 @@ export async function leaveTable(req, res, next) {
         transaction,
       });
 
+      /*
+       * Si le créateur quitte la table, le premier joueur restant
+       * devient le nouveau créateur.
+       *
+       * Dans ce cas, on ne notifie PAS l'ancien créateur :
+       * il est lui-même la personne qui vient de quitter la table.
+       */
       if (gameTable.hostPlayerId === playerId) {
         await gameTable.update({
           hostPlayerId: nextHostReservation.playerId,
@@ -319,6 +343,10 @@ export async function leaveTable(req, res, next) {
           transaction,
         });
       } else if (host && player && event) {
+        /*
+         * Un participant normal quitte la table :
+         * le créateur doit être averti.
+         */
         tableNotification = {
           action: 'leave',
           tableId,
@@ -511,4 +539,3 @@ export async function cancelPlayerReservationByAdmin(req, res, next) {
     return next(error);
   }
 }
-```
