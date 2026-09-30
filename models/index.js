@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { Sequelize } from 'sequelize';
 import initModels from './relations.js';
-import defineTableGuest from './table-guest.js';
 
 const commonOptions = {
   dialect: 'postgres',
