@@ -18,6 +18,12 @@
             <% if (event.status !== 'cancelled') { %>
               <a href="/admindashboard/events/<%= event.id %>/edit" class="text-fantasy-orange">Modifier</a>
               <a href="/admindashboard/events/<%= event.id %>/attendance" class="text-fantasy-orange">Présences</a>
+              <a
+                href="/admindashboard/events/<%= event.id %>/tables"
+                class="text-fantasy-orange"
+              >
+                Tables
+              </a>
             <% } %>
             <% if (['upcoming', 'ongoing'].includes(event.status)) { %><form method="POST" action="/admindashboard/events/<%= event.id %>/archive"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="text-fantasy-orange">Archiver</button></form><% } %>
           </div>

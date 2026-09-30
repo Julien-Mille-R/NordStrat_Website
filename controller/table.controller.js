@@ -9,6 +9,7 @@ import {
   sequelize,
 } from '../models/index.js';
 import { recordAdminAction } from '../services/audit-log.service.js';
+import { setFlash } from './access.controller.js';
 
 function redirectWithError(res, code) {
   return res.redirect(`/booking?error=${code}`);
@@ -231,6 +232,196 @@ export async function reopenEventTableSlotByAdmin(req, res, next) {
     if (['EVENT_NOT_RESERVABLE', 'TABLE_NOT_FOUND', 'TABLE_ALREADY_OPEN'].includes(error.message)) {
       return redirectWithError(res, error.message.toLowerCase());
     }
+    return next(error);
+  }
+}
+
+export async function showAdminTables(req, res, next) {
+  const eventId = Number(req.params.eventId);
+
+  try {
+    if (!Number.isInteger(eventId) || eventId < 1) {
+      return res.status(400).send('Rencontre invalide.');
+    }
+
+    const event = await Event.findByPk(eventId, {
+      include: [
+        {
+          association: 'gameTables',
+          required: false,
+          include: [
+            { association: 'game' },
+            { association: 'host' },
+            {
+              association: 'reservations',
+              required: false,
+              where: { status: 'confirmed' },
+              include: [{ association: 'player' }],
+            },
+          ],
+        },
+        {
+          association: 'tableClosures',
+          required: false,
+        },
+      ],
+    });
+
+    if (!event) {
+      return res.status(404).send('Rencontre introuvable.');
+    }
+
+    const tablesByNumber = new Map(
+      event.gameTables.map((gameTable) => [
+        gameTable.tableNumber,
+        gameTable,
+      ]),
+    );
+
+    const closedTableNumbers = new Set(
+      event.tableClosures.map((closure) => closure.tableNumber),
+    );
+
+    const tables = Array.from(
+      { length: event.maxTable },
+      (_, index) => {
+        const number = index + 1;
+
+        return {
+          number,
+          gameTable: tablesByNumber.get(number) || null,
+          isClosed: closedTableNumbers.has(number),
+        };
+      },
+    );
+
+    const games = await Game.findAll({
+      where: { isAvailable: true },
+      order: [['name', 'ASC']],
+    });
+
+    return res.render('layouts/admin/event-tables', {
+      event,
+      tables,
+      games,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export async function updateTableByAdmin(req, res, next) {
+  const tableId = Number(req.params.tableId);
+  const gameId = Number(req.body.gameId);
+  const maxPlayers = Number(req.body.maxPlayers);
+
+  let eventId;
+
+  try {
+    await sequelize.transaction(async (transaction) => {
+      const gameTable = await GameTable.findByPk(tableId, {
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+
+      if (!gameTable) {
+        throw new Error('TABLE_NOT_FOUND');
+      }
+
+      eventId = gameTable.eventId;
+
+      const event = await Event.findByPk(eventId, {
+        transaction,
+        lock: transaction.LOCK.SHARE,
+      });
+
+      if (!event || !['upcoming', 'ongoing'].includes(event.status)) {
+        throw new Error('EVENT_NOT_AVAILABLE');
+      }
+
+      const game = await Game.findOne({
+        where: {
+          id: gameId,
+          isAvailable: true,
+        },
+        transaction,
+      });
+
+      const playerCount = await Reservation.count({
+        where: {
+          gameTableId: tableId,
+          status: 'confirmed',
+        },
+        transaction,
+      });
+
+      const invalidCapacity =
+        !Number.isInteger(maxPlayers)
+        || maxPlayers < playerCount
+        || maxPlayers > 10
+        || (
+          game?.minPlayers != null
+          && maxPlayers < game.minPlayers
+        )
+        || (
+          game?.maxPlayers != null
+          && maxPlayers > game.maxPlayers
+        );
+
+      if (!game || invalidCapacity) {
+        throw new Error('INVALID_GAME_CAPACITY');
+      }
+
+      const previousGame = await Game.findByPk(
+        gameTable.gameId,
+        { transaction },
+      );
+
+      await gameTable.update({
+        gameId: game.id,
+        maxPlayers,
+      }, {
+        transaction,
+      });
+
+      await recordAdminAction({
+        admin: req.currentUser,
+        category: 'game_tables',
+        action: 'table_updated',
+        targetType: 'game_table',
+        targetId: gameTable.id,
+        targetLabel: tableLabel(gameTable),
+        description:
+          `Table modifiée : jeu « ${previousGame?.name || 'inconnu'} » `
+          + `→ « ${game.name} », capacité ${maxPlayers}.`,
+        transaction,
+      });
+    });
+
+    setFlash(req, 'success', 'La table a été mise à jour.');
+
+    return res.redirect(
+      `/admindashboard/events/${eventId}/tables`,
+    );
+  } catch (error) {
+    if (
+      [
+        'TABLE_NOT_FOUND',
+        'EVENT_NOT_AVAILABLE',
+        'INVALID_GAME_CAPACITY',
+      ].includes(error.message)
+    ) {
+      setFlash(
+        req,
+        'error',
+        'La modification de cette table est impossible.',
+      );
+
+      return res.redirect(
+        `/admindashboard/events/${eventId || ''}/tables`,
+      );
+    }
+
     return next(error);
   }
 }

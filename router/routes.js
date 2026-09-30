@@ -109,6 +109,8 @@ import {
   closeEventTableSlotByAdmin,
   createTable,
   reopenEventTableSlotByAdmin,
+  showAdminTables,
+  updateTableByAdmin,
   updateTable,
 } from '../controller/table.controller.js';
 import {
@@ -295,6 +297,15 @@ router.post('/admindashboard/events/:eventId/update', updateEvent);
 router.post('/admindashboard/events/:eventId/cancel', cancelEvent);
 router.post('/admindashboard/events/:eventId/reopen', reopenEvent);
 router.get('/admindashboard/events/:eventId/attendance', showAttendancePage);
+router.get(
+  '/admindashboard/events/:eventId/tables',
+  showAdminTables,
+);
+
+router.post(
+  '/admindashboard/events/:eventId/tables/:tableId/update',
+  updateTableByAdmin,
+);
 router.post('/admindashboard/events/:eventId/attendance', saveAttendance);
 router.post(
   '/admindashboard/events/:eventId/reservations/:playerId/cancel',
