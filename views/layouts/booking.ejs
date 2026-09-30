@@ -73,7 +73,9 @@
       'table-updated': 'Les paramètres de la table ont été mis à jour.',
       'table-closed': 'La table a été fermée.',
       'table-reopened': 'La table est de nouveau ouverte aux réservations.',
-      'table-cancelled': 'La table a été annulée.'
+      'table-cancelled': 'La table a été annulée.',
+      'guest-added': 'L’invité a été ajouté à votre table.',
+      'guest-removed': 'L’invité a été retiré de votre table.'
     }; %>
     <% const errors = {
       'login-required': 'Vous devez être connecté pour effectuer cette action.',
@@ -213,9 +215,105 @@
                       <% games.forEach((game) => { %><option value="<%= game.id %>" <%= game.id === gameTable.gameId ? 'selected' : '' %>><%= game.name %></option><% }) %>
                     </select>
                     <label class="block text-sm" for="tableCapacity-<%= gameTable.id %>">Nombre maximal de joueurs</label>
-                    <input id="tableCapacity-<%= gameTable.id %>" type="number" name="maxPlayers" min="<%= reservations.length %>" max="10" required value="<%= gameTable.maxPlayers %>" class="w-full min-h-11 bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light">
+                    <input id="tableCapacity-<%= gameTable.id %>" type="number" name="maxPlayers" min="<%= participantCount %>" max="10" required value="<%= gameTable.maxPlayers %>" class="w-full min-h-11 bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light">
                     <button class="w-full min-h-11 px-3 py-2 border border-fantasy-gold rounded hover:bg-fantasy-brown">Enregistrer les modifications</button>
                   </form>
+                  <div class="mt-4 pt-4 border-t border-fantasy-gold/20">
+
+                  <div class="flex items-center justify-between gap-3">
+                    <h3 class="text-sm font-bold text-fantasy-orange">
+                      Invités
+                    </h3>
+
+                    <span class="text-xs text-fantasy-gold-light/60">
+                      <%= guests.length %> invité<%= guests.length > 1 ? 's' : '' %>
+                    </span>
+                  </div>
+
+                  <% if (guests.length) { %>
+
+                    <div class="mt-3 space-y-2">
+
+                      <% guests.forEach((guest) => { %>
+
+                        <div class="flex items-center justify-between gap-3 p-3 bg-fantasy-brown/40 rounded-lg">
+
+                          <span class="text-sm text-fantasy-gold-light">
+                            <%= guest.nickname %>
+                          </span>
+
+                          <form
+                            method="POST"
+                            action="/tables/<%= gameTable.id %>/guests/<%= guest.id %>/remove"
+                            data-confirm="Retirer l’invité « <%= guest.nickname %> » de cette table ?"
+                          >
+                            <input
+                              type="hidden"
+                              name="_csrf"
+                              value="<%= csrfToken %>"
+                            >
+
+                            <button
+                              type="submit"
+                              class="min-h-10 px-3 py-2 border border-fantasy-red text-fantasy-gold-light rounded-lg hover:bg-fantasy-red"
+                            >
+                              Retirer
+                            </button>
+                          </form>
+
+                        </div>
+
+                      <% }) %>
+
+                    </div>
+
+                  <% else %>
+
+                    <p class="mt-2 text-xs text-fantasy-gold-light/50">
+                      Aucun invité.
+                    </p>
+
+                  <% } %>
+
+                  <% if (participantCount < gameTable.maxPlayers && gameTable.status === 'open') { %>
+
+                    <form
+                      method="POST"
+                      action="/tables/<%= gameTable.id %>/guests"
+                      class="mt-3 flex flex-col sm:flex-row gap-2"
+                    >
+                      <input
+                        type="hidden"
+                        name="_csrf"
+                        value="<%= csrfToken %>"
+                      >
+
+                      <input
+                        type="text"
+                        name="nickname"
+                        maxlength="80"
+                        required
+                        placeholder="Pseudo de l’invité"
+                        class="flex-1 min-h-11 bg-fantasy-brown border border-fantasy-gold/40 rounded px-3 py-2 text-fantasy-gold-light placeholder:text-fantasy-gold-light/40"
+                      >
+
+                      <button
+                        type="submit"
+                        class="min-h-11 px-4 py-2 border border-fantasy-gold text-fantasy-gold rounded hover:bg-fantasy-brown"
+                      >
+                        Ajouter
+                      </button>
+                    </form>
+
+                  <% } else if (participantCount >= gameTable.maxPlayers) { %>
+
+                    <p class="mt-3 text-xs text-fantasy-gold-light/50">
+                      La table est complète.
+                    </p>
+
+                  <% } %>
+
+                </div>
                   <% if (gameTable.status === 'open' && !isAdmin) { %>
                     <form method="POST" action="/tables/<%= gameTable.id %>/close" class="mt-2" data-confirm="Fermer les inscriptions à la table <%= gameTable.tableNumber %> ? Les joueurs déjà inscrits conserveront leur place.">
                       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
