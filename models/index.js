@@ -9,8 +9,6 @@ const commonOptions = {
   ...(process.env.DB_SCHEMA ? { define: { schema: process.env.DB_SCHEMA } } : {}),
 };
 
-const TableGuest = defineTableGuest(sequelize);
-
 export const sequelize = process.env.DATABASE_URL
   ? new Sequelize(process.env.DATABASE_URL, commonOptions)
   : new Sequelize(

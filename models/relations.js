@@ -18,6 +18,7 @@ import defineTableComment from './table-comment.js';
 import defineTableDiscussionRead from './table-discussion-read.js';
 import definePasswordResetToken from './password-reset-token.js';
 import defineEmailVerificationToken from './email-verification-token.js';
+import defineTableGuest from './table-guest.js';
 
 const initializedModels = new WeakMap();
 
@@ -46,6 +47,7 @@ export function initModels(sequelize) {
   const ContactMessage = defineContactMessage(sequelize);
   const TableComment = defineTableComment(sequelize);
   const TableDiscussionRead = defineTableDiscussionRead(sequelize);
+  const TableGuest = defineTableGuest(sequelize);
 
   Role.hasMany(Player, {
     as: 'players',
@@ -472,6 +474,7 @@ export function initModels(sequelize) {
     ContactMessage,
     TableComment,
     TableDiscussionRead,
+    TableGuest,
   };
 
   initializedModels.set(sequelize, models);
