@@ -11,7 +11,11 @@ function redirectToTables(res, eventId) {
   return res.redirect(`/admindashboard/events/${eventId}/tables`);
 }
 
-function redirectToBooking(res, eventId, error) {
+function redirectToBookingMessage(res, eventId, message) {
+  return res.redirect(`/booking?event=${eventId}&message=${message}`);
+}
+
+function redirectToBookingError(res, eventId, error) {
   return res.redirect(`/booking?event=${eventId}&error=${error}`);
 }
 
@@ -121,7 +125,7 @@ export async function addTableGuest(req, res, next) {
       return redirectToTables(res, eventId);
     }
 
-    return redirectToBooking(res, eventId, 'guest-added');
+    return redirectToBookingMessage(res, eventId, 'guest-added');
   } catch (error) {
     if (
       [
@@ -152,7 +156,7 @@ export async function addTableGuest(req, res, next) {
         return redirectToTables(res, eventId);
       }
 
-      return redirectToBooking(
+      return redirectToBookingError(
         res,
         eventId,
         error.message.toLowerCase(),
@@ -221,7 +225,7 @@ export async function removeTableGuest(req, res, next) {
       return redirectToTables(res, eventId);
     }
 
-    return redirectToBooking(res, eventId, 'guest-removed');
+    return redirectToBookingMessage(res, eventId, 'guest-removed');
   } catch (error) {
     if (
       [
@@ -240,7 +244,7 @@ export async function removeTableGuest(req, res, next) {
         return redirectToTables(res, eventId);
       }
 
-      return redirectToBooking(
+      return redirectToBookingError(
         res,
         eventId,
         error.message.toLowerCase(),
