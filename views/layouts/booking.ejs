@@ -218,7 +218,6 @@
               <% if (isHost) { %>
                 <details class="mt-3 text-fantasy-gold-light">
                   <summary class="cursor-pointer text-sm">Gérer la table</summary>
-                  <p class="mt-3 p-3 bg-fantasy-orange/10 border border-fantasy-orange/40 rounded-lg text-sm text-fantasy-gold-light"> <strong class="text-fantasy-orange">Besoin d’ajouter un invité ?</strong><br> Si une personne vous accompagne sans compte Nord Stratégie, vous pouvez l’ajouter ici. Elle sera comptabilisée dans les participants de la table. </p>
                   <form method="POST" action="/tables/<%= gameTable.id %>/update" class="mt-3 space-y-3">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <label class="block text-sm" for="tableGame-<%= gameTable.id %>">Jeu</label>
@@ -337,6 +336,10 @@
                     <button class="text-sm text-fantasy-red">Annuler la table</button>
                   </form>
                 </details>
+                <p class="mt-2 p-3 bg-fantasy-orange/10 border border-fantasy-orange/40 rounded-lg text-sm text-fantasy-gold-light">
+                  <strong class="text-fantasy-orange">Vous avez un invité ?</strong>
+                  Ajoutez son pseudo dans la section « Invités » ci-dessous. Il sera comptabilisé dans le nombre de participants de la table.
+                </p>
               <% } %>
             <% } else if (!currentReservation && gameTable.status === 'open' && !isFull) { %>
               <% if (canBookTables) { %>
