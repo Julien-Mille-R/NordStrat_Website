@@ -113,7 +113,9 @@
       <% tableSlots.forEach((slot) => { %>
         <% const gameTable = slot.gameTable; %>
         <% const reservations = gameTable?.reservations || []; %>
-        <% const isFull = gameTable && reservations.length >= gameTable.maxPlayers; %>
+        <% const guests = gameTable?.guests || []; %>
+        <% const participantCount = reservations.length + guests.length; %>
+        <% const isFull = gameTable && participantCount >= gameTable.maxPlayers; %>
         <% const isMyTable = currentReservation && currentReservation.gameTableId === gameTable?.id; %>
         <% const isHost = currentUser && gameTable && currentUser.id === gameTable.hostPlayerId; %>
         <% const isAdmin = currentUser?.role?.name === 'Admin'; %>
@@ -148,7 +150,7 @@
               </div>
               <div class="min-w-0 space-y-2">
                 <p class="font-bold text-lg break-words"><%= gameTable.game.name %></p>
-                <p><%= reservations.length %> / <%= gameTable.maxPlayers %> joueurs</p>
+                <p><%= participantCount %> / <%= gameTable.maxPlayers %> participants</p>
                 <p class="text-sm">Organisateur :
                   <% if (gameTable.host.isProfilePublic) { %><a href="/members/<%= gameTable.host.id %>" class="text-fantasy-orange"><%= gameTable.host.nickname || gameTable.host.firstname %></a><% } else { %><%= gameTable.host.nickname || gameTable.host.firstname %><% } %>
                 </p>

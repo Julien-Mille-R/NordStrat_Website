@@ -52,6 +52,8 @@
 <div class="mb-6 p-4 bg-fantasy-dark border border-fantasy-gold/20 rounded-xl text-sm text-fantasy-gold-light/70">
   Cette page permet de gérer les tables et les inscriptions d'une rencontre.
   Les retraits de joueurs sont conservés dans l'historique des réservations.
+  Les invités sont comptabilisés dans la capacité de la table mais ne disposent
+  pas d'un compte membre.
 </div>
 
 <div class="space-y-5">
@@ -60,6 +62,8 @@
 
     <% const gameTable = slot.gameTable; %>
     <% const reservations = gameTable?.reservations || []; %>
+    <% const guests = gameTable?.guests || []; %>
+    <% const participantCount = reservations.length + guests.length; %>
 
     <article
       class="bg-fantasy-dark border-2 border-fantasy-gold/25 rounded-2xl p-5 sm:p-6"
@@ -116,7 +120,14 @@
               </p>
 
               <p class="text-sm">
-                <%= reservations.length %> / <%= gameTable.maxPlayers %> joueurs
+                <%= participantCount %> / <%= gameTable.maxPlayers %> participants
+              </p>
+
+              <p class="text-xs text-fantasy-gold-light/60">
+                <%= reservations.length %> joueur<%= reservations.length > 1 ? 's' : '' %>
+                <% if (guests.length > 0) { %>
+                  · <%= guests.length %> invité<%= guests.length > 1 ? 's' : '' %>
+                <% } %>
               </p>
 
               <p class="text-sm">
@@ -170,12 +181,12 @@
               <input
                 type="number"
                 name="maxPlayers"
-                min="<%= reservations.length %>"
+                min="<%= participantCount %>"
                 max="10"
                 required
                 value="<%= gameTable.maxPlayers %>"
                 class="min-h-11 bg-fantasy-brown border border-fantasy-gold/40 rounded-lg px-3 py-2 text-fantasy-gold-light"
-                aria-label="Nombre maximum de joueurs"
+                aria-label="Nombre maximum de participants"
               >
 
               <button
@@ -265,6 +276,114 @@
 
             <p class="text-sm text-fantasy-gold-light/50">
               Aucun joueur inscrit.
+            </p>
+
+          <% } %>
+
+        </div>
+
+        <div class="mt-6 pt-5 border-t border-fantasy-gold/15">
+
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+            <h3 class="text-sm uppercase tracking-wider font-bold text-fantasy-orange">
+              Invités
+            </h3>
+
+            <span class="text-xs text-fantasy-gold-light/50">
+              <%= guests.length %> / <%= gameTable.maxPlayers %> participants utilisés
+            </span>
+          </div>
+
+          <% if (guests.length) { %>
+
+            <div class="space-y-2">
+
+              <% guests.forEach((guest) => { %>
+
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 bg-fantasy-brown/40 rounded-lg">
+
+                  <div>
+                    <p class="font-bold text-fantasy-gold-light">
+                      <%= guest.nickname %>
+                    </p>
+
+                    <p class="text-xs text-fantasy-gold-light/50">
+                      Invité ajouté le
+                      <%= new Intl.DateTimeFormat('fr-FR', {
+                        dateStyle: 'short',
+                        timeStyle: 'short',
+                        timeZone: 'Europe/Paris'
+                      }).format(guest.createdAt) %>
+                    </p>
+                  </div>
+
+                  <form
+                    method="POST"
+                    action="/tables/<%= gameTable.id %>/guests/<%= guest.id %>/remove"
+                    data-confirm="Retirer l'invité « <%= guest.nickname %> » de cette table ?"
+                  >
+                    <input
+                      type="hidden"
+                      name="_csrf"
+                      value="<%= csrfToken %>"
+                    >
+
+                    <button
+                      type="submit"
+                      class="min-h-10 px-3 py-2 border border-fantasy-red text-fantasy-gold-light rounded-lg hover:bg-fantasy-red"
+                    >
+                      Retirer l'invité
+                    </button>
+                  </form>
+
+                </div>
+
+              <% }) %>
+
+            </div>
+
+          <% } else { %>
+
+            <p class="text-sm text-fantasy-gold-light/50">
+              Aucun invité sur cette table.
+            </p>
+
+          <% } %>
+
+          <% if (participantCount < gameTable.maxPlayers && gameTable.status === 'open') { %>
+
+            <form
+              method="POST"
+              action="/tables/<%= gameTable.id %>/guests"
+              class="mt-4 flex flex-col sm:flex-row gap-3"
+            >
+              <input
+                type="hidden"
+                name="_csrf"
+                value="<%= csrfToken %>"
+              >
+
+              <input
+                type="text"
+                name="nickname"
+                maxlength="80"
+                required
+                placeholder="Pseudo de l'invité"
+                class="flex-1 min-h-11 bg-fantasy-brown border border-fantasy-gold/40 rounded-lg px-3 py-2 text-fantasy-gold-light placeholder:text-fantasy-gold-light/40"
+              >
+
+              <button
+                type="submit"
+                class="min-h-11 px-4 py-2 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange"
+              >
+                Ajouter un invité
+              </button>
+            </form>
+
+          <% } else if (participantCount >= gameTable.maxPlayers) { %>
+
+            <p class="mt-4 text-sm text-fantasy-gold-light/50">
+              La table est complète.
             </p>
 
           <% } %>

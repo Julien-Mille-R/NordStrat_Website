@@ -6,6 +6,7 @@ import {
   Player,
   Reservation,
   TableDiscussionRead,
+  TableGuest,
   sequelize,
 } from '../models/index.js';
 import { setFlash } from './access.controller.js';
@@ -169,7 +170,14 @@ export async function joinTable(req, res, next) {
         transaction,
       });
 
-      if (playerCount >= gameTable.maxPlayers) {
+      const guestCount = await TableGuest.count({
+        where: {
+          gameTableId: tableId,
+        },
+        transaction,
+      });
+
+      if (playerCount + guestCount >= gameTable.maxPlayers) {
         throw new Error('TABLE_FULL');
       }
 
@@ -310,6 +318,17 @@ export async function leaveTable(req, res, next) {
        * Il n'y a alors plus de créateur à notifier.
        */
       if (!nextHostReservation) {
+        const guestCount = await TableGuest.count({
+          where: {
+            gameTableId: tableId,
+          },
+          transaction,
+        });
+
+        if (guestCount > 0) {
+          throw new Error('GUESTS_REMAIN');
+        }
+
         await gameTable.destroy({ transaction });
         return;
       }
@@ -368,7 +387,7 @@ export async function leaveTable(req, res, next) {
     );
   } catch (error) {
     if (
-      ['TABLE_NOT_FOUND', 'RESERVATION_NOT_FOUND']
+      ['TABLE_NOT_FOUND', 'RESERVATION_NOT_FOUND', 'GUESTS_REMAIN']
         .includes(error.message)
     ) {
       return redirectWithError(
@@ -479,6 +498,17 @@ export async function cancelPlayerReservationByAdmin(req, res, next) {
       });
 
       if (!nextHostReservation) {
+        const guestCount = await TableGuest.count({
+          where: {
+            gameTableId: gameTable.id,
+          },
+          transaction,
+        });
+
+        if (guestCount > 0) {
+          throw new Error('GUESTS_REMAIN');
+        }
+
         await gameTable.destroy({ transaction });
         return;
       }
@@ -523,6 +553,7 @@ export async function cancelPlayerReservationByAdmin(req, res, next) {
         'RESERVATION_NOT_FOUND',
         'PLAYER_NOT_FOUND',
         'TABLE_NOT_FOUND',
+        'GUESTS_REMAIN',
       ].includes(error.message)
     ) {
       setFlash(

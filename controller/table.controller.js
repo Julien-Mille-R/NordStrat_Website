@@ -6,6 +6,7 @@ import {
   GameTable,
   Reservation,
   TableDiscussionRead,
+  TableGuest,
   sequelize,
 } from '../models/index.js';
 import { recordAdminAction } from '../services/audit-log.service.js';
@@ -355,9 +356,18 @@ export async function updateTableByAdmin(req, res, next) {
         transaction,
       });
 
+      const guestCount = await TableGuest.count({
+        where: {
+          gameTableId: tableId,
+        },
+        transaction,
+      });
+
+      const participantCount = playerCount + guestCount;
+
       const invalidCapacity =
         !Number.isInteger(maxPlayers)
-        || maxPlayers < playerCount
+        || maxPlayers < participantCount
         || maxPlayers > 10
         || (
           game?.minPlayers != null
@@ -459,11 +469,23 @@ export async function updateTable(req, res, next) {
       if (!previousGame || !game || changesToUnavailableGame) throw new Error('INVALID_GAME_CAPACITY');
 
       const playerCount = await Reservation.count({
-        where: { gameTableId: tableId, status: 'confirmed' },
+        where: {
+          gameTableId: tableId,
+          status: 'confirmed',
+        },
         transaction,
       });
+
+      const guestCount = await TableGuest.count({
+        where: {
+          gameTableId: tableId,
+        },
+        transaction,
+      });
+
+      const participantCount = playerCount + guestCount;
       const invalidCapacity = !Number.isInteger(maxPlayers)
-        || maxPlayers < playerCount
+        || maxPlayers < participantCount
         || maxPlayers > 10
         || (game.minPlayers != null && maxPlayers < game.minPlayers)
         || (game.maxPlayers != null && maxPlayers > game.maxPlayers);

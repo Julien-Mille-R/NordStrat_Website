@@ -120,6 +120,10 @@ import {
 } from '../controller/table-discussion.controller.js';
 import { showRobotsTxt, showSitemapXml } from '../controller/seo.controller.js';
 import { PostgresRateLimitStore } from '../services/postgres-rate-limit-store.js';
+import {
+  addTableGuest,
+  removeTableGuest,
+} from '../controller/guest.controller.js';
 
 const router = express.Router();
 const authLimiter = rateLimit({
@@ -220,6 +224,18 @@ router.post('/events/:eventId/tables/:tableNumber/reopen', requireAdmin, reopenE
 router.post('/tables/:tableId/discussion/open', requireUser, openTableDiscussion);
 router.post('/tables/:tableId/comments', requireUser, tableDiscussionLimiter, createTableComment);
 router.post('/tables/:tableId/comments/:commentId/delete', requireAdmin, deleteTableComment);
+router.post(
+  '/tables/:tableId/guests',
+  requireUser,
+  addTableGuest,
+);
+
+router.post(
+  '/tables/:tableId/guests/:guestId/remove',
+  requireUser,
+  removeTableGuest,
+);
+
 
 router.get('/admin', (req, res) => res.status(404).send('Page introuvable.'));
 

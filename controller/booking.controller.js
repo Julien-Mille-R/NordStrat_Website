@@ -56,6 +56,10 @@ export async function showBookingPage(req, res, next) {
               include: [{ association: 'player' }],
             },
             {
+              association: 'guests',
+              required: false,
+            },
+            {
               association: 'comments',
               required: false,
               include: [{
