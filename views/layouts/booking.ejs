@@ -158,6 +158,12 @@
               <div class="min-w-0 space-y-2">
                 <p class="font-bold text-lg break-words"><%= gameTable.game.name %></p>
                 <p><%= participantCount %> / <%= gameTable.maxPlayers %> participants</p>
+
+                <% if (guests.length > 0) { %>
+                  <p class="text-sm text-fantasy-gold-light/60">
+                    dont <%= guests.length %> invité<%= guests.length > 1 ? 's' : '' %>
+                  </p>
+                <% } %>
                 <p class="text-sm">Organisateur :
                   <% if (gameTable.host.isProfilePublic) { %><a href="/members/<%= gameTable.host.id %>" class="text-fantasy-orange"><%= gameTable.host.nickname || gameTable.host.firstname %></a><% } else { %><%= gameTable.host.nickname || gameTable.host.firstname %><% } %>
                 </p>
