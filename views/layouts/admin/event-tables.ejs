@@ -205,7 +205,10 @@
                   <% reservations.forEach((reservation) => { %>
 
                     <% const player = reservation.player; %>
-                    <% const playerLabel = player.nickname || `${player.firstname} ${player.lastname}`; %>
+                    <%
+                    const playerLabel = player.nickname
+                        || [player.firstname, player.lastname].filter(Boolean).join(' ');
+                    %>
 
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 bg-fantasy-brown/40 rounded-lg">
 
