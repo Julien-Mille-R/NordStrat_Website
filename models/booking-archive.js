@@ -119,6 +119,10 @@ export default function defineBookingArchive(sequelize) {
                 required: false,
                 include: [{ association: 'player' }],
               },
+              {
+                association: 'guests',
+                required: false,
+              },
             ],
           },
           { association: 'attendances', required: false },
@@ -131,6 +135,7 @@ export default function defineBookingArchive(sequelize) {
         number: gameTable.tableNumber,
         game: { id: gameTable.game.id, name: gameTable.game.name },
         maximumPlayers: gameTable.maxPlayers,
+        guestCount: gameTable.guests.length,
         participants: gameTable.reservations.map((reservation) => ({
           playerId: reservation.playerId,
           nickname: reservation.player.nickname || reservation.player.firstname,
@@ -141,11 +146,16 @@ export default function defineBookingArchive(sequelize) {
         })),
       }));
       const participants = tables.flatMap((table) => table.participants);
+      const registeredGuests = tables.reduce(
+        (total, table) => total + table.guestCount,
+        0,
+      );
       const snapshot = {
         schemaVersion: 1,
         event: { id: event.id, title: event.title, date: event.date },
         statistics: {
           registeredPlayers: participants.length,
+          registeredGuests,
           attendanceRecorded: true,
           attendedPlayers: participants.filter((participant) => participant.attended).length,
           tablesUsed: tables.length,
