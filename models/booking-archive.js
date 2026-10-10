@@ -24,11 +24,76 @@ function nextWeeklyDate(date) {
   return nextDate;
 }
 
+
 function eventClosingDate(date) {
-  const closingDate = new Date(date);
-  closingDate.setHours(23, 59, 0, 0);
-  return closingDate;
+  // Récupère la date civile de la rencontre en heure de Paris.
+  const parisDateParts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: PARIS_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+
+  const part = (type) => parisDateParts.find((item) => item.type === type).value;
+
+  const year = Number(part('year'));
+  const month = Number(part('month'));
+  const day = Number(part('day'));
+
+  // Calcule le lendemain en calendrier, indépendamment du fuseau du serveur.
+  const nextDay = new Date(Date.UTC(year, month - 1, day + 1));
+
+  const nextYear = nextDay.getUTCFullYear();
+  const nextMonth = nextDay.getUTCMonth() + 1;
+  const nextDayOfMonth = nextDay.getUTCDate();
+
+  // Convertit 16 h à Paris en un instant UTC.
+  // L'ajustement itératif gère automatiquement l'heure d'été/hiver.
+  const targetLocalTime = Date.UTC(
+    nextYear,
+    nextMonth - 1,
+    nextDayOfMonth,
+    16,
+    0,
+    0,
+  );
+
+  let candidate = targetLocalTime;
+
+  const parisFormatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone: PARIS_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  });
+
+  for (let i = 0; i < 3; i += 1) {
+    const parts = parisFormatter.formatToParts(new Date(candidate));
+    const values = Object.fromEntries(
+      parts
+        .filter((item) => item.type !== 'literal')
+        .map((item) => [item.type, Number(item.value)]),
+    );
+
+    const representedAsUtc = Date.UTC(
+      values.year,
+      values.month - 1,
+      values.day,
+      values.hour,
+      values.minute,
+      values.second,
+    );
+
+    candidate += targetLocalTime - representedAsUtc;
+  }
+
+  return new Date(candidate);
 }
+
 
 export default function defineBookingArchive(sequelize) {
   const BookingArchive = sequelize.define('BookingArchive', {
@@ -203,22 +268,30 @@ export default function defineBookingArchive(sequelize) {
     return { archive, nextEvent };
   };
 
+  
   BookingArchive.archiveDueEvents = async function archiveDueEvents(now = new Date()) {
     const { Event } = sequelize.models;
+
     const events = await Event.findAll({
-      where: { status: { [Op.in]: ['upcoming', 'ongoing'] } },
+      where: {
+        status: { [Op.in]: ['upcoming', 'ongoing'] },
+      },
       order: [['date', 'ASC']],
     });
+
     const results = [];
 
     for (const event of events) {
-      const isFriday = event.date.getDay() === 5;
-      if (isFriday && now >= eventClosingDate(event.date)) {
+      const closingDate = eventClosingDate(event.date);
+
+      if (now >= closingDate) {
         results.push(await BookingArchive.archiveEvent(event.id));
       }
     }
+
     return results;
   };
+
 
   BookingArchive.exportMissingFiles = async function exportMissingFiles() {
     const archives = await BookingArchive.findAll();
