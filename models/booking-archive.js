@@ -161,11 +161,25 @@ export default function defineBookingArchive(sequelize) {
         EventTableClosure,
         GameTable,
       } = sequelize.models;
-      const lockedEvent = await Event.findByPk(eventId, { transaction, lock: transaction.LOCK.UPDATE });
-      if (!lockedEvent) throw new Error('EVENT_NOT_FOUND');
-      if (!['upcoming', 'ongoing'].includes(lockedEvent.status)) throw new Error('EVENT_NOT_ARCHIVABLE');
 
-      const existingArchive = await BookingArchive.findOne({ where: { eventId }, transaction });
+      const lockedEvent = await Event.findByPk(eventId, {
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+
+      if (!lockedEvent) {
+        throw new Error('EVENT_NOT_FOUND');
+      }
+
+      if (!['upcoming', 'ongoing'].includes(lockedEvent.status)) {
+        throw new Error('EVENT_NOT_ARCHIVABLE');
+      }
+
+      const existingArchive = await BookingArchive.findOne({
+        where: { eventId },
+        transaction,
+      });
+
       if (existingArchive) {
         archive = existingArchive;
         return;
@@ -190,41 +204,68 @@ export default function defineBookingArchive(sequelize) {
               },
             ],
           },
-          { association: 'attendances', required: false },
+          {
+            association: 'attendances',
+            required: false,
+          },
         ],
         transaction,
       });
 
-      const attendanceByPlayer = new Map(event.attendances.map((item) => [item.playerId, item.attended]));
+      const attendanceByPlayer = new Map(
+        event.attendances.map((item) => [
+          item.playerId,
+          item.attended,
+        ]),
+      );
+
       const tables = event.gameTables.map((gameTable) => ({
         number: gameTable.tableNumber,
-        game: { id: gameTable.game.id, name: gameTable.game.name },
+        game: {
+          id: gameTable.game.id,
+          name: gameTable.game.name,
+        },
         maximumPlayers: gameTable.maxPlayers,
         guestCount: gameTable.guests.length,
         participants: gameTable.reservations.map((reservation) => ({
           playerId: reservation.playerId,
-          nickname: reservation.player.nickname || reservation.player.firstname,
+          nickname:
+            reservation.player.nickname ||
+            reservation.player.firstname,
           wasHost: reservation.playerId === gameTable.hostPlayerId,
           attended: attendanceByPlayer.has(reservation.playerId)
             ? attendanceByPlayer.get(reservation.playerId)
             : true,
         })),
       }));
-      const participants = tables.flatMap((table) => table.participants);
+
+      const participants = tables.flatMap(
+        (table) => table.participants,
+      );
+
       const registeredGuests = tables.reduce(
         (total, table) => total + table.guestCount,
         0,
       );
+
       const snapshot = {
         schemaVersion: 1,
-        event: { id: event.id, title: event.title, date: event.date },
+        event: {
+          id: event.id,
+          title: event.title,
+          date: event.date,
+        },
         statistics: {
           registeredPlayers: participants.length,
           registeredGuests,
           attendanceRecorded: true,
-          attendedPlayers: participants.filter((participant) => participant.attended).length,
+          attendedPlayers: participants.filter(
+            (participant) => participant.attended,
+          ).length,
           tablesUsed: tables.length,
-          gamesUsed: new Set(tables.map((table) => table.game.id)).size,
+          gamesUsed: new Set(
+            tables.map((table) => table.game.id),
+          ).size,
         },
         tables,
         archivedAt: new Date(),
@@ -237,34 +278,72 @@ export default function defineBookingArchive(sequelize) {
         snapshot,
       }, { transaction });
 
-      await EventAttendance.destroy({ where: { eventId }, transaction });
-      await EventTableClosure.destroy({ where: { eventId }, transaction });
-      await GameTable.destroy({ where: { eventId }, transaction });
-      await lockedEvent.update({ status: 'completed', reservable: false }, { transaction });
+      // Nettoyage des données opérationnelles après création de l'archive.
+      await EventAttendance.destroy({
+        where: { eventId },
+        transaction,
+      });
 
-      const nextDate = nextWeeklyDate(event.date);
-      nextEvent = await Event.findOne({ where: { date: nextDate }, transaction });
-      if (!nextEvent) {
-        const deadlineOffset = event.date.getTime() - event.registrationDeadline.getTime();
-        const formattedDate = new Intl.DateTimeFormat('fr-FR', {
-          dateStyle: 'long',
-          timeZone: PARIS_TIME_ZONE,
-        }).format(nextDate);
-        nextEvent = await Event.create({
-          title: `Soirée jeux du ${formattedDate}`,
-          date: nextDate,
-          status: 'upcoming',
-          maxTable: event.maxTable,
-          registrationDeadline: new Date(nextDate.getTime() - deadlineOffset),
-          isPaid: event.isPaid,
-          price: event.price,
-          reservable: true,
-          createdBy: event.createdBy,
-        }, { transaction });
+      await EventTableClosure.destroy({
+        where: { eventId },
+        transaction,
+      });
+
+      await GameTable.destroy({
+        where: { eventId },
+        transaction,
+      });
+
+      await lockedEvent.update({
+        status: 'completed',
+        reservable: false,
+      }, { transaction });
+
+      // Seules les rencontres du vendredi créent automatiquement
+      // la rencontre de la semaine suivante.
+      const eventWeekday = new Intl.DateTimeFormat('en-GB', {
+        timeZone: PARIS_TIME_ZONE,
+        weekday: 'short',
+      }).format(event.date);
+
+      if (eventWeekday === 'Fri') {
+        const nextDate = nextWeeklyDate(event.date);
+
+        nextEvent = await Event.findOne({
+          where: { date: nextDate },
+          transaction,
+        });
+
+        if (!nextEvent) {
+          const deadlineOffset =
+            event.date.getTime() -
+            event.registrationDeadline.getTime();
+
+          const formattedDate = new Intl.DateTimeFormat('fr-FR', {
+            dateStyle: 'long',
+            timeZone: PARIS_TIME_ZONE,
+          }).format(nextDate);
+
+          nextEvent = await Event.create({
+            title: `Soirée jeux du ${formattedDate}`,
+            date: nextDate,
+            status: 'upcoming',
+            maxTable: event.maxTable,
+            registrationDeadline: new Date(
+              nextDate.getTime() - deadlineOffset,
+            ),
+            isPaid: event.isPaid,
+            price: event.price,
+            reservable: true,
+            createdBy: event.createdBy,
+          }, { transaction });
+        }
       }
     });
 
+    // Export du fichier d'archive après validation de la transaction.
     await archive.exportToFile();
+
     return { archive, nextEvent };
   };
 
