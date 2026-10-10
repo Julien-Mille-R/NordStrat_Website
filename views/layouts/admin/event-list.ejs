@@ -46,7 +46,6 @@
                 <button class="text-fantasy-orange">Archiver</button>
               </form>
             <% } %>
-            <% if (['upcoming', 'ongoing'].includes(event.status)) { %><form method="POST" action="/admindashboard/events/<%= event.id %>/archive"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="text-fantasy-orange">Archiver</button></form><% } %>
           </div>
           <% if (['upcoming', 'ongoing'].includes(event.status)) { %>
             <details class="mt-4 pt-4 border-t border-fantasy-red/20">
