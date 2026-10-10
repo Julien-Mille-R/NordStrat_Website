@@ -11,6 +11,7 @@
     ['events', '/admindashboard/events', 'Rencontres', '◷'],
     ['games', '/admindashboard/games', 'Jeux', '◆'],
     ['archives', '/admindashboard/archives', 'Archives', '▤'],
+    ['event-statistics', '/admindashboard/event-statistics', 'Statistiques', '▥'],
     ['audit-log', '/admindashboard/audit-log', 'Journal', '≡']
   ];
 
@@ -68,7 +69,7 @@
     </div>
   </details>
 
-  <div class="hidden lg:grid lg:grid-cols-5 xl:grid-cols-10 gap-2 rounded-xl border border-fantasy-gold/20 bg-fantasy-dark p-2">
+  <div class="hidden lg:grid lg:grid-cols-5 xl:grid-cols-11 gap-2 rounded-xl border border-fantasy-gold/20 bg-fantasy-dark p-2">
     <% visibleAdminSections.forEach(([key, href, label, icon]) => { %>
       <a
         href="<%= href %>"

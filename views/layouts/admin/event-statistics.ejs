@@ -1,0 +1,196 @@
+<%- include('../../partials/header') %>
+
+<section class="pt-28 pb-12 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 max-w-7xl text-fantasy-gold-light">
+    <%- include('../../partials/admin-navigation', { activeAdminSection: 'event-statistics' }) %>
+
+    <header class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-8">
+      <div>
+        <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">Espace administrateur</p>
+        <h1 class="text-3xl md:text-5xl font-fantasy text-fantasy-gold mt-1">Statistiques des rencontres</h1>
+        <p class="mt-2 text-fantasy-gold-light/80">Bilan de l'activité ludique calculé à partir des archives.</p>
+      </div>
+
+      <a
+        href="/admindashboard/event-statistics/export.csv?period=<%= statistics.period %>"
+        class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-fantasy-gold text-fantasy-darkest font-bold hover:bg-fantasy-orange transition"
+      >
+        ↓ Exporter en CSV
+      </a>
+    </header>
+
+    <section class="mb-8 p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-2xl">
+      <form method="GET" action="/admindashboard/event-statistics" class="flex flex-col sm:flex-row sm:items-end gap-4">
+        <div class="flex-1">
+          <label for="period" class="block mb-2 font-bold text-fantasy-gold">Période d'analyse</label>
+          <select
+            id="period"
+            name="period"
+            class="w-full sm:max-w-xs p-3 rounded-lg bg-fantasy-darkest border border-fantasy-gold/30 text-fantasy-gold-light"
+          >
+            <option value="1" <%= statistics.period === 1 ? 'selected' : '' %>>Dernier mois</option>
+            <option value="3" <%= statistics.period === 3 ? 'selected' : '' %>>3 derniers mois</option>
+            <option value="6" <%= statistics.period === 6 ? 'selected' : '' %>>6 derniers mois</option>
+            <option value="12" <%= statistics.period === 12 ? 'selected' : '' %>>12 derniers mois</option>
+          </select>
+        </div>
+
+        <button type="submit" class="px-5 py-3 rounded-lg bg-fantasy-brown border border-fantasy-gold/30 text-fantasy-gold font-bold hover:border-fantasy-orange">
+          Actualiser
+        </button>
+
+        <p class="text-xs text-fantasy-gold-light/60 sm:max-w-sm">
+          Du <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeZone: 'Europe/Paris' }).format(statistics.startDate) %>
+          au <%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeZone: 'Europe/Paris' }).format(statistics.endDate) %>.
+        </p>
+      </form>
+    </section>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
+      <article class="p-4 md:p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+        <p class="text-sm text-fantasy-gold-light/75">Rencontres archivées</p>
+        <p class="mt-2 text-3xl md:text-4xl font-bold text-fantasy-gold"><%= statistics.eventCount %></p>
+      </article>
+
+      <article class="p-4 md:p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+        <p class="text-sm text-fantasy-gold-light/75">Tables archivées</p>
+        <p class="mt-2 text-3xl md:text-4xl font-bold text-fantasy-gold"><%= statistics.tableCount %></p>
+        <p class="mt-1 text-xs text-fantasy-gold-light/60">
+          Moyenne : <%= statistics.averageTables.toLocaleString('fr-FR', { maximumFractionDigits: 1 }) %> par rencontre
+        </p>
+      </article>
+
+      <article class="p-4 md:p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+        <p class="text-sm text-fantasy-gold-light/75">Joueurs uniques présents</p>
+        <p class="mt-2 text-3xl md:text-4xl font-bold text-fantasy-gold"><%= statistics.uniquePlayers %></p>
+      </article>
+
+      <article class="p-4 md:p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-xl">
+        <p class="text-sm text-fantasy-gold-light/75">Participants totaux</p>
+        <p class="mt-2 text-3xl md:text-4xl font-bold text-fantasy-gold"><%= statistics.totalParticipants %></p>
+        <p class="mt-1 text-xs text-fantasy-gold-light/60">Joueurs présents + invités</p>
+      </article>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-8">
+      <article class="p-5 bg-fantasy-dark border border-fantasy-gold/20 rounded-xl">
+        <p class="text-sm text-fantasy-gold-light/75">Participations de joueurs</p>
+        <p class="mt-2 text-2xl font-bold text-fantasy-gold"><%= statistics.playerParticipations %></p>
+        <p class="text-xs text-fantasy-gold-light/60 mt-1">Présences cumulées</p>
+      </article>
+
+      <article class="p-5 bg-fantasy-dark border border-fantasy-gold/20 rounded-xl">
+        <p class="text-sm text-fantasy-gold-light/75">Joueurs présents en moyenne</p>
+        <p class="mt-2 text-2xl font-bold text-fantasy-gold"><%= statistics.averagePlayers.toLocaleString('fr-FR', { maximumFractionDigits: 1 }) %></p>
+        <p class="text-xs text-fantasy-gold-light/60 mt-1">Par rencontre archivée</p>
+      </article>
+
+      <article class="p-5 bg-fantasy-dark border border-fantasy-gold/20 rounded-xl">
+        <p class="text-sm text-fantasy-gold-light/75">Invités</p>
+        <p class="mt-2 text-2xl font-bold text-fantasy-gold"><%= statistics.guestCount %></p>
+        <p class="text-xs text-fantasy-gold-light/60 mt-1">Cumul des invités enregistrés</p>
+      </article>
+
+      <article class="p-5 bg-fantasy-dark border border-fantasy-gold/20 rounded-xl">
+        <p class="text-sm text-fantasy-gold-light/75">Taux de présence</p>
+        <p class="mt-2 text-2xl font-bold text-fantasy-gold"><%= statistics.attendanceRate.toLocaleString('fr-FR', { maximumFractionDigits: 1 }) %> %</p>
+        <p class="text-xs text-fantasy-gold-light/60 mt-1">Présences effectives / participations inscrites archivées</p>
+      </article>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-8">
+      <section class="p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-2xl">
+        <h2 class="text-xl font-fantasy text-fantasy-gold mb-1">Évolution des participants</h2>
+        <p class="text-sm text-fantasy-gold-light/65 mb-5">Joueurs effectivement présents + invités, par mois civil.</p>
+
+        <div class="flex items-end gap-2 h-48 border-b border-fantasy-gold/20 pb-2">
+          <% statistics.monthlyTrend.forEach((month) => { %>
+            <div class="flex-1 min-w-0 h-full flex flex-col items-center justify-end gap-2" title="<%= month.label %> : <%= month.participants %> participants">
+              <span class="text-xs text-fantasy-gold-light"><%= month.participants %></span>
+              <div class="w-full max-w-12 rounded-t bg-fantasy-orange/90" style="height: <%= month.participants ? Math.max(4, month.participants / statistics.maxMonthlyParticipants * 100) : 0 %>%;"></div>
+            </div>
+          <% }) %>
+        </div>
+
+        <div class="flex gap-2 mt-2">
+          <% statistics.monthlyTrend.forEach((month) => { %>
+            <div class="flex-1 min-w-0 text-center text-xs text-fantasy-gold-light/65"><%= month.label %></div>
+          <% }) %>
+        </div>
+      </section>
+
+      <section class="p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-2xl">
+        <h2 class="text-xl font-fantasy text-fantasy-gold mb-1">Rencontres par mois</h2>
+        <p class="text-sm text-fantasy-gold-light/65 mb-5">Nombre de rencontres archivées sur chaque mois civil.</p>
+
+        <% const maxMonthlyEvents = Math.max(1, ...statistics.monthlyTrend.map((month) => month.events)); %>
+
+        <div class="flex items-end gap-2 h-48 border-b border-fantasy-gold/20 pb-2">
+          <% statistics.monthlyTrend.forEach((month) => { %>
+            <div class="flex-1 min-w-0 h-full flex flex-col items-center justify-end gap-2" title="<%= month.label %> : <%= month.events %> rencontres">
+              <span class="text-xs text-fantasy-gold-light"><%= month.events %></span>
+              <div class="w-full max-w-12 rounded-t bg-fantasy-gold/90" style="height: <%= month.events ? Math.max(4, month.events / maxMonthlyEvents * 100) : 0 %>%;"></div>
+            </div>
+          <% }) %>
+        </div>
+
+        <div class="flex gap-2 mt-2">
+          <% statistics.monthlyTrend.forEach((month) => { %>
+            <div class="flex-1 min-w-0 text-center text-xs text-fantasy-gold-light/65"><%= month.label %></div>
+          <% }) %>
+        </div>
+      </section>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+      <section class="p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-2xl">
+        <h2 class="text-xl font-fantasy text-fantasy-gold mb-1">Jeux les plus pratiqués</h2>
+        <p class="text-sm text-fantasy-gold-light/65 mb-5">Classement par nombre de tables présentes dans les archives.</p>
+
+        <% if (statistics.gameBreakdown.length === 0) { %>
+          <p class="py-8 text-center text-fantasy-gold-light/60">Aucune table archivée pour cette période.</p>
+        <% } else { %>
+          <div class="space-y-4">
+            <% statistics.gameBreakdown.forEach((game) => { %>
+              <div>
+                <div class="flex justify-between items-start gap-3 mb-1">
+                  <span class="text-sm"><%= game.name %></span>
+                  <strong class="text-sm text-fantasy-gold whitespace-nowrap"><%= game.tables %> table(s)</strong>
+                </div>
+                <div class="h-2 rounded-full bg-fantasy-darkest overflow-hidden">
+                  <div class="h-full rounded-full bg-fantasy-orange" style="width: <%= game.tables / statistics.maxGameTables * 100 %>%;"></div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </section>
+
+      <section class="p-5 bg-fantasy-dark border border-fantasy-gold/25 rounded-2xl">
+        <h2 class="text-xl font-fantasy text-fantasy-gold mb-1">Top 5 des joueurs</h2>
+        <p class="text-sm text-fantasy-gold-light/65 mb-5">Classés par nombre de présences effectives.</p>
+
+        <% if (statistics.topPlayers.length === 0) { %>
+          <p class="py-8 text-center text-fantasy-gold-light/60">Aucune présence de joueur trouvée pour cette période.</p>
+        <% } else { %>
+          <ol class="space-y-3">
+            <% statistics.topPlayers.forEach((player, index) => { %>
+              <li class="flex items-center gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-fantasy-brown text-fantasy-gold font-bold"><%= index + 1 %></span>
+                <span class="flex-1 min-w-0 break-words"><%= player.nickname %></span>
+                <strong class="text-fantasy-gold whitespace-nowrap"><%= player.count %> présence(s)</strong>
+              </li>
+            <% }) %>
+          </ol>
+        <% } %>
+      </section>
+    </div>
+
+    <p class="mt-6 text-xs text-fantasy-gold-light/55">
+      Lecture seule : aucune donnée n'est modifiée. Les statistiques reposent sur les instantanés JSONB des archives.
+      Les tables historiques sont comptées telles qu'elles apparaissent dans les archives, car les anciens instantanés ne conservent pas leur statut (ouverte, fermée ou annulée).
+    </p>
+  </div>
+</section>
+
+<%- include('../../partials/footer') %>

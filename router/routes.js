@@ -32,7 +32,14 @@ import {
   updateMemberModeration,
   deleteMemberAccount,
 } from '../controller/account-admin.controller.js';
-import { showDashboard, showStatistics } from '../controller/admin.controller.js';
+
+import {
+  showDashboard,
+  showStatistics,
+  showEventStatistics,
+  exportEventStatisticsCsv,
+} from '../controller/admin.controller.js';
+
 import { showAuditLog } from '../controller/audit-log.controller.js';
 import { archiveEvent, downloadArchive, showArchiveDetails, showArchiveList } from '../controller/archive.controller.js';
 import {
@@ -278,6 +285,12 @@ router.use('/admindashboard', requireAdmin);
 router.get('/admindashboard/statistics', (req, res) => {
   res.render('layouts/admin/adminStatistics');
 });
+
+router.get('/admindashboard/event-statistics', showEventStatistics);
+router.get(
+  '/admindashboard/event-statistics/export.csv',
+  exportEventStatisticsCsv,
+);
 
 router.get('/admindashboard/statistics/report', showStatistics);
 router.get('/admindashboard/audit-log', showAuditLog);
