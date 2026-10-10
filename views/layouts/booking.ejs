@@ -176,6 +176,9 @@
                   <% if (reservation.player.isProfilePublic) { %><a href="/members/<%= reservation.player.id %>" class="text-fantasy-orange"><%= reservation.player.nickname || reservation.player.firstname %></a><% } else { %><%= reservation.player.nickname || reservation.player.firstname %><% } %><%= reservation.playerId === gameTable.hostPlayerId ? ' (organisateur)' : '' %>
                 </li>
               <% }) %>
+              <% guests.forEach((guest) => { %>
+                <li>• <%= guest.nickname %> (invité)</li>
+              <% }) %>
             </ul>
 
             <% if (currentUser) { %>
