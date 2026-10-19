@@ -42,6 +42,9 @@ const NEWS_HTML_SANITIZE_OPTIONS = {
     img: ['http', 'https'],
   },
   allowProtocolRelative: false,
+  transformTags: {
+    div: 'p',
+  },
 };
 
 function sanitizeNewsContent(content) {
