@@ -487,6 +487,7 @@ export async function showNewsDetails(req, res, next) {
         category: {
           [Op.in]: ['accueil', 'actualites'],
         },
+      },
       include: [
         { association: 'author' },
         { association: 'images' },
