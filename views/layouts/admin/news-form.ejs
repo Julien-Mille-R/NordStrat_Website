@@ -1,3 +1,4 @@
+
 <%- include('../../partials/header') %>
 
 <section class="pt-28 pb-20 bg-fantasy-darkest min-h-screen">
@@ -12,10 +13,7 @@
       </h1>
 
       <p class="mt-3 text-fantasy-gold-light">
-        <%= newsPost
-          ? 'Les modifications seront immédiatement visibles sur le site.'
-          : 'L’article sera immédiatement visible par tous et pourra apparaître parmi les cinq actualités de l’accueil.'
-        %>
+        Gérez la catégorie, la visibilité, l’illustration principale et les photos supplémentaires.
       </p>
     </header>
 
@@ -47,6 +45,68 @@
         </span>
       </label>
 
+      <!-- CATÉGORIE -->
+      <label class="block text-fantasy-gold-light">
+        <span class="font-bold text-fantasy-gold">Catégorie</span>
+
+        <select
+          name="category"
+          required
+          class="mt-2 w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg"
+        >
+          <option
+            value="accueil"
+            <%= !newsPost || newsPost.category === 'accueil' ? 'selected' : '' %>
+          >
+            Accueil et Actualités
+          </option>
+
+          <option
+            value="actualites"
+            <%= newsPost?.category === 'actualites' ? 'selected' : '' %>
+          >
+            Actualités uniquement
+          </option>
+
+          <option
+            value="assaut_bruay"
+            <%= newsPost?.category === 'assaut_bruay' ? 'selected' : '' %>
+          >
+            Assaut sur Bruay
+          </option>
+        </select>
+
+        <span class="block mt-1 text-xs text-fantasy-gold-light/55">
+          « Accueil et Actualités » permet l’affichage sur les deux pages.
+          « Actualités uniquement » exclut la page d’accueil.
+          « Assaut sur Bruay » est réservé à la future page dédiée.
+        </span>
+      </label>
+
+      <!-- VISIBILITÉ -->
+      <div class="p-4 border border-fantasy-gold/25 rounded-lg">
+        <label class="flex items-start gap-3 text-fantasy-gold-light">
+          <input
+            type="checkbox"
+            name="isVisible"
+            value="on"
+            <%= !newsPost || newsPost.isVisible ? 'checked' : '' %>
+            class="mt-1 accent-amber-400"
+          >
+
+          <span>
+            <span class="block font-bold text-fantasy-gold">
+              Actualité visible sur le site public
+            </span>
+            <span class="block mt-1 text-sm text-fantasy-gold-light/70">
+              Si cette case est décochée, l’actualité reste enregistrée
+              et modifiable dans l’administration, mais doit être masquée
+              des pages publiques.
+            </span>
+          </span>
+        </label>
+      </div>
+
       <!-- CONTENU -->
       <div class="block text-fantasy-gold-light">
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
@@ -66,7 +126,6 @@
           id="news-editor"
           class="mt-2 border border-fantasy-gold/30 rounded-lg overflow-hidden bg-fantasy-brown"
         >
-          <!-- BARRE D'OUTILS -->
           <div
             class="flex flex-wrap gap-1 p-2 border-b border-fantasy-gold/20 bg-fantasy-dark"
             role="toolbar"
@@ -96,23 +155,11 @@
 
             <span class="news-editor-separator"></span>
 
-            <button
-              type="button"
-              data-editor-command="insertUnorderedList"
-              title="Liste à puces"
-              aria-label="Liste à puces"
-              class="news-editor-button"
-            >
+            <button type="button" data-editor-command="insertUnorderedList" title="Liste à puces" aria-label="Liste à puces" class="news-editor-button">
               • Liste
             </button>
 
-            <button
-              type="button"
-              data-editor-command="insertOrderedList"
-              title="Liste numérotée"
-              aria-label="Liste numérotée"
-              class="news-editor-button"
-            >
+            <button type="button" data-editor-command="insertOrderedList" title="Liste numérotée" aria-label="Liste numérotée" class="news-editor-button">
               1. Liste
             </button>
 
@@ -137,7 +184,6 @@
             </button>
           </div>
 
-          <!-- ZONE D'ÉDITION -->
           <div
             id="news-editor-content"
             class="news-editor-content"
@@ -149,7 +195,6 @@
           ><%- newsPost?.content || '' %></div>
         </div>
 
-        <!-- Valeur réellement envoyée au serveur -->
         <textarea
           id="news-editor-input"
           name="content"
@@ -160,50 +205,106 @@
         ><%= newsPost?.content || '' %></textarea>
 
         <span class="block mt-1 text-xs text-fantasy-gold-light/55">
-          Vous pouvez utiliser les titres, listes, liens, citations et mises en forme.
+          Titres, listes, liens, citations et mises en forme.
           50 000 caractères maximum.
         </span>
       </div>
 
-      <!-- IMAGE -->
+      <!-- IMAGE PRINCIPALE -->
+      <div class="text-fantasy-gold-light">
+        <label class="block">
+          <span class="font-bold text-fantasy-gold">
+            Image d’illustration principale
+            <span class="font-normal text-fantasy-gold-light/55">(facultative)</span>
+          </span>
+
+          <input
+            type="file"
+            name="image"
+            accept="image/jpeg,image/png,image/webp"
+            class="mt-2 block w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg file:mr-4 file:px-4 file:py-2 file:border-0 file:rounded file:bg-fantasy-gold file:text-fantasy-darkest file:font-bold"
+          >
+
+          <span class="block mt-1 text-xs text-fantasy-gold-light/55">
+            JPEG, PNG ou WebP, 5 Mo maximum.
+          </span>
+        </label>
+
+        <% if (newsPost?.imageUrl) { %>
+          <div class="mt-4 flex items-center gap-4">
+            <img
+              src="<%= newsPost.imageUrl %>"
+              alt="Illustration principale actuelle"
+              class="w-24 h-20 object-cover rounded-lg border border-fantasy-gold/30"
+            >
+
+            <div class="text-sm">
+              <p>Une nouvelle image remplacera l’illustration actuelle.</p>
+
+              <label class="mt-2 flex items-center gap-2">
+                <input type="checkbox" name="removeImage" value="on">
+                Supprimer l’image principale
+              </label>
+            </div>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- GALERIE EXISTANTE -->
+      <% if (newsPost?.images?.length) { %>
+        <section class="space-y-3">
+          <div>
+            <h2 class="font-bold text-fantasy-gold">
+              Photos actuellement dans la galerie
+            </h2>
+            <p class="mt-1 text-sm text-fantasy-gold-light/65">
+              Cochez les photos à supprimer. Les autres seront conservées.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <% newsPost.images.forEach((image) => { %>
+              <label class="block p-3 border border-fantasy-gold/25 rounded-lg">
+                <img
+                  src="<%= image.imageUrl %>"
+                  alt="Photo de la galerie"
+                  loading="lazy"
+                  class="w-full h-28 object-cover rounded-md"
+                >
+
+                <span class="mt-3 flex items-start gap-2 text-sm text-fantasy-gold-light">
+                  <input
+                    type="checkbox"
+                    name="removeGalleryImageIds"
+                    value="<%= image.id %>"
+                    class="mt-1"
+                  >
+                  Supprimer cette photo
+                </span>
+              </label>
+            <% }) %>
+          </div>
+        </section>
+      <% } %>
+
+      <!-- AJOUT DE PHOTOS -->
       <label class="block text-fantasy-gold-light">
         <span class="font-bold text-fantasy-gold">
-          Image d’illustration
-          <span class="font-normal text-fantasy-gold-light/55">(facultative)</span>
+          Ajouter des photos à la galerie
         </span>
 
         <input
           type="file"
-          name="image"
+          name="galleryImages"
           accept="image/jpeg,image/png,image/webp"
+          multiple
           class="mt-2 block w-full p-3 bg-fantasy-brown border border-fantasy-gold/30 rounded-lg file:mr-4 file:px-4 file:py-2 file:border-0 file:rounded file:bg-fantasy-gold file:text-fantasy-darkest file:font-bold"
         >
 
         <span class="block mt-1 text-xs text-fantasy-gold-light/55">
-          JPEG, PNG ou WebP, 5 Mo maximum.
-          Un fond graphique sera utilisé si aucune image n’est fournie.
+          Sélectionnez plusieurs photos en une fois.
+          JPEG, PNG ou WebP, 5 Mo maximum par photo et 10 photos maximum par envoi.
         </span>
-
-        <% if (newsPost?.imageUrl) { %>
-          <span class="mt-4 flex items-center gap-4">
-            <img
-              src="<%= newsPost.imageUrl %>"
-              alt="Illustration actuelle"
-              class="w-24 h-20 object-cover rounded-lg border border-fantasy-gold/30"
-            >
-
-            <span>
-              <span class="block text-sm">
-                Une nouvelle image remplacera l’illustration actuelle.
-              </span>
-
-              <span class="mt-2 flex items-center gap-2 text-sm">
-                <input type="checkbox" name="removeImage">
-                Supprimer l’image actuelle
-              </span>
-            </span>
-          </span>
-        <% } %>
       </label>
 
       <!-- ACTIONS -->

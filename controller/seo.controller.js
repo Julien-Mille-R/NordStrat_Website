@@ -1,7 +1,11 @@
+import { Op } from 'sequelize';
 import { NewsPost } from '../models/index.js';
 
 const SITE_NAME = 'Nord Stratégie';
 const DEFAULT_DESCRIPTION = 'Nord Stratégie rassemble les passionnés de jeux de figurines à Bruay-sur-l’Escaut : rencontres jeux, découvertes, événements et vie associative.';
+
+const PUBLIC_NEWS_CATEGORIES = ['accueil', 'actualites'];
+
 const PRIVATE_PATH_PREFIXES = [
   '/account',
   '/admindashboard',
@@ -10,6 +14,7 @@ const PRIVATE_PATH_PREFIXES = [
   '/members/',
   '/events/assaut-de-bruay',
 ];
+
 const STATIC_PAGE_SEO = {
   '/': {
     title: 'Nord Stratégie | Jeux de figurines à Bruay-sur-l’Escaut',
@@ -49,12 +54,14 @@ const STATIC_PAGE_SEO = {
 function normalizedBaseUrl() {
   const configuredUrl = process.env.SITE_URL?.trim();
   const fallbackUrl = `http://localhost:${process.env.PORT || 3000}`;
+
   return (configuredUrl || fallbackUrl).replace(/\/+$/, '');
 }
 
 function absoluteUrl(value, baseUrl = normalizedBaseUrl()) {
   if (!value) return null;
   if (/^https?:\/\//i.test(value)) return value;
+
   return `${baseUrl}${value.startsWith('/') ? value : `/${value}`}`;
 }
 
@@ -125,10 +132,16 @@ export function provideSeo(req, res, next) {
   const baseUrl = normalizedBaseUrl();
   const pathname = req.path === '/' ? '/' : req.path.replace(/\/+$/, '');
   const pageSeo = STATIC_PAGE_SEO[pathname] || {};
+
   const noindex = PRIVATE_PATH_PREFIXES.some((prefix) => (
-    prefix.endsWith('/') ? pathname.startsWith(prefix) : pathname === prefix || pathname.startsWith(`${prefix}/`)
+    prefix.endsWith('/')
+      ? pathname.startsWith(prefix)
+      : pathname === prefix || pathname.startsWith(`${prefix}/`)
   ));
-  const schemas = pageSeo.schema === 'organization' ? [organizationSchema(baseUrl)] : [];
+
+  const schemas = pageSeo.schema === 'organization'
+    ? [organizationSchema(baseUrl)]
+    : [];
 
   res.locals.seo = {
     baseUrl,
@@ -143,13 +156,18 @@ export function provideSeo(req, res, next) {
     structuredData: safeStructuredData(schemas),
   };
 
-  if (noindex) res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  if (noindex) {
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  }
+
   return next();
 }
 
 export function showRobotsTxt(req, res) {
   const baseUrl = normalizedBaseUrl();
+
   res.type('text/plain');
+
   return res.send([
     'User-agent: *',
     'Allow: /',
@@ -178,26 +196,46 @@ function xmlEscape(value) {
 export async function showSitemapXml(req, res, next) {
   try {
     const baseUrl = normalizedBaseUrl();
-    const publicPages = ['/', '/news', '/about', '/contact', '/accessibility'];
+    const publicPages = [
+      '/',
+      '/news',
+      '/about',
+      '/contact',
+      '/accessibility',
+    ];
+
     const newsPosts = await NewsPost.findAll({
       attributes: ['id', 'updatedAt'],
+      where: {
+        isVisible: true,
+        category: {
+          [Op.in]: PUBLIC_NEWS_CATEGORIES,
+        },
+      },
       order: [['publishedAt', 'DESC']],
     });
+
     const urls = [
-      ...publicPages.map((pathname) => ({ location: `${baseUrl}${pathname}` })),
+      ...publicPages.map((pathname) => ({
+        location: `${baseUrl}${pathname}`,
+      })),
       ...newsPosts.map((post) => ({
         location: `${baseUrl}/news/${post.id}`,
         lastModified: post.updatedAt?.toISOString(),
       })),
     ];
+
     const entries = urls.map(({ location, lastModified }) => [
       '  <url>',
       `    <loc>${xmlEscape(location)}</loc>`,
-      ...(lastModified ? [`    <lastmod>${xmlEscape(lastModified)}</lastmod>`] : []),
+      ...(lastModified
+        ? [`    <lastmod>${xmlEscape(lastModified)}</lastmod>`]
+        : []),
       '  </url>',
     ].join('\n')).join('\n');
 
     res.type('application/xml');
+
     return res.send([
       '<?xml version="1.0" encoding="UTF-8"?>',
       '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',

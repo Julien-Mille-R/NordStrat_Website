@@ -4,6 +4,10 @@ import { NewsPost } from '../models/index.js';
 export async function showHomePage(req, res, next) {
   try {
     const latestNews = await NewsPost.findAll({
+      where: {
+        isVisible: true,
+        category: 'accueil',
+      },
       include: [{ association: 'author' }],
       order: [['publishedAt', 'DESC']],
       limit: 5,

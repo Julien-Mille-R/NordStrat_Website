@@ -8,6 +8,7 @@ import defineGameTable from './game-table.js';
 import defineGame from './game.js';
 import defineMembership from './membership.js';
 import defineNewsPost from './news-post.js';
+import defineNewsPostImage from './news-post-image.js';
 import definePlayer from './player.js';
 import definePlayerGame from './player-game.js';
 import definePublicEventApplication from './public-event-application.js';
@@ -37,6 +38,7 @@ export function initModels(sequelize) {
   const Game = defineGame(sequelize);
   const Membership = defineMembership(sequelize);
   const NewsPost = defineNewsPost(sequelize);
+  const NewsPostImage = defineNewsPostImage(sequelize);
   const PublicEvent = definePublicEvent(sequelize);
   const PublicEventApplication = definePublicEventApplication(sequelize);
   const GameTable = defineGameTable(sequelize);
@@ -104,6 +106,18 @@ export function initModels(sequelize) {
     as: 'author',
     foreignKey: 'authorId',
     onDelete: 'RESTRICT',
+  });
+
+  NewsPost.hasMany(NewsPostImage, {
+    as: 'images',
+    foreignKey: 'newsPostId',
+    onDelete: 'CASCADE',
+  });
+
+  NewsPostImage.belongsTo(NewsPost, {
+    as: 'newsPost',
+    foreignKey: 'newsPostId',
+    onDelete: 'CASCADE',
   });
 
   Player.hasMany(PublicEvent, {
@@ -464,6 +478,7 @@ export function initModels(sequelize) {
     Game,
     Membership,
     NewsPost,
+    NewsPostImage,
     PublicEvent,
     PublicEventApplication,
     GameTable,

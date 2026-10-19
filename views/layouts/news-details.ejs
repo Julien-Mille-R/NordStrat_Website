@@ -1,13 +1,31 @@
+
 <%- include('../partials/header') %>
 
 <article class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
   <div class="container mx-auto px-4 sm:px-6 max-w-4xl">
-    <a href="/news" class="text-fantasy-orange hover:text-fantasy-gold transition-colors">← Retour aux actualités</a>
+    <a href="/news" class="text-fantasy-orange hover:text-fantasy-gold transition-colors">
+      ← Retour aux actualités
+    </a>
 
     <header class="mt-7">
-      <time datetime="<%= newsPost.publishedAt.toISOString() %>" class="text-sm uppercase tracking-wider text-fantasy-orange"><%= new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' }).format(newsPost.publishedAt) %></time>
-      <h1 class="mt-3 text-4xl md:text-6xl font-fantasy text-fantasy-gold"><%= newsPost.title %></h1>
-      <div class="mt-5"><%- include('../partials/news-author', { author: newsPost.author }) %></div>
+      <time
+        datetime="<%= newsPost.publishedAt.toISOString() %>"
+        class="text-sm uppercase tracking-wider text-fantasy-orange"
+      >
+        <%= new Intl.DateTimeFormat('fr-FR', {
+          dateStyle: 'long',
+          timeZone: 'Europe/Paris'
+        }).format(newsPost.publishedAt) %>
+      </time>
+
+      <h1 class="mt-3 text-4xl md:text-6xl font-fantasy text-fantasy-gold">
+        <%= newsPost.title %>
+      </h1>
+
+      <div class="mt-5">
+        <%- include('../partials/news-author', { author: newsPost.author }) %>
+      </div>
+
       <% if (['Admin', 'NewsManager'].includes(currentUser?.role?.name)) { %>
         <a
           href="/admindashboard/news/<%= newsPost.id %>/edit"
@@ -18,19 +36,61 @@
       <% } %>
     </header>
 
-    <div class="mt-8 h-64 sm:h-96 overflow-hidden bg-gradient-to-br from-fantasy-brown via-fantasy-dark to-fantasy-darkest border border-fantasy-gold/30 rounded-2xl shadow-fantasy">
-      <% if (newsPost.imageUrl) { %>
-        <img src="<%= newsPost.imageUrl %>" alt="Illustration de l’actualité : <%= newsPost.title %>" class="w-full h-full object-cover">
-      <% } else { %>
-        <div class="w-full h-full flex items-center justify-center text-8xl text-fantasy-gold/30" aria-hidden="true">⚔️</div>
-      <% } %>
-    </div>
+    <% if (newsPost.imageUrl) { %>
+      <div class="mt-8 h-64 sm:h-96 overflow-hidden bg-gradient-to-br from-fantasy-brown via-fantasy-dark to-fantasy-darkest border border-fantasy-gold/30 rounded-2xl shadow-fantasy">
+        <img
+          src="<%= newsPost.imageUrl %>"
+          alt="Illustration de l’actualité : <%= newsPost.title %>"
+          class="w-full h-full object-cover"
+        >
+      </div>
+    <% } %>
 
     <div class="mt-10 p-6 sm:p-9 bg-fantasy-dark border border-fantasy-gold/25 rounded-2xl">
       <div class="news-article-content text-lg leading-8 text-fantasy-gold-light">
         <%- newsPost.content %>
       </div>
     </div>
+
+    <% if (newsPost.images?.length) { %>
+      <section class="mt-10" aria-labelledby="news-gallery-title">
+        <h2
+          id="news-gallery-title"
+          class="text-3xl font-fantasy text-fantasy-gold"
+        >
+          Galerie photos
+        </h2>
+
+        <p class="mt-2 text-fantasy-gold-light">
+          <%= newsPost.images.length %>
+          photo<%= newsPost.images.length > 1 ? 's' : '' %>
+        </p>
+
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <% newsPost.images.forEach((galleryImage, index) => { %>
+            <figure class="overflow-hidden rounded-xl border border-fantasy-gold/30 bg-fantasy-dark">
+              <a
+                href="<%= galleryImage.imageUrl %>"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Ouvrir la photo <%= index + 1 %> dans un nouvel onglet"
+              >
+                <img
+                  src="<%= galleryImage.imageUrl %>"
+                  alt="Photo <%= index + 1 %> de l’actualité : <%= newsPost.title %>"
+                  loading="lazy"
+                  class="w-full aspect-[4/3] object-cover hover:scale-105 transition-transform duration-300"
+                >
+              </a>
+
+              <figcaption class="px-4 py-3 text-sm text-fantasy-gold-light">
+                Photo <%= index + 1 %>
+              </figcaption>
+            </figure>
+          <% }) %>
+        </div>
+      </section>
+    <% } %>
   </div>
 </article>
 

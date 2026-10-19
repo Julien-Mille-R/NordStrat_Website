@@ -23,6 +23,7 @@ export const sequelize = process.env.DATABASE_URL
 
 export const models = initModels(sequelize);
 
+
 export const {
   Role,
   Player,
@@ -34,6 +35,7 @@ export const {
   Game,
   Membership,
   NewsPost,
+  NewsPostImage,
   PublicEvent,
   PublicEventApplication,
   GameTable,
@@ -46,5 +48,6 @@ export const {
   TableDiscussionRead,
   TableGuest,
 } = models;
+
 
 export default models;
