@@ -29,6 +29,10 @@ const STATIC_PAGE_SEO = {
     title: 'À propos de Nord Stratégie | Association de jeux de figurines',
     description: 'Découvrez Nord Stratégie, association créée en 2007 pour faire découvrir et partager les jeux de figurines à Bruay-sur-l’Escaut.',
   },
+  '/partenaires': {
+    title: 'Nos partenaires | Nord Stratégie',
+    description: 'Découvrez les associations et boutiques partenaires de Nord Stratégie, réunies autour des jeux de figurines, des jeux de rôle et des jeux de société.',
+  },
   '/contact': {
     title: 'Contacter Nord Stratégie | Bruay-sur-l’Escaut',
     description: 'Contactez l’association Nord Stratégie pour découvrir les rencontres jeux, poser une question ou préparer votre première visite.',
@@ -200,6 +204,7 @@ export async function showSitemapXml(req, res, next) {
       '/',
       '/news',
       '/about',
+      '/partenaires',
       '/contact',
       '/accessibility',
     ];

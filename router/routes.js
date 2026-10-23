@@ -183,6 +183,7 @@ router.get('/events/assaut-de-bruay', requireUser, showPublicEventPage);
 router.get('/events/assaut-de-bruay/registration', requireUser, showPublicEventRegistrationPage);
 router.post('/events/assaut-de-bruay/apply', requireUser, contactLimiter, submitPublicEventApplication);
 router.get('/about', (req, res) => res.render('layouts/about'));
+router.get('/partenaires', (req, res) => res.render('layouts/partners'));
 router.get('/accessibility', (req, res) => res.render('layouts/accessibility'));
 router.get('/apropos', (req, res) => res.redirect(301, '/about'));
 router.get('/cgu', (req, res) => res.render('layouts/cgu'));

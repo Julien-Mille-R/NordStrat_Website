@@ -58,6 +58,7 @@
             <a href="/events/assaut-de-bruay" class="<%= linkClass(navigationPath.startsWith('/events/assaut-de-bruay')) %>">Assaut de Bruay</a>
           <% } %>
           <a href="/about" class="<%= linkClass(navigationPath === '/about') %>">À propos</a>
+          <a href="/partenaires" class="<%= linkClass(navigationPath === '/partenaires') %>">Partenaires</a>
           <% if (currentUser) { %>
             <span class="px-4 py-2 rounded-lg font-medieval border border-fantasy-gold/15 text-fantasy-gold-light/40 cursor-not-allowed" aria-disabled="true" title="La galerie sera bientôt disponible">Galerie</span>
             <a href="/booking" class="<%= linkClass(navigationPath.startsWith('/booking')) %>">Réserver une table</a>
@@ -117,7 +118,7 @@
           <% } %>
 
           <a href="/about" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath === '/about' ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">À propos</a>
-
+          <a href="/partenaires" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath === '/partenaires' ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">Partenaires</a>
           <% if (currentUser) { %>
             <span class="block px-4 py-3 rounded-lg font-bold text-fantasy-gold-light/40" aria-disabled="true">Galerie <span class="text-xs font-normal">(bientôt disponible)</span></span>
             <a href="/booking" class="block px-4 py-3 rounded-lg font-bold <%= navigationPath.startsWith('/booking') ? 'bg-fantasy-brown text-fantasy-gold' : 'text-fantasy-gold-light hover:bg-fantasy-brown' %>">Réserver une table</a>

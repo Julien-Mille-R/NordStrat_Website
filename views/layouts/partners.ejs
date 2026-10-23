@@ -1,0 +1,195 @@
+
+<%- include('../partials/header') %>
+
+<section class="pt-32 pb-20 bg-fantasy-darkest min-h-screen">
+  <div class="container mx-auto px-4 sm:px-6 max-w-7xl">
+
+    <header class="max-w-4xl">
+      <p class="text-sm uppercase tracking-[0.2em] text-fantasy-orange">
+        Notre réseau ludique
+      </p>
+      <h1 class="mt-3 text-4xl md:text-6xl font-fantasy text-fantasy-gold">
+        Nos partenaires
+      </h1>
+      <p class="mt-6 text-lg md:text-xl leading-relaxed text-fantasy-gold-light">
+        Associations passionnées et boutiques spécialisées contribuent à faire
+        vivre le jeu sous toutes ses formes. Nous sommes heureux de partager
+        cette aventure avec eux et de vous les faire découvrir.
+      </p>
+    </header>
+
+    <% const partners = [
+      {
+        name: 'Les Coureurs de Rêves',
+        initials: 'CR',
+        description: 'Association de jeux de rôle et de jeux de société basée à Saint-Saulve. Elle fait découvrir les jeux de simulation et les univers ludiques à travers ses activités et ses événements.',
+        url: 'https://www.facebook.com/lescoureursdereves/?locale=fr_FR',
+        kind: 'facebook'
+      },
+      {
+        name: "Lud'Hainaut",
+        initials: 'LH',
+        description: "Association d’Onnaing qui rassemble des joueurs de tous âges autour des jeux de société. Elle organise des rencontres et des animations pour promouvoir le jeu comme activité de découverte et de partage.",
+        url: 'https://ludhainaut.fr/',
+        kind: 'website'
+      },
+      {
+        name: 'Les En-jeux Podéens',
+        initials: 'EJ',
+        description: 'Club ludique de Poix-du-Nord qui contribue à faire vivre les rencontres entre passionnés et les événements ludiques du territoire.',
+        url: 'https://www.facebook.com/lesenjeuxpodeens/?locale=fr_FR',
+        kind: 'facebook'
+      },
+      {
+        name: 'Les Céréales Killers',
+        initials: 'CK',
+        description: "Association de jeu de rôle basée à Fresnes-sur-Escaut. Elle propose des aventures dans différents univers et participe à des événements ludiques, dont À l’Assaut de Bruay.",
+        url: 'https://www.facebook.com/LesCerealesKillers/?locale=fr_FR',
+        kind: 'facebook'
+      },
+      {
+        name: 'La Porte Épique',
+        initials: 'PE',
+        description: "Association d’Aniche réunissant des passionnés de jeux de rôle, de jeux de société et de wargames. Ses activités comprennent également la création de décors et la peinture de figurines.",
+        url: 'https://www.facebook.com/p/La-Porte-%C3%89pique-Aniche-100085949893882/',
+        kind: 'facebook'
+      },
+      {
+        name: 'War House Games',
+        initials: 'WHG',
+        description: 'Boutique spécialisée dans les figurines fantastiques, historiques et de science-fiction, les jeux de société, les jeux de rôle et les accessoires de modélisme.',
+        url: 'https://www.warhousegames.com/store/fr/',
+        kind: 'website'
+      },
+      {
+        name: 'Farfadet Joueur',
+        initials: 'FJ',
+        description: 'Boutique ludique de Valenciennes, tournée vers le conseil et la découverte des jeux. Une adresse pour échanger avec des passionnés et trouver de nouvelles idées de jeu.',
+        url: 'https://www.facebook.com/farfadetjoueur/?locale=fr_FR',
+        kind: 'facebook'
+      },
+      {
+        name: 'Osakatoys',
+        initials: 'OT',
+        description: 'Boutique en ligne tournée vers les cartes à collectionner, les figurines et les produits dérivés, pour les joueurs comme pour les collectionneurs.',
+        url: 'https://www.osakatoys.com/',
+        kind: 'website'
+      }
+    ]; %>
+
+    <section class="mt-14" aria-labelledby="associations-title">
+      <div class="flex items-center gap-4">
+        <span class="text-3xl" aria-hidden="true">🤝</span>
+        <div>
+          <p class="text-sm uppercase tracking-wider text-fantasy-orange">
+            Jouer et partager
+          </p>
+          <h2 id="associations-title" class="mt-1 text-3xl md:text-4xl font-fantasy text-fantasy-gold">
+            Associations partenaires
+          </h2>
+        </div>
+      </div>
+
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <% partners.filter(partner => ['CR', 'LH', 'EJ', 'CK', 'PE'].includes(partner.initials)).forEach(partner => { %>
+          <article class="flex flex-col p-6 bg-fantasy-dark border border-fantasy-gold/30 rounded-2xl shadow-fantasy">
+            <div class="flex items-center gap-4">
+              <div class="w-20 h-20 shrink-0 flex items-center justify-center rounded-xl bg-fantasy-darker border border-fantasy-gold/25 text-fantasy-gold font-fantasy text-2xl"
+                   role="img"
+                   aria-label="Emplacement du logo de <%= partner.name %>">
+                <%= partner.initials %>
+              </div>
+              <h3 class="text-xl font-fantasy text-fantasy-gold">
+                <%= partner.name %>
+              </h3>
+            </div>
+
+            <p class="mt-5 flex-grow leading-relaxed text-fantasy-gold-light">
+              <%= partner.description %>
+            </p>
+
+            <a href="<%= partner.url %>"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="inline-flex items-center justify-center gap-2 mt-6 px-4 py-3 rounded-lg border border-fantasy-gold/40 text-fantasy-gold font-bold hover:bg-fantasy-brown transition-colors"
+               aria-label="Découvrir <%= partner.name %>, nouvel onglet">
+              <% if (partner.kind === 'facebook') { %>
+                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#1877F2] text-white font-bold text-sm" aria-hidden="true">f</span>
+                Facebook
+              <% } else { %>
+                <span aria-hidden="true">↗</span>
+                Visiter le site
+              <% } %>
+            </a>
+          </article>
+        <% }) %>
+      </div>
+    </section>
+
+    <section class="mt-16" aria-labelledby="shops-title">
+      <div class="flex items-center gap-4">
+        <span class="text-3xl" aria-hidden="true">🏪</span>
+        <div>
+          <p class="text-sm uppercase tracking-wider text-fantasy-orange">
+            Matériel et découvertes
+          </p>
+          <h2 id="shops-title" class="mt-1 text-3xl md:text-4xl font-fantasy text-fantasy-gold">
+            Boutiques partenaires
+          </h2>
+        </div>
+      </div>
+
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <% partners.filter(partner => ['WHG', 'FJ', 'OT'].includes(partner.initials)).forEach(partner => { %>
+          <article class="flex flex-col p-6 bg-fantasy-dark border border-fantasy-orange/30 rounded-2xl shadow-fantasy">
+            <div class="flex items-center gap-4">
+              <div class="w-20 h-20 shrink-0 flex items-center justify-center rounded-xl bg-fantasy-darker border border-fantasy-orange/25 text-fantasy-gold font-fantasy text-2xl"
+                   role="img"
+                   aria-label="Emplacement du logo de <%= partner.name %>">
+                <%= partner.initials %>
+              </div>
+              <h3 class="text-xl font-fantasy text-fantasy-gold">
+                <%= partner.name %>
+              </h3>
+            </div>
+
+            <p class="mt-5 flex-grow leading-relaxed text-fantasy-gold-light">
+              <%= partner.description %>
+            </p>
+
+            <a href="<%= partner.url %>"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="inline-flex items-center justify-center gap-2 mt-6 px-4 py-3 rounded-lg border border-fantasy-gold/40 text-fantasy-gold font-bold hover:bg-fantasy-brown transition-colors"
+               aria-label="Découvrir <%= partner.name %>, nouvel onglet">
+              <% if (partner.kind === 'facebook') { %>
+                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#1877F2] text-white font-bold text-sm" aria-hidden="true">f</span>
+                Facebook
+              <% } else { %>
+                <span aria-hidden="true">↗</span>
+                Visiter le site
+              <% } %>
+            </a>
+          </article>
+        <% }) %>
+      </div>
+    </section>
+
+    <div class="mt-16 p-6 sm:p-8 bg-fantasy-darker border border-fantasy-gold/30 rounded-2xl">
+      <h2 class="text-2xl font-fantasy text-fantasy-gold">
+        Un projet commun autour du jeu ?
+      </h2>
+      <p class="mt-3 leading-relaxed text-fantasy-gold-light">
+        Vous êtes une association ou un acteur du monde ludique et souhaitez
+        échanger avec Nord Stratégie ? Contactez-nous pour en discuter.
+      </p>
+      <a href="/contact"
+         class="inline-flex mt-5 px-5 py-3 bg-fantasy-gold text-fantasy-darkest font-bold rounded-lg hover:bg-fantasy-orange transition-colors">
+        Nous contacter
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
